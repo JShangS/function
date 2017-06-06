@@ -4,7 +4,7 @@ close all
 %%%基本粒子群算法，根据《Particle Swarm Optimization》 James Kennedy
 %%By Jerry Shang,JS
 %%2017/6/5
-N = 50;                                    %粒子群规模，即粒子数
+N = 30;                                    %粒子群规模，即粒子数
 D = 2;                                     %粒子的维数，即寻优参数的个数
 X_pso = 1-2*rand(D,N);                         %初始化粒子群的位置
 V = rand(D,N);                             %初始化粒子群的速度
