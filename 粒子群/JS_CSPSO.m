@@ -3,40 +3,51 @@ clear
 close all
 %%%基本粒子群算法的改进 Current Simplified particle swarn optimizer
 %%%，根据《Particle Swarm Optimization》 James Kennedy
+%%% 不需要对g_increament 参数进行设置，这个参数没有一定的解析方式，所以比较靠经验。
+%%It was soon realized that there is no good way to guess whether p - or g-increment should be larger. 
 %%By Jerry Shang,JS
-%%2017/6/5
-N = 10;                                    %粒子群规模，即粒子数
-D = 2;                                     %粒子的维数，即寻优参数的个数
-X_pso = 10-20*rand(D,N);                   %初始化粒子群的位置
+%%2017/6/8
+N = 100;                                %粒子群规模，即粒子数
+D = 2;                                 %粒子的维数，即寻优参数的个数
+prsentx = 1-2*rand(D,N);                 %初始化粒子群的位置,迭代作为上一代的位置
+pbestx = rand(D,N);                      %最好值对应的位置 
 V = rand(D,N);                             %初始化粒子群的速度
-Pbest = 10000*ones(1,N);                  %粒子群的个体最优解
+Pbest = 10000*ones(1,N);                    %粒子群的个体最优解
 Gbest = 0;                                 %粒子群的全体最优解索引
-Max_iter = 500 ;                           %最大迭代次数
-Xmax = 8;                                 %X的最大取值范围[-1,1]
+Max_iter = 1000 ;                           %最大迭代次数
+Record_X = zeros(D,N,Max_iter);              %记录每一代的粒子分布
+Xmax = 3;                                  %X的最大取值范围[-1,1]
 Vmax = 10;                                 %最大速度
 iter = 1;
-g_increament = 0.01;                         %步长
-
+X_iter = zeros(N,Max_iter);
+Gvalue_iter = zeros(1,Max_iter);
 tic
 while(iter <= Max_iter)
-    bool_Xmax = abs(X_pso) < Xmax;
-    X_pso = X_pso.*bool_Xmax + (ones(D,N) - bool_Xmax) .* (Xmax * ones(D,N));
-    Pbest_t = f1(X_pso(1,:),X_pso(2,:));
-    bool_P = Pbest_t<Pbest;                 %把Pbest中的大于当前X_pso结果的值替换掉
+    Record_X(:,:,iter) = prsentx;
+    %%X越界阻止
+    bool_Xmax = abs(prsentx) < Xmax;
+    prsentx = prsentx.*bool_Xmax + (ones(D,N) - bool_Xmax) .* (Xmax * ones(D,N));
+    %%%
+    Pbest_t = f1(prsentx(1,:),prsentx(2,:));  %下一代的值
+    bool_P = Pbest_t<Pbest;                 %把Pbest中的大于当前pbestx结果的值替换掉
+    %更新每个粒子最好的值
     Pbest =  Pbest_t.*bool_P + (ones(1,N) - bool_P) .* Pbest;
+    %更新每个粒子最好的位置
+    pbestx =  prsentx.*repmat(bool_P,2,1) + repmat((ones(1,N) - bool_P),2,1) .* pbestx;
     Gvalue_iter(iter)=min(Pbest);           %每一代的最小值
     Gbest = find(Pbest==min(Pbest));        %找到当前的全局最优所在的位置
-    X_iter(:,iter) = X_pso(:,Gbest);    %每一代的最好值
-    for i = 1:D
-        bool_X = X_pso(i,:)<X_pso(i,Gbest);  %向当前最好的X的位置靠拢
-        direct = double(bool_X);
-        direct = 2*(direct - 0.5);
-        V(i,:) = V(i,:) + direct.*rand(1,N)*g_increament;
-        V(i,Gbest)=0;
-        bool_V(i,:) = V(i,:)<Vmax;
-        V(i,:) = V(i,:).*bool_V(i,:) + (ones(1,N) - bool_V(i,:)) .* (Vmax * ones(1,N));     
-    end
-    X_pso = X_pso + V;
+    Gt =  pbestx(:,Gbest);
+    [Gt_hang,Gt_lie] = size(Gt);
+    Gt = reshape(Gt,Gt_hang*Gt_lie,1);
+    X_iter(1:Gt_hang*Gt_lie,iter) = Gt;       %每一代的最好值
+    V = V + rand(D,N).*(pbestx - prsentx) + rand(D,N).*(pbestx(:,Gbest(1)) - prsentx);
+    V(:,Gbest)=0;
+    %%限制V的大小
+    bool_V = abs(V)<Vmax;
+    V = V.*bool_V + (ones(D,N) - bool_V) .* (Vmax * ones(D,N));
+    %下一代的x
+    prsentx = prsentx + V; 
+    %迭代加1
     iter = iter + 1;
 end
 time1 = toc;
@@ -70,7 +81,7 @@ xlabel('迭代次数')
 ylabel('坐标值')
 
 
-step = 0.01 ;
+step = 0.001 ;
 L = -Xmax:step:Xmax;
 [X1,X2]=meshgrid(L,L);
 tic
@@ -93,3 +104,12 @@ end
 disp(['步长为',num2str(step),'下穷举的最佳值: ',num2str(minZ)])
 disp(['最佳值的坐标:','(',num2str(L(hang)),' , ',num2str(L(lie)),')']);
 disp(['穷举情况下的耗时: ',num2str(time2)])
+
+
+% figure()
+% for i = 1:Max_iter
+%     plot(Record_X(1,:,i),Record_X(2,:,i),'r.')
+%     axis([-10,10,-10,10])
+%     pause(0.1)
+%     
+% end
