@@ -6,12 +6,12 @@ close all
 %%2017/6/5
 N = 10;                                    %粒子群规模，即粒子数
 D = 2;                                     %粒子的维数，即寻优参数的个数
-X_pso = 10-20*rand(D,N);                     %初始化粒子群的位置
+X_pso = 1*rand(D,N);                     %初始化粒子群的位置
 V = rand(D,N);                             %初始化粒子群的速度
 Pbest = 10000*ones(1,N);                   %粒子群的个体最优解
 Gbest = 0;                                 %粒子群的全体最优解索引
-Max_iter = 500 ;                           %最大迭代次数
-Xmax = 8;                                 %X的最大取值范围[-1,1]
+Max_iter = 10000 ;                           %最大迭代次数
+Xmax = 3;                                 %X的最大取值范围[-1,1]
 Vmax = 10;                                 %最大速度
 iter = 1;
 g_increament = 0.01;                         %步长
@@ -26,15 +26,20 @@ while(iter <= Max_iter)
     Gvalue_iter(iter)=min(Pbest);           %每一代的最小值
     Gbest = find(Pbest==min(Pbest));        %找到当前的全局最优所在的位置
     X_iter(:,iter) = X_pso(:,Gbest);    %每一代的最好值
-    for i = 1:D
-        bool_X = X_pso(i,:)<X_pso(i,Gbest);  %向当前最好的X的位置靠拢
-        direct = double(bool_X);
-        direct = 2*(direct - 0.5);
-        V(i,:) = V(i,:) + direct.*rand(1,N)*g_increament;
-        V(i,Gbest)=0;
-        bool_V(i,:) = V(i,:)<Vmax;
-        V(i,:) = V(i,:).*bool_V(i,:) + (ones(1,N) - bool_V(i,:)) .* (Vmax * ones(1,N));     
-    end
+    bool_X = X_pso<X_pso(:,Gbest);  %向当前最好的X的位置靠拢
+    direct = double(bool_X);
+    direct = 2*(direct - 0.5);
+    V =  V + direct.*rand(D,N)*g_increament;
+    V(:,Gbest)=0;
+%     for i = 1:D
+%         bool_X = X_pso(i,:)<X_pso(i,Gbest);  %向当前最好的X的位置靠拢
+%         direct = double(bool_X);
+%         direct = 2*(direct - 0.5);
+%         V(i,:) = V(i,:) + direct.*rand(1,N)*g_increament;
+%         V(i,Gbest)=0;
+%         bool_V(i,:) = V(i,:)<Vmax;
+%         V(i,:) = V(i,:).*bool_V(i,:) + (ones(1,N) - bool_V(i,:)) .* (Vmax * ones(1,N));     
+%     end
     X_pso = X_pso + V;
     iter = iter + 1;
 end
@@ -69,7 +74,7 @@ xlabel('迭代次数')
 ylabel('坐标值')
 
 
-step = 0.01 ;
+step = 0.001 ;
 L = -Xmax:step:Xmax;
 [X1,X2]=meshgrid(L,L);
 tic
