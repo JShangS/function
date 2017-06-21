@@ -10,7 +10,7 @@ X_pso = 1*rand(D,N);                     %初始化粒子群的位置
 V = rand(D,N);                             %初始化粒子群的速度
 Pbest = 10000*ones(1,N);                   %粒子群的个体最优解
 Gbest = 0;                                 %粒子群的全体最优解索引
-Max_iter = 10000 ;                           %最大迭代次数
+Max_iter = 100 ;                           %最大迭代次数
 Xmax = 3;                                 %X的最大取值范围[-1,1]
 Vmax = 10;                                 %最大速度
 iter = 1;
@@ -20,7 +20,7 @@ tic
 while(iter <= Max_iter)
     bool_Xmax = abs(X_pso) < Xmax;
     X_pso = X_pso.*bool_Xmax + (ones(D,N) - bool_Xmax) .* (Xmax * ones(D,N));
-    Pbest_t = f1(X_pso(1,:),X_pso(2,:));
+    Pbest_t = f2(X_pso(1,:),X_pso(2,:));
     bool_P = Pbest_t<Pbest;                %把Pbest中的大于当前X_pso结果的值替换掉
     Pbest =  Pbest_t.*bool_P + (ones(1,N) - bool_P) .* Pbest;
     Gvalue_iter(iter)=min(Pbest);           %每一代的最小值
@@ -74,11 +74,11 @@ xlabel('迭代次数')
 ylabel('坐标值')
 
 
-step = 0.001 ;
+step = 0.005 ;
 L = -Xmax:step:Xmax;
 [X1,X2]=meshgrid(L,L);
 tic
-Z = f1(X1,X2);
+Z = f2(X1,X2);
 minZ = min(min(Z));
 [hang,lie] = find(Z==minZ);
 time2 = toc;

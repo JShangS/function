@@ -1,5 +1,4 @@
-clc
-clear 
+]clear 
 close all
 %%%基本粒子群算法的改进 Current Simplified particle swarn optimizer
 %%%，根据《Particle Swarm Optimization》 James Kennedy
@@ -14,10 +13,13 @@ pbestx = rand(D,N);                      %最好值对应的位置
 V = rand(D,N);                             %初始化粒子群的速度
 Pbest = 10000*ones(1,N);                    %粒子群的个体最优解
 Gbest = 0;                                 %粒子群的全体最优解索引
-Max_iter = 1000 ;                           %最大迭代次数
+Max_iter = 100 ;                           %最大迭代次数
 Record_X = zeros(D,N,Max_iter);              %记录每一代的粒子分布
-Xmax = 3;                                  %X的最大取值范围[-1,1]
+Xmax = 2;                                  %X的最大取值范围[-1,1]
 Vmax = 10;                                 %最大速度
+w = 0.9;                                   %惯性权值
+c1 = 1;                                    %加速因子 
+c2 = 1;
 iter = 1;
 X_iter = zeros(N,Max_iter);
 Gvalue_iter = zeros(1,Max_iter);
@@ -40,11 +42,11 @@ while(iter <= Max_iter)
     [Gt_hang,Gt_lie] = size(Gt);
     Gt = reshape(Gt,Gt_hang*Gt_lie,1);
     X_iter(1:Gt_hang*Gt_lie,iter) = Gt;       %每一代的最好值
-    V = V + rand(D,N).*(pbestx - prsentx) + rand(D,N).*(pbestx(:,Gbest(1)) - prsentx);
+    V = w*V + c1*rand(D,N).*(pbestx - prsentx) + c2*rand(D,N).*(pbestx(:,Gbest) - prsentx);
     V(:,Gbest)=0;
     %%限制V的大小
-    bool_V = abs(V)<Vmax;
-    V = V.*bool_V + (ones(D,N) - bool_V) .* (Vmax * ones(D,N));
+%     bool_V = abs(V)<Vmax;
+%     V = V.*bool_V + (ones(D,N) - bool_V) .* (Vmax * ones(D,N));
     %下一代的x
     prsentx = prsentx + V; 
     %迭代加1
@@ -64,14 +66,6 @@ plot(Gvalue_iter);
 xlabel('迭代次数')
 ylabel('最小值')
 
-% figure()
-% plot(X_iter(1,:),'k');
-% hold on
-% plot(X_iter(2,:),'g');
-% plot(1:Max_iter,ones(1,Max_iter),'r')
-% legend('X1值','X2值','最价值')
-% xlabel('迭代次数')
-% ylabel('坐标值')
 figure()
 plot(X_iter(1,:),'k');
 hold on
@@ -81,7 +75,7 @@ xlabel('迭代次数')
 ylabel('坐标值')
 
 
-step = 0.001 ;
+step = 0.01 ;
 L = -Xmax:step:Xmax;
 [X1,X2]=meshgrid(L,L);
 tic
@@ -109,7 +103,8 @@ disp(['穷举情况下的耗时: ',num2str(time2)])
 % figure()
 % for i = 1:Max_iter
 %     plot(Record_X(1,:,i),Record_X(2,:,i),'r.')
+%     hold on
 %     axis([-10,10,-10,10])
-%     pause(0.1)
+%     pause(0.001)
 %     
 % end
