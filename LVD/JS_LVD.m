@@ -1,4 +1,4 @@
-function [ LVD ] = JS_LVD( s,Ts,a,h)
+function [ LVD ] = JS_LVD(s,Ts,a,h)
 %JS_LVD 此处显示有关此函数的摘要
 %   此处显示详细说明
 %%lv分布实现函数，经过瞬时自相光，变尺度FFT，在进行FFT后得到lv分布结果

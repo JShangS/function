@@ -111,37 +111,37 @@ title('MTD')
 % mesh(abs(ACCF_LVD))
 % title('ACCF-LVD结果')
 %%%%%%%%%%%%%%%%%%%%%%% radon-LVD %%%%%%%%%%%%%%%%%%%%%%%
-% % Radon_LVD1 = JS_LVD(target_line1,Tr);
-% % Radon_LVD1 = circshift(abs(Radon_LVD1),[0,-(pulse_M-Beishu*f0_Lvd1)]);
-% % Radon_LVD2 = JS_LVD(target_line2,Tr);
-% % Radon_LVD2 = circshift(abs(Radon_LVD2),[0,-(pulse_M-Beishu*f0_Lvd2)]);
-% % Radon_LVD = Radon_LVD1+Radon_LVD2;
-% Radon_LVD = JS_LVD(target_line,Tr);
-% Radon_LVD = circshift(abs(Radon_LVD),[0,-(pulse_M-Beishu*f0_Lvd2)]);
-% % Radon_LVD2 = circshift(abs(Radon_LVD),[0,(pulse_M-Beishu*f0_Lvd2)]);
-% f1 = linspace(-PRF/2,PRF/2,pulse_M);
-% f_u = linspace(-PRF/2,PRF/2,pulse_M);
-% [F,Mu] = (meshgrid(f1,f_u));
-% figure()
-% % mesh(abs(Radon_LVD))
-% mesh(F,Mu,(abs(Radon_LVD)));%fftshift
-% title('Radon-LVD结果')
-% xlabel('f0\ ')
-% ylabel('mu')
+% Radon_LVD1 = JS_LVD(target_line1,Tr);
+% Radon_LVD1 = circshift(abs(Radon_LVD1),[0,-(pulse_M-Beishu*f0_Lvd1)]);
+% Radon_LVD2 = JS_LVD(target_line2,Tr);
+% Radon_LVD2 = circshift(abs(Radon_LVD2),[0,-(pulse_M-Beishu*f0_Lvd2)]);
+% Radon_LVD = Radon_LVD1+Radon_LVD2;
+Radon_LVD = JS_LVD(target_line,Tr);
+Radon_LVD = circshift(abs(Radon_LVD),[0,-(pulse_M-Beishu*f0_Lvd2)]);
+% Radon_LVD2 = circshift(abs(Radon_LVD),[0,(pulse_M-Beishu*f0_Lvd2)]);
+f1 = linspace(-PRF/2,PRF/2,pulse_M);
+f_u = linspace(-PRF/2,PRF/2,pulse_M);
+[F,Mu] = (meshgrid(f1,f_u));
+figure()
+% mesh(abs(Radon_LVD))
+mesh(F,Mu,(abs(Radon_LVD)));%fftshift
+title('Radon-LVD结果')
+xlabel('f0\ ')
+ylabel('mu')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RFRFT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% p = 0:0.001:2;
-% p=p.';
-% S = PRF / (Tr * pulse_M); %量纲归一化
-% dx = sqrt((Tr * pulse_M) * PRF);
-% u = ((-pulse_M/2):(pulse_M/2-1)) / (dx);
-% L_alpha = length(p);
-% tic
-% for i_a = 1:L_alpha
-%     i_a
-%     x(i_a,:) = frft(target_line,p(i_a));
-% end
-% toc
-% figure()
-% [X,Y] = meshgrid(u , p);
-% mesh(X,Y,(abs(x)));
-% title('FRFT结果')
+p = 0:0.001:2;
+p=p.';
+S = PRF / (Tr * pulse_M); %量纲归一化
+dx = sqrt((Tr * pulse_M) * PRF);
+u = ((-pulse_M/2):(pulse_M/2-1)) / (dx);
+L_alpha = length(p);
+tic
+for i_a = 1:L_alpha
+    i_a
+    x(i_a,:) = frft(target_line,p(i_a));
+end
+toc
+figure()
+[X,Y] = meshgrid(u , p);
+mesh(X,Y,(abs(x)));
+title('FRFT结果')
