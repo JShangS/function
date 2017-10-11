@@ -4,7 +4,7 @@ close all
 % 刘维建，2017.09.15
 % 多种检测器的检测性能仿真
 %%
-Na=3;     % 阵元数
+Na=8;     % 阵元数
 Np=4;     % 脉冲数
 N=Na*Np;
 L=round(2*N); 
@@ -50,6 +50,7 @@ Tdnamf = zeros(1,MonteCarloPfa);
 Taed = zeros(1,MonteCarloPfa);
 tic    
 for i=1:MonteCarloPfa
+    i
     X=(randn(N,L)+1i*randn(N,L))/sqrt(2); % 产生方差为1的复高斯白噪声 % Rwhite1=1/snapshot1*X1*X1'; eig(Rwhite1); % round(mean(abs(eig(Rwhite1)))) == 1
     S=(R_half*X)*(R_half*X)'; % 有L个训练样本估计的杂波与噪声的协方差矩阵(Rhalf*X表示接收的L个训练数据)
     iS=inv(S);
@@ -150,15 +151,15 @@ toc
 figure;
 hold on
 plot(SNRout,Pd_AMF_mc,'g.-')
-plot(SNRout,Pd_KGLRT_mc,'r-+','linewidth',2)
-plot(SNRout,Pd_ACE_mc,'b-x','linewidth',2)
-plot(SNRout,Pd_ABORT_mc,'c-*','linewidth',2)
-plot(SNRout,Pd_WABORT_mc,'m-P','linewidth',2)
+% plot(SNRout,Pd_KGLRT_mc,'r-+','linewidth',2)
+% plot(SNRout,Pd_ACE_mc,'b-x','linewidth',2)
+% plot(SNRout,Pd_ABORT_mc,'c-*','linewidth',2)
+% plot(SNRout,Pd_WABORT_mc,'m-P','linewidth',2)
 plot(SNRout,Pd_DMRao_mc,'r-o','linewidth',2)
-plot(SNRout,Pd_AED_mc,'r-d','linewidth',2)
-plot(SNRout,Pd_DNAMF_mc,'g-s','linewidth',2);    
-legend('AMF/DMwald','KGLRT','ACE','ABORT','WABORT','DMRao','AED','DNAMF')
-% legend('AMF/DMwald','DMRao')
+% plot(SNRout,Pd_AED_mc,'r-d','linewidth',2)
+% plot(SNRout,Pd_DNAMF_mc,'g-s','linewidth',2);    
+% legend('AMF/DMwald','KGLRT','ACE','ABORT','WABORT','DMRao','AED','DNAMF')
+legend('AMF/DMwald','DMRao')
 xlabel('SNR/dB')
 ylabel('Pd')
 

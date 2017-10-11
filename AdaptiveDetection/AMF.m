@@ -9,8 +9,8 @@ close all
 fc = 1e9;       %载频
 C = 3e8;        %光速
 lamda = C/fc;   %波长
-tao = 10e-6;    %脉宽
-B = 5e6;        %带宽
+tao = 127e-6;    %脉宽
+B = 1e6;        %带宽
 mu = B/tao;     %调频率
 Fs = 2*B;       %采样频率
 Ts = 1/Fs;
@@ -18,18 +18,18 @@ t = -tao/2:Ts:tao/2-Ts;  %快时间
 L = length(t);
 R = 0e3;
 dt = 2*R/C;
-M = 1;                  %脉冲数
+M = 2;                  %脉冲数
 %%阵列参数
 N = 1;                  %阵元数
 d = 0.5*lamda;          %阵元间隔
-theta = jiao2hu(10);    %到达角
+theta = 0;%jiao2hu(10);    %到达角
 St = exp(1j*2*pi*d*(0:N-1).'/lamda*sin(theta));%导向矢量
 S = St;
 S = repmat(S,[M,1]);    %导向矢量
 %%%接收处理(脉压)
 signal = exp(-1j*2*pi*(fc*t+0.5*mu*t.^2) );
 h_fft = fft(signal);
-MC = 10000;
+MC = 1000;
 %%%
 Pfa = 1e-6;     %虚警率
 r0 = -log(Pfa); %门限
@@ -39,8 +39,8 @@ for SNR_i = 1:length(SNR)
     num = 0;
         for MC_i = 1:MC
             Pc = zeros(N,M*L);
-            A = 1*rand()+1j*1*rand();
-%             A=1;
+%             A = 1*rand()+1j*1*rand();
+            A=1;
             for i =1:M %脉冲
                 for j =1:N %阵列
                     echo = A*exp(1j*2*pi*(fc*dt+0.5*mu*(t-dt).^2) );
