@@ -1,4 +1,4 @@
-function [ R_AIWCM_inv ] = fun_AIWCM( X,x0 )
+function [ R_AIWCM ] = fun_AIWCM( X,x0 )
 %FUN_AIWCM 此处显示有关此函数的摘要
 %   此处显示详细说明
 % 《Adaptively iterative weighting covariance matrix estimation 
@@ -22,7 +22,7 @@ while (sum(abs(beta_parent-beta_child))/sum(abs(beta_child))>0.1)
     end
     R_AIWCM = abs(R_AIWCM_t);
     count =count+1;
-    if count >1000
+    if count >50
         break;
     end
 end
