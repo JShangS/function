@@ -21,7 +21,7 @@ Vr_start1=290;%1初始速度
 pusle_num=64;%脉冲数
 PV=PRF*lamda/4;
 M=pusle_num;
-Pfa = 1e-3;     %虚警率
+Pfa = 1e-6;     %虚警率
 r0 = -log(Pfa); %门限
 echo=zeros(M,L);%回波
 for i=1:pusle_num
@@ -81,6 +81,7 @@ for i_fd = 1:length(fdt)
     for j = 1:L
         S = exp(-1j*2*pi*fdt(i_fd)*(0:M-1).'*Tr);
         AMF(i_fd,j)=abs(abs(S'*inv_R*pc_result(:,j))^2/(S'*inv_R*S));
+        ACE(i_fd,j)=AMF(i_fd,j)/abs(pc_result(:,L/2)'*inv_R*pc_result(:,L/2));
     end
 end
 toc
@@ -89,10 +90,12 @@ mesh(X,Y,AMF)
 xlabel('距离单元')
 ylabel('速度m/s')
 zlabel('幅度')
-bool_AMF = AMF>r0;
-AMF_th = AMF.*bool_AMF;
+N = M;
+K = length(cankao);
+bool_ACE = ACE>fun_Th_ACE(K,N,Pfa);
+ACE_th = ACE.*bool_ACE;
 figure(5)
-mesh(X,Y,AMF_th)
+mesh(X,Y,ACE_th)
 % imagesc(1:L,Vrt,AMF)
 % figure()
 % plot(abs(MTD(:,L/2)));
