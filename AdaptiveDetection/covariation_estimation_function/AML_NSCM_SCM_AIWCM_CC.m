@@ -17,7 +17,7 @@ for i=1:N
     end
 end
 % t = 0.1*rand(N,1);
-t = normrnd(1,0.1,N,1);
+t = normrnd(1,0.2,N,1);%%0~0.5
 R_KA = rouR.*(t*t');
 irouR=inv(rouR);
 rouR_half=rouR^0.5;
