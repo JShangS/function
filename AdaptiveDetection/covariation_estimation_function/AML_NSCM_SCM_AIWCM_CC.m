@@ -42,21 +42,21 @@ for i = 1:MC
     x0=rouR_half*W;%+pp; % noise=(randn(N,1)+j*randn(N,1))/sqrt(2);  % 接收信号仅包括杂波和噪声
     %%协方差估计
     %%SCM
-    R_SCM = fun_SCM(Train);
+    R_SCM = abs(fun_SCM(Train));
     %%NSCM
-    R_NSCM = fun_NSCM(Train);
+    R_NSCM = abs(fun_NSCM(Train));
     %%AML
-    R_AML = fun_AML(Train);
+    R_AML = abs(fun_AML(Train));
     %%AIWCM
-    R_AIWCM = fun_AIWCM(Train,x0);
+    R_AIWCM =abs(fun_AIWCM(Train,x0));
     %%CC+R_SCM
-    R_CC_SCM = fun_CC(Train,R_SCM,R_KA);
+    R_CC_SCM = abs(fun_CC(Train,R_SCM,R_KA));
     %%CC+R_NSCM
-    R_CC_NSCM = fun_CC(Train,R_NSCM,R_KA);
+    R_CC_NSCM = abs(fun_CC(Train,R_NSCM,R_KA));
     %%CC+R_AML
-    R_CC_AML = fun_CC(Train,R_AML,R_KA);
+    R_CC_AML = abs(fun_CC(Train,R_AML,R_KA));
     %%CC+R_AML
-    R_CC_AIWCM = fun_CC(Train,R_AIWCM,R_KA);
+    R_CC_AIWCM = abs(fun_CC(Train,R_AIWCM,R_KA));
     %%%误差比较
     error_SCM(i) = sum(sum(sqrt(abs(R_SCM-rouR).^2)))/ALL;
     error_NSCM(i) = sum(sum(sqrt(abs(R_NSCM-rouR).^2)))/ALL;
@@ -77,6 +77,7 @@ for i = 1:MC
 %     error_CC_AIWCM(i) = sum(sum((abs(R_CC_AIWCM-rouR))))/ALL2;
 end
 close(h)
+
 mean_error_SCM = mean(error_SCM);
 mean_error_NSCM = mean(error_NSCM);
 mean_error_AML = mean(error_AML);
@@ -130,6 +131,8 @@ plot(error_CC_AIWCM,'c')
 legend('CCAIWCM')
 axis([0,MC,0,1])
 hold off
+
+
 figure(2)
 Xbar = {'AML','AIWCM','CCAIWCM','CCAML','CCNSCM','CCSCM','NSCM','SCM'};
 Ybar = [mean_error_AML,mean_error_AIWCM,mean_error_CC_AIWCM,mean_error_CC_AML,mean_error_CC_NSCM,mean_error_CC_SCM,...
@@ -138,6 +141,9 @@ bar(Ybar,0.4)
 title('均值')
 set(gca,'xticklabel',Xbar)
 set(gcf,'Position',[400 200 700 439])
+
+
+
 figure(3)
 Xbar = {'AML','AIWCM','CCAIWCM','CCAML','CCNSCM','CCSCM','NSCM','SCM'};
 Ybar = [var_error_AML,var_error_AIWCM,var_error_CC_AIWCM,var_error_CC_AML,var_error_CC_NSCM,var_error_CC_SCM,...

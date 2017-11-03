@@ -3,6 +3,6 @@ function [ R_S ] = fun_SCM( X )
 %一列是一个距离单元
 %X:训练样本
 [~,N] = size(X);
-R_S = X*X'/N;
+R_S = abs(X*X'/N);
 end
 
