@@ -6,8 +6,8 @@ function [ R_NS ] = fun_NSCM( X )
 [M,N] = size(X);
 NX = zeros(M,N);
 for i = 1:N
-    NX(:,i) = X(:,i)/sqrt(X(:,i)'*X(:,i)/M);
+    NX(:,i) = abs(X(:,i))/sqrt(abs(X(:,i)'*X(:,i)/M));
 end
-R_NS = NX * NX'/N;
+R_NS = abs(NX * NX'/N);
 end
 
