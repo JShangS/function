@@ -17,13 +17,12 @@ for i=1:N
     end
 end
 % t = 0.1*rand(N,1);
-t = normrnd(1,0.1,N,1);%%0~0.5
+t = normrnd(1,0.,N,1);%%0~0.5
 R_KA = rouR.*(t*t');
 irouR=inv(rouR);
 rouR_half=rouR^0.5;
 MC = 1000;
-ALL = sum(sum(sqrt(abs(rouR).^2)));
-% ALL2 = sum(sum((abs(rouR))));
+ALL = sum(sum(sqrtabs(rouR).^2));
 error_SCM = zeros(MC,1);
 error_NSCM = zeros(MC,1);
 error_AML = zeros(MC,1);
@@ -58,23 +57,23 @@ for i = 1:MC
     %%CC+R_AML
     R_CC_AIWCM = fun_CC(Train,R_AIWCM,R_KA);
     %%%误差比较
-    error_SCM(i) = sum(sum(sqrt(abs(R_SCM-rouR).^2)))/ALL;
-    error_NSCM(i) = sum(sum(sqrt(abs(R_NSCM-rouR).^2)))/ALL;
-    error_AML(i) = sum(sum(sqrt(abs(R_AML-rouR).^2)))/ALL;
-    error_AIWCM(i) = sum(sum(sqrt(abs(R_AIWCM-rouR).^2)))/ALL;
-    error_CC_SCM(i) = sum(sum(sqrt(abs(R_CC_SCM-rouR).^2)))/ALL;
-    error_CC_NSCM(i) = sum(sum(sqrt(abs(R_CC_NSCM-rouR).^2)))/ALL;
-    error_CC_AML(i) = sum(sum(sqrt(abs(R_CC_AML-rouR).^2)))/ALL;
-    error_CC_AIWCM(i) = sum(sum(sqrt(abs(R_CC_AIWCM-rouR).^2)))/ALL;
+%     error_SCM(i) = sum(sum(sqrt(abs(R_SCM-rouR).^2)))/ALL;
+%     error_NSCM(i) = sum(sum(sqrt(abs(R_NSCM-rouR).^2)))/ALL;
+%     error_AML(i) = sum(sum(sqrt(abs(R_AML-rouR).^2)))/ALL;
+%     error_AIWCM(i) = sum(sum(sqrt(abs(R_AIWCM-rouR).^2)))/ALL;
+%     error_CC_SCM(i) = sum(sum(sqrt(abs(R_CC_SCM-rouR).^2)))/ALL;
+%     error_CC_NSCM(i) = sum(sum(sqrt(abs(R_CC_NSCM-rouR).^2)))/ALL;
+%     error_CC_AML(i) = sum(sum(sqrt(abs(R_CC_AML-rouR).^2)))/ALL;
+%     error_CC_AIWCM(i) = sum(sum(sqrt(abs(R_CC_AIWCM-rouR).^2)))/ALL;
     %%%误差比较2
-%     error_SCM(i) = sum(sum((abs(R_SCM-rouR))))/ALL2;
-%     error_NSCM(i) = sum(sum((abs(R_NSCM-rouR))))/ALL2;
-%     error_AML(i) = sum(sum((abs(R_AML-rouR))))/ALL2;
-%     error_AIWCM(i) = sum(sum((abs(R_AIWCM-rouR))))/ALL2;
-%     error_CC_SCM(i) = sum(sum((abs(R_CC_SCM-rouR))))/ALL2;
-%     error_CC_NSCM(i) = sum(sum((abs(R_CC_NSCM-rouR))))/ALL2;
-%     error_CC_AML(i) = sum(sum((abs(R_CC_AML-rouR))))/ALL2;
-%     error_CC_AIWCM(i) = sum(sum((abs(R_CC_AIWCM-rouR))))/ALL2;
+    error_SCM(i) = sum(sum((abs(R_SCM-rouR))))/ALL;
+    error_NSCM(i) = sum(sum((abs(R_NSCM-rouR))))/ALL;
+    error_AML(i) = sum(sum((abs(R_AML-rouR))))/ALL;
+    error_AIWCM(i) = sum(sum((abs(R_AIWCM-rouR))))/ALL;
+    error_CC_SCM(i) = sum(sum((abs(R_CC_SCM-rouR))))/ALL;
+    error_CC_NSCM(i) = sum(sum((abs(R_CC_NSCM-rouR))))/ALL;
+    error_CC_AML(i) = sum(sum((abs(R_CC_AML-rouR))))/ALL;
+    error_CC_AIWCM(i) = sum(sum((abs(R_CC_AIWCM-rouR))))/ALL;
 end
 close(h)
 mean_error_SCM = mean(error_SCM);
