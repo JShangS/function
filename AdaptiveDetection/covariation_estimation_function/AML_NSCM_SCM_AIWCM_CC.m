@@ -36,11 +36,13 @@ h = waitbar(0,'Please wait...');
 for i = 1:MC
     waitbar(i/MC,h,sprintf([num2str(i/MC*100),'%%']));
     %%产生杂波和噪声
-    X = (randn(N,L)+1i*randn(N,L))/sqrt(2);  % 产生方差为1的复高斯白噪声 % Rwhite1=1/snapshot1*X1*X1'; eig(Rwhite1); % round(mean(abs(eig(Rwhite1)))) == 1
-    Train = rouR_half*X;%%产生的训练数据,协方差矩阵为rouR的高斯杂波
-    W=(randn(N,1)+1i*randn(N,1))/sqrt(2); % 1i == -i
-    x0=rouR_half*W;%+pp; % noise=(randn(N,1)+j*randn(N,1))/sqrt(2);  % 接收信号仅包括杂波和噪声
-    %%协方差估计
+%     X = (randn(N,L)+1i*randn(N,L))/sqrt(2);  % 产生方差为1的复高斯白噪声 % Rwhite1=1/snapshot1*X1*X1'; eig(Rwhite1); % round(mean(abs(eig(Rwhite1)))) == 1
+%     Train = rouR_half*X;%%产生的训练数据,协方差矩阵为rouR的高斯杂波
+    Train = fun_TrainData(N,L,rouR);
+%     W=(randn(N,1)+1i*randn(N,1))/sqrt(2); % 1i == -i
+%     x0=rouR_half*W;%+pp; % noise=(randn(N,1)+j*randn(N,1))/sqrt(2);  % 接收信号仅包括杂波和噪声
+    x0 = fun_TrainData(N,1,rouR);
+%%协方差估计
     %%SCM
     R_SCM = abs(fun_SCM(Train));
     %%NSCM
