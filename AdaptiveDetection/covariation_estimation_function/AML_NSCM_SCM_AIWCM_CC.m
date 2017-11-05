@@ -36,6 +36,7 @@ for i = 1:MC
     %%产生杂波和噪声
     Train = fun_TrainData(N,L,rouR);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
     x0 = fun_TrainData(N,1,rouR); % 接收信号仅包括杂波和噪声
+    Sx0 = (x0*x0');
 %%协方差估计
     %%SCM，采样协方差
     R_SCM = abs(fun_SCM(Train));
@@ -53,6 +54,8 @@ for i = 1:MC
     R_CC_AML = abs(fun_CC(Train,R_AML,R_KA));
     %%CC+R_AML
     R_CC_AIWCM = abs(fun_CC(Train,R_AIWCM,R_KA));
+    %%DWCM
+    [R_DWCM,W] = (fun_DWCM(Train,R_KA,x0));
     %%%误差比较
     error_SCM(i) = sum(sum(sqrt(abs(R_SCM-rouR).^2)))/ALL;
     error_NSCM(i) = sum(sum(sqrt(abs(R_NSCM-rouR).^2)))/ALL;
@@ -62,6 +65,7 @@ for i = 1:MC
     error_CC_NSCM(i) = sum(sum(sqrt(abs(R_CC_NSCM-rouR).^2)))/ALL;
     error_CC_AML(i) = sum(sum(sqrt(abs(R_CC_AML-rouR).^2)))/ALL;
     error_CC_AIWCM(i) = sum(sum(sqrt(abs(R_CC_AIWCM-rouR).^2)))/ALL;
+    error_DWCM(i) = sum(sum(sqrt(abs(R_DWCM-rouR).^2)))/ALL;
 end
 close(h)
 %%误差均值
@@ -73,6 +77,7 @@ mean_error_CC_SCM = mean(error_CC_SCM);
 mean_error_CC_NSCM = mean(error_CC_NSCM);
 mean_error_CC_AML = mean(error_CC_AML);
 mean_error_CC_AIWCM = mean(error_CC_AIWCM);
+mean_error_DWCM = mean(error_DWCM);
 
 %%误差方差
 var_error_SCM = var(error_SCM);

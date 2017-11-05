@@ -7,8 +7,8 @@ function [ R_CC ] = fun_CC( X,R,R_KA )
 %R,样本估计的协方差
 %R_KA:先验协方差
 [M,N]=size(X);
-rou_ba = sum(diag(X'*X).^2)/N^2-sum(sum(R.^2))/N;%（18）式,
-alpha0 = rou_ba/(rou_ba+sum(sum((R-R_KA).^2)));
+rou_ba = sum(diag(X'*X).^2)/N^2-sum(sum(abs(R).^2))/N;%（18）式,
+alpha0 = rou_ba/(rou_ba+sum(sum(abs(R-R_KA).^2)));
 R_CC = (1-alpha0)*R+alpha0*R_KA;
 end
 
