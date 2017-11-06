@@ -7,7 +7,7 @@ Np = 4;     % 脉冲数
 N = Na*Np;
 rou = 0.95;  %%协方差矩阵生成的迟滞因子
 rouR = zeros(N,N);  %%真实的杂波协方差
-L=round(1.5*N); 
+L=round(2*N); 
 % theta_sig = 0.1;
 % nn = 0:N-1;
 % s = exp(-1i*2*pi*nn*theta_sig)'; %%%%%% 系统导向矢量
@@ -17,7 +17,7 @@ for i=1:N
     end
 end
 irouR=inv(rouR);
-t = normrnd(1,0.01,N,1);%%0~0.5%%失配向量
+t = normrnd(1,0.1,N,1);%%0~0.5%%失配向量
 R_KA = rouR.*(t*t');
 rouR_half=rouR^0.5;
 MC = 1000;

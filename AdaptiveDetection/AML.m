@@ -6,9 +6,9 @@ close all
 Na = 4;     % 阵元数
 Np = 4;     % 脉冲数
 N = Na*Np;
-rou = 0.90;  %%协方差矩阵生成系数
+rou = 0.95;  %%协方差矩阵生成系数
 rouR = zeros(N,N);
-L=round(2*N); 
+L=round(4*N); 
 % theta_sig = 0.1;
 % nn = 0:N-1;
 % s = exp(-1i*2*pi*nn*theta_sig)'; %%%%%% 系统导向矢量
@@ -53,11 +53,11 @@ for iMC = 1:MC
 %         count;
         tao_parent = tao_child;
         R0_gu_inv = inv(R0_gu);
-        tao_child = abs(Train_real'*R0_gu_inv*Train_real)/N;
+        tao_child = diag(abs(Train_real'*R0_gu_inv*Train_real)/N);
     %     tao_child_all(count) = tao_child;
         R0_gu_t = 0;
         for i = 1:Len
-            R0_gu_t = R0_gu_t+Train_real(:,i)*Train_real(:,i)'/Len;
+            R0_gu_t = R0_gu_t+Train_real(:,i)*Train_real(:,i)'/Len/tao_child(i);
         end
         R0_gu = abs(R0_gu_t);
 %         count =count+1;
@@ -71,3 +71,4 @@ for iMC = 1:MC
 end
 mean_error_S = mean(error_S);
 mean_error_AML = mean(error_AML);
+mean_error_NS = mean(error_NS);

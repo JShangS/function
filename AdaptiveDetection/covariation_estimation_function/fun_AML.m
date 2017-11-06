@@ -12,10 +12,10 @@ tao_parent = 0;%%上次迭代值
 while (abs(tao_child-tao_parent)>0.1)%
     tao_parent = tao_child;
     R_AML_inv = inv(R_AML);
-    tao_child = abs(X'*R_AML_inv*X)/M;
+    tao_child = diag(abs(X'*R_AML_inv*X)/M);
     R_AML_t = 0;
     for i = 1:N
-        R_AML_t = R_AML_t+X(:,i)*X(:,i)'/N;
+        R_AML_t = R_AML_t+X(:,i)*X(:,i)'/N/tao_child(i);
     end
     R_AML = abs(R_AML_t);
 %     count =count+1;
