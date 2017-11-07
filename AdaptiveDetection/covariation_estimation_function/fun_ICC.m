@@ -3,6 +3,5 @@ function [ R_ICC ] = fun_ICC( X,R2,R1 )
 %   此处显示详细说明
 %%迭代的CC
 R1 = fun_CC(X,R2,R1);
-
 end
 

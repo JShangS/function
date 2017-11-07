@@ -1,4 +1,5 @@
 %%%几种协方差估计的比较
+%%%范数计算用的norm（A,'fro'）
 clc
 clear 
 close all
@@ -7,7 +8,7 @@ Np = 4;     % 脉冲数
 N = Na*Np;
 rou = 0.95;  %%协方差矩阵生成的迟滞因子
 rouR = zeros(N,N);  %%真实的杂波协方差
-L=round(2*N); 
+L=round(1.5*N); 
 % theta_sig = 0.1;
 % nn = 0:N-1;
 % s = exp(-1i*2*pi*nn*theta_sig)'; %%%%%% 系统导向矢量
@@ -17,11 +18,11 @@ for i=1:N
     end
 end
 irouR=inv(rouR);
-t = normrnd(1,0.1,N,1);%%0~0.5%%失配向量
+t = normrnd(1,0.5,N,1);%%0~0.5%%失配向量
 R_KA = rouR.*(t*t');
 rouR_half=rouR^0.5;
 MC = 1000;
-ALL = sum(sum(sqrt(abs(rouR).^2)));%真正协方差的范数
+ALL = norm(rouR,'fro');%真正协方差的Frobenius范数
 error_SCM = zeros(MC,1);
 error_NSCM = zeros(MC,1);
 error_AML = zeros(MC,1);
@@ -60,20 +61,20 @@ for i = 1:MC
     %%MKA+CC=KCC
 %     R_MKA = abs(fun_MKA(Train,R_KA,x0));
     R_MKA = abs(fun_CC(Train,R_NSCM,R_KA));
-    R_KCC_AIWCM = abs(fun_CC(Train,R_SCM,R_MKA));
+    R_KCC_AIWCM = abs(fun_CC(Train,R_AML,R_MKA));
     %%%误差比较
-    error_SCM(i) = sum(sum(sqrt(abs(R_SCM-rouR).^2)))/ALL;
-    error_NSCM(i) = sum(sum(sqrt(abs(R_NSCM-rouR).^2)))/ALL;
-    error_AML(i) = sum(sum(sqrt(abs(R_AML-rouR).^2)))/ALL;
-    error_AIWCM(i) = sum(sum(sqrt(abs(R_AIWCM-rouR).^2)))/ALL;
-    error_CC_SCM(i) = sum(sum(sqrt(abs(R_CC_SCM-rouR).^2)))/ALL;
-    error_CC_NSCM(i) = sum(sum(sqrt(abs(R_CC_NSCM-rouR).^2)))/ALL;
-    error_CC_AML(i) = sum(sum(sqrt(abs(R_CC_AML-rouR).^2)))/ALL;
-    error_CC_AIWCM(i) = sum(sum(sqrt(abs(R_CC_AIWCM-rouR).^2)))/ALL;
-%     error_DWCM(i) = sum(sum(sqrt(abs(R_DWCM-rouR).^2)))/ALL;
-    error_KCC_AIWCM(i) = sum(sum(sqrt(abs(R_KCC_AIWCM-rouR).^2)))/ALL;
-    error_MKA(i) = sum(sum(sqrt(abs(R_MKA-rouR).^2)))/ALL;
-    error_KA(i) = sum(sum(sqrt(abs(R_KA-rouR).^2)))/ALL;
+    error_SCM(i) = norm(R_SCM-rouR,'fro')/ALL;
+    error_NSCM(i) = norm(R_NSCM-rouR,'fro')/ALL;
+    error_AML(i) = norm(R_AML-rouR,'fro')/ALL;
+    error_AIWCM(i) = norm(R_AIWCM-rouR,'fro')/ALL;
+    error_CC_SCM(i) = norm(R_CC_SCM-rouR,'fro')/ALL;
+    error_CC_NSCM(i) = norm(R_CC_NSCM-rouR,'fro')/ALL;
+    error_CC_AML(i) = norm(R_CC_AML-rouR,'fro')/ALL;
+    error_CC_AIWCM(i) = norm(R_CC_AIWCM-rouR,'fro')/ALL;
+%     error_DWCM(i) = norm(R_DWCM-rouR,'fro')/ALL;
+    error_KCC_AIWCM(i) = norm(R_KCC_AIWCM-rouR,'fro')/ALL;
+    error_MKA(i) = norm(R_MKA-rouR,'fro')/ALL;
+    error_KA(i) = norm(R_KA-rouR,'fro')/ALL;
 end
 close(h)
 %%误差均值

@@ -19,7 +19,7 @@ for i=1:N
         rouR(i,j)=rou^abs(i-j);
     end
 end
-t = 0.1*rand(N,1);
+t = normrnd(1,0.5,N,1);%%0~0.5%%失配向量
 R_KA = rouR.*(t*t');
 % rouR = R_KA;%diag(ones(1,N));%%%独立的协方差
 irouR=inv(rouR);
@@ -45,26 +45,26 @@ beta_child = ones(Len,1);
 beta_parent = zeros(Len,1);
 R0_gu = eye(N,N);%R_x0;%eye(N,N);
 count = 1;
-while (sum(abs(beta_parent-beta_child))/sum(abs(beta_child))>0.0001)
+while (norm(beta_parent-beta_child,'fro')/norm(beta_child,'fro')>0.1)
     count
     beta_parent = beta_child;
     R0_gu_inv = inv(R0_gu);
     beta_child_t1 = Train_real'*R0_gu_inv*x0;
     beta_child_t2 = diag(Train_real'*R0_gu_inv*Train_real);
-    beta_child = abs(beta_child_t1./beta_child_t2);
+    beta_child = abs(beta_child_t1./beta_child_t2).^2;
     beta_child_all(:,count) = beta_child;
     R0_gu_t = 0;
     for i = 1:Len
 %         beta_child_t1 = Train(:,i)'*R0_gu_inv*x0;
 %         beta_child_t2 = (Train(:,i)'*R0_gu_inv*Train(:,i));
 %         beta_child(i) = (beta_child_t1/beta_child_t2).^2;
-        R0_gu_t = R0_gu_t+beta_child(i)*(Train_real(:,i)*Train_real(:,i)')/sum(beta_child);
+        R0_gu_t = R0_gu_t+beta_child(i)*(Train_real(:,i)*Train_real(:,i)')/sum(beta_child);%;sum(beta_child);
     end
     R0_gu = abs(R0_gu_t);
     count =count+1;
-    if count >1000
+    if count >50
         break;
     end
 end
-erroS = sum(sum(abs(rouR - S_abs)));
-erro_AIWCM = sum(sum(abs(rouR - R0_gu)));
+erroS = norm(rouR - S_abs,'fro')/norm(rouR,'fro');
+erro_AIWCM = norm(rouR - R0_gu,'fro')/norm(rouR,'fro');

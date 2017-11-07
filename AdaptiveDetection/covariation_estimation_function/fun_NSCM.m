@@ -5,9 +5,10 @@ function [ R_NS ] = fun_NSCM( X )
 %一列是一个距离单元
 [M,N] = size(X);
 NX = zeros(M,N);
+%%数据归一化
 for i = 1:N
-    NX(:,i) = abs(X(:,i))/sqrt(abs(X(:,i)'*X(:,i)/M));
+    NX(:,i) = X(:,i)/sqrt(norm(X(:,i),'fro')^2/M);
 end
-R_NS = abs(NX * NX'/N);
+R_NS = (NX * NX'/N);
 end
 

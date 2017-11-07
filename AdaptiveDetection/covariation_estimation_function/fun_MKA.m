@@ -23,7 +23,7 @@ beta_child=ones(L,1);
 beta_parent=zeros(L,1);
 R_MKA=R_KA;
 count = 1;
-while(sum(abs(beta_parent-beta_child))/sum(abs(beta_child))>0.01)
+while(norm(beta_parent-beta_child,'fro')/norm(beta_child,'fro')>0.1)
     count;
     beta_parent=beta_child;
     R_KA_M_inv=inv(R_MKA);
@@ -32,9 +32,9 @@ while(sum(abs(beta_parent-beta_child))/sum(abs(beta_child))>0.01)
     beta_child=abs(beta_child_t1./beta_child_t2);
     R_KA_M_t=0;
     for i=1:L
-        R_KA_M_t=R_KA_M_t+beta_child(i)*(X(:,i)*X(:,i)')/sum(beta_child);
+        R_KA_M_t=R_KA_M_t+beta_child(i)*(X(:,i)*X(:,i)')/sum(beta_child);%sum(beta_child);
     end
-    R_MKA=abs(R_KA_M_t);
+    R_MKA=(R_KA_M_t);
     count=count+1;
     if count>50
        break;
