@@ -18,7 +18,7 @@ for i=1:N
     end
 end
 irouR=inv(rouR);
-t = normrnd(1,0.5,N,1);%%0~0.5%% ß≈‰œÚ¡ø
+t = normrnd(1,0.1,N,1);%%0~0.5%% ß≈‰œÚ¡ø
 R_KA = rouR.*(t*t');
 rouR_half=rouR^0.5;
 MC = 1000;
@@ -32,6 +32,8 @@ error_CC_NSCM = zeros(MC,1);
 error_CC_AML = zeros(MC,1);
 error_CC_AIWCM = zeros(MC,1);
 error_KCC_AIWCM = zeros(MC,1);
+error_MKA = zeros(MC,1);
+error_KA = zeros(MC,1);
 h = waitbar(0,'Please wait...');
 for i = 1:MC
     waitbar(i/MC,h,sprintf([num2str(i/MC*100),'%%']));
@@ -89,7 +91,7 @@ mean_error_CC_AIWCM = mean(error_CC_AIWCM);
 mean_error_KCC_AIWCM = mean(error_KCC_AIWCM);
 mean_error_MKA = mean(error_MKA);
 mean_error_KA = mean(error_KA);
-% mean_error_DWCM = mean(error_DWCM);
+mean_error_DWCM = mean(error_DWCM);
 
 %%ŒÛ≤Ó∑Ω≤Ó
 var_error_SCM = var(error_SCM);
@@ -101,6 +103,7 @@ var_error_CC_NSCM = var(error_CC_NSCM);
 var_error_CC_AML = var(error_CC_AML);
 var_error_CC_AIWCM = var(error_CC_AIWCM);
 var_error_KCC_AIWCM = var(error_KCC_AIWCM);
+var_error_DWCM = var(error_DWCM);
 %%ª≠Õº
 figure(1)
 subplot(4,2,1)
