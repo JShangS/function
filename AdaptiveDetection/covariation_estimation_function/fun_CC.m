@@ -1,4 +1,4 @@
-function [ R_CC ] = fun_CC( X,R,R_KA )
+function [ R_CC,alpha0] = fun_CC( X,R,R_KA )
 %FUN_CC 此处显示有关此函数的摘要
 %《On Using a priori Knowledge in Space-Time Adaptive Processing》
 %   此处显示详细说明
