@@ -18,7 +18,7 @@ for i=1:N
     end
 end
 irouR=inv(rouR);
-t = normrnd(1,0.5,N,1);%%0~0.5%%失配向量
+t = normrnd(1,0.01,N,1);%%0~0.5%%失配向量
 R_KA = rouR.*(t*t');
 rouR_half=rouR^0.5;
 MC = 1000;
@@ -159,14 +159,14 @@ set(gcf,'Position',[400 200 777 439])
 
 
 
-% figure(3)
-% Xbar = {'AML','AIWCM','CCAIWCM','CCAML','CCNSCM','CCSCM','KCC','NSCM','SCM','ML'};
-% Ybar = [var_error_AML;var_error_AIWCM;var_error_CC_AIWCM;var_error_CC_AML;...
-%         var_error_CC_NSCM;var_error_CC_SCM;var_error_KCC_AIWCM;var_error_NSCM;...
-%         var_error_SCM;var_error_MLalpha];
-% bar(Ybar,0.4)
-% title('方差')
-% set(gca,'xticklabel',Xbar)
-% set(gcf,'Position',[300 200 777 439])
+figure(3)
+Xbar = {'AML','AIWCM','CCAIWCM','CCAML','CCNSCM','CCSCM','KCC','NSCM','SCM','ML'};
+Ybar = [var_error_AML;var_error_AIWCM;var_error_CC_AIWCM;var_error_CC_AML;...
+        var_error_CC_NSCM;var_error_CC_SCM;var_error_KCC_AIWCM;var_error_NSCM;...
+        var_error_SCM;var_error_MLalpha];
+bar(Ybar,0.4)
+title('方差')
+set(gca,'xticklabel',Xbar)
+set(gcf,'Position',[300 200 777 439])
 
 
