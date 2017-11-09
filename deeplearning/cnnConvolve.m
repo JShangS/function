@@ -15,10 +15,11 @@ function convolvedFeatures = cnnConvolve(patchDim, numFeatures, images, W, b, ZC
 %  convolvedFeatures - matrix of convolved features in the form
 %                      convolvedFeatures(featureNum, imageNum, imageRow, imageCol)
 
-numImages = size(images, 4);
+% numImages = size(images, 4);--JS--
+numImages = size(images, 3);
 imageDim = size(images, 1);
-imageChannels = size(images, 3);
-
+% imageChannels = size(images, 3);
+imageChannels = 1;%%--JS--
 convolvedFeatures = zeros(numFeatures, numImages, imageDim - patchDim + 1, imageDim - patchDim + 1);
 
 % Instructions:
@@ -55,7 +56,7 @@ for imageNum = 1:numImages
     WT = W(featureNum,:)*ZCAWhite;
     bslide = b(featureNum) - WT*meanPatch;
     
-    for channel = 1:3
+    for channel = 1:1%3--JS--
 
       % Obtain the feature (patchDim x patchDim) needed during the convolution
       % ---- YOUR CODE HERE ----
@@ -69,8 +70,8 @@ for imageNum = 1:numImages
       feature = flipud(fliplr(squeeze(feature)));
       
       % Obtain the image
-      im = squeeze(images(:, :, channel, imageNum));
-
+%       im = squeeze(images(:, :, channel, imageNum));
+      im = squeeze(images(:, :, imageNum));%--JS--
       % Convolve "feature" with "im", adding the result to convolvedImage
       % be sure to do a 'valid' convolution
       % ---- YOUR CODE HERE ----

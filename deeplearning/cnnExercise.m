@@ -11,12 +11,14 @@
 %%======================================================================
 %% STEP 0: Initialization
 %  Here we initialize some parameters used for the exercise.
-
-imageDim = 64;         % image dimension
-imageChannels = 3;     % number of channels (rgb, so 3)
+clc
+clear
+close all
+imageDim = 28;         % image dimension
+imageChannels = 1;     % number of channels (rgb, so 3)
 
 patchDim = 8;          % patch dimension
-numPatches = 50000;    % number of patches
+numPatches = 6000;    % number of patches
 
 visibleSize = patchDim * patchDim * imageChannels;  % number of input units 
 outputSize = visibleSize;   % number of output units
@@ -42,7 +44,7 @@ optTheta =  zeros(2*hiddenSize*visibleSize+hiddenSize+visibleSize, 1);
 ZCAWhite =  zeros(visibleSize, visibleSize);
 meanPatch = zeros(visibleSize, 1);
 
-load('STL10Features.mat');
+% load('STL10Features.mat');
 
 % --------------------------------------------------------------------
 
@@ -65,11 +67,13 @@ displayColorNetwork( (W*ZCAWhite)');
 % Note that we have to preprocess the images in the exact same way 
 % we preprocessed the patches before we can obtain the feature activations.
 
-load stlTrainSubset.mat % loads numTrainImages, trainImages, trainLabels
+% load stlTrainSubset.mat % loads numTrainImages, trainImages, trainLabels
+load JS_trainData2d.mat
 
 %% Use only the first 8 images for testing
-convImages = trainImages(:, :, :, 1:8); 
-
+trainImages = trainData2d(:,:,1:10000);
+convImages = trainImages(:, :, 1:8);
+% convImages = trainImages(:, :, :, 1:8);
 % NOTE: Implement cnnConvolve in cnnConvolve.m first!
 convolvedFeatures = cnnConvolve(patchDim, hiddenSize, convImages, W, b, ZCAWhite, meanPatch);
 
@@ -85,13 +89,14 @@ for i = 1:1000
     imageRow = randi([1, imageDim - patchDim + 1]);
     imageCol = randi([1, imageDim - patchDim + 1]);    
    
-    patch = convImages(imageRow:imageRow + patchDim - 1, imageCol:imageCol + patchDim - 1, :, imageNum);
+%     patch = convImages(imageRow:imageRow + patchDim - 1, imageCol:imageCol + patchDim - 1, :, imageNum);
+    patch = convImages(imageRow:imageRow + patchDim - 1, imageCol:imageCol + patchDim - 1, imageNum);
     patch = patch(:);            
     patch = patch - meanPatch;
     patch = ZCAWhite * patch;
     
     features = feedForwardAutoencoder(optTheta, hiddenSize, visibleSize, patch); 
-
+%     if abs(features(featureNum, 1) - convolvedFeatures(featureNum, imageNum, imageRow, imageCol)) > 1e-9
     if abs(features(featureNum, 1) - convolvedFeatures(featureNum, imageNum, imageRow, imageCol)) > 1e-9
         fprintf('Convolved feature does not match activation from autoencoder\n');
         fprintf('Feature Number    : %d\n', featureNum);
@@ -147,10 +152,13 @@ end
 
 stepSize = 50;
 assert(mod(hiddenSize, stepSize) == 0, 'stepSize should divide hiddenSize');
-
-load stlTrainSubset.mat % loads numTrainImages, trainImages, trainLabels
-load stlTestSubset.mat  % loads numTestImages,  testImages,  testLabels
-
+%%--JS-------------------------
+% load stlTrainSubset.mat % loads numTrainImages, trainImages, trainLabels
+% load stlTestSubset.mat  % loads numTestImages,  testImages,  testLabels
+[~,~,numImages_JS] = size(trainImages);
+numTrainImages = numImages_JS;
+numTestImages =  numImages_JS;
+%%--JS-------------------------------
 pooledFeaturesTrain = zeros(hiddenSize, numTrainImages, ...
     floor((imageDim - patchDim + 1) / poolDim), ...
     floor((imageDim - patchDim + 1) / poolDim) );
@@ -159,7 +167,8 @@ pooledFeaturesTest = zeros(hiddenSize, numTestImages, ...
     floor((imageDim - patchDim + 1) / poolDim) );
 
 tic();
-
+testImages =  trainData2d(:,:,10001:20000);
+%%Ãÿ’˜Ã·»°
 for convPart = 1:(hiddenSize / stepSize)
     
     featureStart = (convPart - 1) * stepSize + 1;
@@ -173,7 +182,7 @@ for convPart = 1:(hiddenSize / stepSize)
     convolvedFeaturesThis = cnnConvolve(patchDim, stepSize, ...
         trainImages, Wt, bt, ZCAWhite, meanPatch);
     pooledFeaturesThis = cnnPool(poolDim, convolvedFeaturesThis);
-    pooledFeaturesTrain(featureStart:featureEnd, :, :, :) = pooledFeaturesThis;   
+    pooledFeaturesTrain(featureStart:featureEnd, :, :, :) = pooledFeaturesThis;
     toc();
     clear convolvedFeaturesThis pooledFeaturesThis;
     
@@ -185,7 +194,6 @@ for convPart = 1:(hiddenSize / stepSize)
     toc();
 
     clear convolvedFeaturesThis pooledFeaturesThis;
-
 end
 
 
@@ -205,7 +213,9 @@ toc();
 
 % Setup parameters for softmax
 softmaxLambda = 1e-4;
-numClasses = 4;
+% numClasses = 4;
+numClasses = 2;%--JS--
+trainLabels = trainLabels(1:10000);%--JS--
 % Reshape the pooledFeatures to form an input vector for softmax
 softmaxX = permute(pooledFeaturesTrain, [1 3 4 2]);
 softmaxX = reshape(softmaxX, numel(pooledFeaturesTrain) / numTrainImages,...
@@ -220,7 +230,7 @@ softmaxModel = softmaxTrain(numel(pooledFeaturesTrain) / numTrainImages,...
 %%======================================================================
 %% STEP 5: Test classifer
 %  Now you will test your trained classifer against the test images
-
+testLabels = trainLabels(10001:20000);%--JS--
 softmaxX = permute(pooledFeaturesTest, [1 3 4 2]);
 softmaxX = reshape(softmaxX, numel(pooledFeaturesTest) / numTestImages, numTestImages);
 softmaxY = testLabels;

@@ -17,7 +17,7 @@
 %% STEP 0: Here we provide the relevant parameters values that will
 %  allow your sparse autoencoder to get good filters; you do not need to 
 %  change the parameters below.
-clc; clear all; close all;
+clc; clear ; close all;
 
 
 inputSize = 28 * 28;
