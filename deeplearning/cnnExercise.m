@@ -215,12 +215,12 @@ toc();
 softmaxLambda = 1e-4;
 % numClasses = 4;
 numClasses = 2;%--JS--
-trainLabels = trainLabels(1:10000);%--JS--
+trainLabels_1 = trainLabels(1:10000);%--JS--
 % Reshape the pooledFeatures to form an input vector for softmax
 softmaxX = permute(pooledFeaturesTrain, [1 3 4 2]);
 softmaxX = reshape(softmaxX, numel(pooledFeaturesTrain) / numTrainImages,...
     numTrainImages);
-softmaxY = trainLabels;
+softmaxY = trainLabels_1;
 
 options = struct;
 options.maxIter = 200;
@@ -230,10 +230,10 @@ softmaxModel = softmaxTrain(numel(pooledFeaturesTrain) / numTrainImages,...
 %%======================================================================
 %% STEP 5: Test classifer
 %  Now you will test your trained classifer against the test images
-testLabels = trainLabels(10001:20000);%--JS--
+testLabels_1 = trainLabels;%--JS--
 softmaxX = permute(pooledFeaturesTest, [1 3 4 2]);
 softmaxX = reshape(softmaxX, numel(pooledFeaturesTest) / numTestImages, numTestImages);
-softmaxY = testLabels;
+softmaxY = testLabels_1;
 
 [pred] = softmaxPredict(softmaxModel, softmaxX);
 acc = (pred(:) == softmaxY(:));
