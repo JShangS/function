@@ -45,20 +45,20 @@ beta = 3;              % weight of sparsity penalty term
 %     trainData(:,a+30000)=trainData2(:,a+30000);
 % end
 % trainLabels = loadMNISTLabels('train-labels.idx1-ubyte');
-load trainDataWarhead;
-load trainDataOther;
-
-trainData=zeros(784,60000);
-for a=1:392
-    trainData(a,:)=trainDataWarhead(a,:);
-    trainData(a+392,:)=trainDataOther(a,:);
-end
-trainLabels=zeros(60000,1);
-for i=1:30000
-    trainLabels(i,1)=2;
-    trainLabels(i+30000,1)=1;
-end
-
+% load trainDataWarhead;
+% load trainDataOther;
+% 
+% trainData=zeros(784,60000);
+% for a=1:392
+%     trainData(a,:)=trainDataWarhead(a,:);
+%     trainData(a+392,:)=trainDataOther(a,:);
+% end
+% trainLabels=zeros(60000,1);
+% for i=1:30000
+%     trainLabels(i,1)=2;
+%     trainLabels(i+30000,1)=1;
+% end
+load
 % trainLabels(trainLabels == 0) = 10; % Remap 0 to 10 since our labels need to start from 1
 
 %%======================================================================

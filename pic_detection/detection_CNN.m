@@ -68,7 +68,7 @@ displayColorNetwork( (W*ZCAWhite)');
 % we preprocessed the patches before we can obtain the feature activations.
 
 % load stlTrainSubset.mat % loads numTrainImages, trainImages, trainLabels
-load MTDData.mat
+load MTDData_17dB.mat
 
 %% Use only the first 8 images for testing
 trainImages = trainData;

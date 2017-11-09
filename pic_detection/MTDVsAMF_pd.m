@@ -37,20 +37,23 @@ end
     ht=conj(fliplr(ht_t));
     ht_fft=fftshift(fft(ht));%fftshift
 A1=1; 
-SNR = 100;
+SNR = -20
 for i=1:pusle_num
     echo(i,:)=A1*exp(-1j*2*pi*(mu/2*(t+delt_t1(i)).^2)+-1j*2*pi*(fc)*(delt_t1(i)));
     echo(i,:)=awgn(echo(i,:),SNR);%%加噪声
     echo_fft(i,:)=(fft(echo(i,:)));%fftshift
     pc_result(i,:)=(ifft(echo_fft(i,:).*ht_fft));%ifftshift
     pc_result_fft(i,:)=(fft(pc_result(i,:)));%fftshift%快时间FFT
-    pc_result(i,:)=(pc_result(i,:))/max(abs(pc_result(i,:)));%归一化
+%     pc_result(i,:)=(pc_result(i,:))/max(abs(pc_result(i,:)));%归一化
 end
-MTD = fft(pc_result,[],1);
+MTD = abs(fft(pc_result,[],1));
+% MTD = awgn(MTD,SNR);
+% MTD = MTD/max(max(MTD));
+mesh(abs(MTD));
 [hang,lie]=find(max(max(abs(MTD)))==abs(MTD));
 
 %%MC开始%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-SNR = -33:0.1:0;
+SNR = -20:-10;
 MC = 1000;
 for i_SNR = 1:length(SNR)
     i_SNR
@@ -63,10 +66,12 @@ for i_SNR = 1:length(SNR)
             echo_fft(i,:)=(fft(echo(i,:)));%fftshift
             pc_result(i,:)=(ifft(echo_fft(i,:).*ht_fft));%ifftshift
             pc_result_fft(i,:)=(fft(pc_result(i,:)));%fftshift%快时间FFT
-            pc_result(i,:)=(pc_result(i,:))/max(abs(pc_result(i,:)));%归一化
+%             pc_result(i,:)=(pc_result(i,:))/max(abs(pc_result(i,:)));%归一化
         end
         %%MTD检测
-        MTD = fft(pc_result,[],1);
+        MTD = abs(fft(pc_result,[],1));
+%         MTD = MTD/max(max(MTD));
+%         MTD = awgn(MTD,SNR(i_SNR));
         cankao_MTD = [MTD(:,1:lie-50),MTD(:,lie+50:end)];
 %         cankao_MTD = [MTD(hang-3,lie-3:lie+3),... 
 %                       MTD(hang-2,lie-3),MTD(hang-2,lie+3),...
@@ -96,24 +101,24 @@ for i_SNR = 1:length(SNR)
 % %             end
 % %         end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        cankao = [pc_result(:,1:L/2-5),pc_result(:,L/2+5:end)];
-        K = length(cankao);
-        N = M;
-        R = (cankao*cankao')/length(cankao);
-        inv_R = inv(R);
-        AMF = abs(abs(S'*inv_R*pc_result(:,lie))^2/(S'*inv_R*S));
-        ACE = AMF/abs(pc_result(:,lie)'*inv_R*pc_result(:,lie));
-        if ACE> fun_Th_ACE(K,N,Pfa)   %AMF>r0%0.0328
-            count_AMF=count_AMF+1;
-        end
+%         cankao = [pc_result(:,1:L/2-5),pc_result(:,L/2+5:end)];
+%         K = length(cankao);
+%         N = M;
+%         R = (cankao*cankao')/length(cankao);
+%         inv_R = inv(R);
+%         AMF = abs(abs(S'*inv_R*pc_result(:,lie))^2/(S'*inv_R*S));
+%         ACE = AMF/abs(pc_result(:,lie)'*inv_R*pc_result(:,lie));
+%         if ACE> fun_Th_ACE(K,N,Pfa)   %AMF>r0%0.0328
+%             count_AMF=count_AMF+1;
+%         end
     end
     Pd_MTD(i_SNR) = count_MTD/MC;
-    Pd_AMF(i_SNR) = count_AMF/MC;
+%     Pd_AMF(i_SNR) = count_AMF/MC;
 end
 figure
 plot(SNR,Pd_MTD,'b','LineWidth',2)
 hold on
-plot(SNR,Pd_AMF,'r','LineWidth',2)
+% plot(SNR,Pd_AMF,'r','LineWidth',2)
 
 
 

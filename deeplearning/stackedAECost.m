@@ -41,13 +41,15 @@ groundTruth = full(sparse(labels, 1:M, 1));
 
 
 %% --------------------------- YOUR CODE HERE -----------------------------
-
+%%几个分类就几个
 z2 = bsxfun(@plus, stack{1}.w*data, stack{1}.b);
 a2 = sigmoid(z2);
-z3 = bsxfun(@plus, stack{2}.w*a2, stack{2}.b);
-a3 = sigmoid(z3);
-zz=bsxfun(@plus, stack{3}.w*a3, stack{3}.b);
+% z3 = bsxfun(@plus, stack{2}.w*a2, stack{2}.b);
+% a3 = sigmoid(z3);
+zz = bsxfun(@plus, stack{2}.w*a2, stack{2}.b);
 aa = sigmoid(zz);
+% zz = bsxfun(@plus, stack{3}.w*a3, stack{3}.b); 
+% aa = sigmoid(zz);
 
 z4 = softmaxTheta * aa;
 a4 = exp(z4);
@@ -56,17 +58,18 @@ a4 = bsxfun(@rdivide, a4, sum(a4));
 
 delta4 = -(groundTruth - a4);
 
-deltazz=(softmaxTheta' * delta4) .* sigmoidGrad(zz);
+% deltazz=(softmaxTheta' * delta4) .* sigmoidGrad(zz);
+delta3=(softmaxTheta' * delta4) .* sigmoidGrad(zz);
 
-delta3 = (stack{3}.w' * deltazz) .* sigmoidGrad(z3);
+% delta3 = (stack{3}.w' * deltazz) .* sigmoidGrad(z3);
 
 
 delta2 = (stack{2}.w' * delta3) .* sigmoidGrad(z2);
 
 softmaxThetaGrad = -(1. / M) * (groundTruth - a4) * aa'  + lambda * softmaxTheta;
 
-stackgrad{3}.w = (1. / M) * deltazz * a3' + lambda * stack{3}.w;
-stackgrad{3}.b = (1. / M) * sum(deltazz, 2);
+% stackgrad{3}.w = (1. / M) * deltazz * a3' + lambda * stack{3}.w;
+% stackgrad{3}.b = (1. / M) * sum(deltazz, 2);
 stackgrad{2}.w = (1. / M) * delta3 * a2' + lambda * stack{2}.w;
 stackgrad{2}.b = (1. / M) * sum(delta3, 2);
 stackgrad{1}.w = (1. / M) * delta2 * data' + lambda * stack{1}.w;
@@ -76,7 +79,7 @@ stackgrad{1}.b = (1. / M) * sum(delta2, 2);
 
 cost = -(1. / M) * sum(sum(groundTruth .* log(a4))) + (lambda / 2.) * ...
     sum(sum(softmaxTheta.^2)) + (lambda / 2.) * (sum(sum(stack{1}.w .^2)) ...
-    + sum(sum(stack{2}.w .^2))+sum(sum(stack{3}.w .^2)));
+    + sum(sum(stack{2}.w .^2)));%+sum(sum(stack{3}.w .^2))
 
 function grad = softmaxGrad(x)
     e_x = exp(-x);

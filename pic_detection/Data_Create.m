@@ -37,7 +37,7 @@ trainLabels = zeros(Createnum/2,1);
 testLabels =  zeros(Createnum/2,1);
 trainData = zeros(64,64,Createnum/2);
 testData = zeros(64,64,Createnum/2);
-SNR=-17;
+SNR=-20;
 h = waitbar(0,'Please wait...');
 for i_Createnum = 1:Createnum
     waitbar(i_Createnum/Createnum,h,sprintf([num2str(i_Createnum/Createnum*100),'%%']));
@@ -47,7 +47,7 @@ for i_Createnum = 1:Createnum
            trainLabels(i_Createnum) = 1;
         else %%没目标
            A1 = 0; %%1.8%1.45 
-           trainLabels(i_Createnum) = 0;
+           trainLabels(i_Createnum) = 2;
         end
     else %%测试样本
         if rand()>0.5 %有目标
@@ -55,7 +55,7 @@ for i_Createnum = 1:Createnum
            testLabels(i_Createnum-Createnum/2) = 1;
         else %%没目标
            A1 = 0; %%1.8%1.45 
-           testLabels(i_Createnum-Createnum/2) = 0;
+           testLabels(i_Createnum-Createnum/2) = 2;
         end
     end
     for i=1:pusle_num
@@ -66,16 +66,25 @@ for i_Createnum = 1:Createnum
         pc_result_fft(i,:)=(fft(pc_result(i,:)));%fftshift%快时间FFT
     end
     MTD = abs(fft(pc_result,[],1));
-    max_MTD = max(max(MTD));
-    MTD = round(MTD/max_MTD*255);
+%     max_MTD = max(max(MTD));
+%     if A1~=0
+%         MTD = MTD/max(max(MTD));
+%     end
+%     MTD = awgn(MTD,SNR);
+%     MTD = round(MTD/max_MTD*255);
     if i_Createnum<=Createnum/2 %%训练样本
-       trainData(:,:,i_Createnum) = uint8(MTD(1:end,1:64));
+       trainData(:,:,i_Createnum) = (MTD(1:end,1:64));
     else
-       testData(:,:,i_Createnum-Createnum/2) = uint8(MTD(1:end,1:64));
+       testData(:,:,i_Createnum-Createnum/2) = (MTD(1:end,1:64));
     end
 end
 close(h)
-save('MTDData.mat','trainData','testData','trainLabels','testLabels')
+if SNR>=0
+    str=['MTDData','_',num2str(abs(SNR)),'dB.mat'];
+else
+    str=['MTDData','_fu',num2str(abs(SNR)),'dB.mat'];
+end
+save(str,'trainData','testData','trainLabels','testLabels')
 
 
 % % % 脉压后原始回波
