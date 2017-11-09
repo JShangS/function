@@ -16,7 +16,7 @@ R_start1=L/2*delt_R;%目标1初始位置%170
 lamda=C/fc;
 PRF=10000;
 Tr=1/PRF;
-Vr_start1=290;%1初始速度
+Vr_start1=300;%1初始速度
 fd = 2*(Vr_start1+3)/lamda;
 pusle_num=64;%脉冲数
 PV=PRF*lamda/4;
@@ -50,7 +50,7 @@ MTD = fft(pc_result,[],1);
 [hang,lie]=find(max(max(abs(MTD)))==abs(MTD));
 
 %%MC开始%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-SNR = -33:0.1:0;
+SNR = -17:0;
 MC = 1000;
 for i_SNR = 1:length(SNR)
     i_SNR
@@ -83,32 +83,32 @@ for i_SNR = 1:length(SNR)
             count_MTD=count_MTD+1;
         end
         %%AMF检测
-% %         %%AMFs
-% %         cankao = [pc_result(:,1:L/2-5),pc_result(:,L/2+5:end)];
-% %         R = (cankao*cankao')/length(cankao);
-% %         inv_R = inv(R);
-% %         fdt = 2*Vrt/lamda;
-% %         AMF = zeros(M,L);
-% %         for i_fd = 1:length(fdt)
-% %             for j = 1:L
-% %                 S = exp(-1j*2*pi*fdt(i_fd)*(0:M-1).'*Tr);
-% %                 AMF(i_fd,j)=abs(abs(S'*inv_R*pc_result(:,j))^2/(S'*inv_R*S));
-% %             end
-% %         end
+        %%AMFs
+%         cankao = [pc_result(:,1:L/2-5),pc_result(:,L/2+5:end)];
+%         R = (cankao*cankao')/length(cankao);
+%         inv_R = inv(R);
+%         fdt = 2*Vrt/lamda;
+%         AMF = zeros(M,L);
+%         for i_fd = 1:length(fdt)
+%             for j = 1:L
+%                 S = exp(-1j*2*pi*fdt(i_fd)*(0:M-1).'*Tr);
+%                 AMF(i_fd,j)=abs(abs(S'*inv_R*pc_result(:,j))^2/(S'*inv_R*S));
+%             end
+%         end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        cankao = [pc_result(:,1:L/2-5),pc_result(:,L/2+5:end)];
-        K = length(cankao);
-        N = M;
-        R = (cankao*cankao')/length(cankao);
-        inv_R = inv(R);
-        AMF = abs(abs(S'*inv_R*pc_result(:,lie))^2/(S'*inv_R*S));
-        ACE = AMF/abs(pc_result(:,lie)'*inv_R*pc_result(:,lie));
-        if ACE> fun_Th_ACE(K,N,Pfa)   %AMF>r0%0.0328
-            count_AMF=count_AMF+1;
-        end
+%         cankao = [pc_result(:,1:L/2-5),pc_result(:,L/2+5:end)];
+%         K = length(cankao);
+%         N = M;
+%         R = (cankao*cankao')/length(cankao);
+%         inv_R = inv(R);
+%         AMF = abs(abs(S'*inv_R*pc_result(:,lie))^2/(S'*inv_R*S));
+%         ACE = AMF/abs(pc_result(:,lie)'*inv_R*pc_result(:,lie));
+%         if ACE> fun_Th_ACE(K,N,Pfa)   %AMF>r0%0.0328
+%             count_AMF=count_AMF+1;
+%         end
     end
     Pd_MTD(i_SNR) = count_MTD/MC;
-    Pd_AMF(i_SNR) = count_AMF/MC;
+%     Pd_AMF(i_SNR) = count_AMF/MC;
 end
 figure
 plot(SNR,Pd_MTD,'b','LineWidth',2)
