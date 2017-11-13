@@ -16,7 +16,7 @@ R_start1=220*delt_R;%目标1初始位置%170
 lamda=C/fc;
 PRF=10000;
 Tr=1/PRF;
-Vr_start1=300;%1初始速度
+Vr_start1=100;%1初始速度
 pusle_num=64;%脉冲数
 PV=PRF*lamda/4;
 M=pusle_num;
@@ -80,9 +80,9 @@ for i_Createnum = 1:Createnum
 end
 close(h)
 if SNR>=0
-    str=['MTDData','_',num2str(abs(SNR)),'dB.mat'];
+    str=['MTDData','_',num2str(abs(SNR)),'dB_V',num2str(Vr_start1),'.mat'];
 else
-    str=['MTDData','_fu',num2str(abs(SNR)),'dB.mat'];
+    str=['MTDData','_fu',num2str(abs(SNR)),'dB_V',num2str(Vr_start1),'.mat'];
 end
 save(str,'trainData','testData','trainLabels','testLabels')
 

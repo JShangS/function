@@ -1,7 +1,7 @@
 clc
 clear
 close all
-load stackedAEOptTheta_20dB.mat
+load stackedAEOptTheta_fu20dB.mat
 load MTDData_20dB.mat
 trainData = reshape(trainData,64*64,1000);
 testData = reshape(testData,64*64,1000);
