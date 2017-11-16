@@ -24,7 +24,7 @@ for i=1:N
 end
 irouR=inv(rouR);
 rouR_abs=abs(rouR);
-t = normrnd(1,0.01,N,1);%%0~0.5%%失配向量
+t = normrnd(1,0.1,N,1);%%0~0.5%%失配向量
 R_KA = rouR.*(t*t');
 % R_KA_inv = inv(R_KA);
 rouR_half=rouR^0.5;
@@ -49,30 +49,33 @@ s_real=Weight*s+(1-Weight)*s_v;
 
 
 
-lamda = 1;
-mu = 5;
+lamda = 1.2;
+mu = 1;
 %%%门限计算
  h = waitbar(0,'Please wait...');
 for i = 1:MonteCarloPfa
     waitbar(i/MonteCarloPfa,h,sprintf([num2str(i/MonteCarloPfa*100),'%%']));
 %     Train = fun_TrainData_gauss(N,L,rouR);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
 %     x0 = fun_TrainData_gauss(N,1,rouR); % 接收信号仅包括杂波和噪声
-    Train = fun_TrainData_IGCC(N,L,rouR,lamda,mu);%%产生的训练数据,协方差矩阵为rouR的逆gamma纹理复合高斯杂波
-    x0 = fun_TrainData_IGCC(N,1,rouR,lamda,mu); % 接收信号仅包括杂波和噪声
+    Train = fun_TrainData_IGCC(N,L,rouR,lamda,mu,2);%%产生的训练数据,协方差矩阵为rouR的逆gamma纹理复合高斯杂波
+    x0 = fun_TrainData_IGCC(N,1,rouR,lamda,mu,2); % 接收信号仅包括杂波和噪声
 %     Train = fun_TrainData_K(N,L,rouR,mu);%%产生的训练数据,协方差矩阵为rouR的复合高斯杂波——K分布
 %     x0 = fun_TrainData_K(N,1,rouR,mu); % 接收信号仅包括杂波和噪声
     %%%%协方差估计
     R_SCM = (fun_SCM(Train));
+    R_NSCM = fun_NSCM(Train);
     iR_SCM = inv(R_SCM);
-%     R_CC = fun_CC(Train,R_SCM,R_KA);
-%     iR_CC = inv(R_CC);
+    R_CC = fun_CC(Train,R_SCM,R_KA);
+    iR_CC = inv(R_CC);
     R_ICL1 = (fun_ICL(s,x0,inv(R_KA),inv(R_SCM),lamda,mu,1));
     R_ICL0 = (fun_ICL(s,x0,inv(R_KA),inv(R_SCM),lamda,mu,0));
     iR_ICL1 = inv(R_ICL1);
     iR_ICL0 = inv(R_ICL0);
     %%%检测器
-    Tamf(i) = abs(s'*iR_SCM*x0)^2/abs(s'*iR_SCM*s);     %%%%%% AMF或者wald
-    tmp=abs(x0'*iR_SCM*x0);
+%     Tamf(i) = abs(s'*iR_SCM*x0)^2/abs(s'*iR_SCM*s);     %%%%%% AMF或者wald
+    Tamf(i) = abs(s'*iR_CC*x0)^2/abs(s'*iR_CC*s);     %%%%%% AMF或者wald
+    tmp=abs(x0'*iR_CC*x0);
+%     tmp=abs(x0'*iR_SCM*x0);
     Tglrt(i) = Tamf(i)/(1+tmp);                   %%%%%% KGLRT
     Tace(i)=Tamf(i)/tmp;                        %%%%%% ACE
     Tabort(i)=(1+Tamf(i))/(2+tmp);              %%%%%% ABORT  % eq.(16) 检测统计量
@@ -83,8 +86,8 @@ for i = 1:MonteCarloPfa
     Taed(i)=tmp;                                %%%%%% 能量检测器 
     %%%%%% CLGLRT
     a = (s'*iR_ICL1*x0)/(s'*iR_ICL1*s);
-    tmp1 = ((x0 - a*s)'*iR_ICL1*(x0 - a*s)+1/mu)^(-lamda-N);
-    tmp2 = (x0'*iR_ICL1*x0+1/mu)^(-lamda-N);
+    tmp1 = det(iR_ICL1)*((x0 - a*s)'*iR_ICL1*(x0 - a*s)+1/mu)^(-lamda-N);
+    tmp2 = det(iR_ICL0)*(x0'*iR_ICL0*x0+1/mu)^(-lamda-N);
     Tclglrt(i) =  abs(tmp1/tmp2);%%%%%% 色加载的GLRT
 end
 close(h)
@@ -133,8 +136,8 @@ for m=1:length(SNRout)
         waitbar(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd,h,sprintf([num2str(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd*100),'%%']));
 %         Train = fun_TrainData_gauss(N,L,rouR);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
 %         x0 = fun_TrainData_gauss(N,1,rouR); % 接收信号仅包括杂波和噪声
-        Train = fun_TrainData_IGCC(N,L,rouR,lamda,mu);%%产生的训练数据,协方差矩阵为rouR的逆gamma纹理复合高斯杂波
-        x0 = fun_TrainData_IGCC(N,1,rouR,lamda,mu); % 接收信号仅包括杂波和噪声
+        Train = fun_TrainData_IGCC(N,L,rouR,lamda,mu,2);%%产生的训练数据,协方差矩阵为rouR的逆gamma纹理复合高斯杂波
+        x0 = fun_TrainData_IGCC(N,1,rouR,lamda,mu,2); % 接收信号仅包括杂波和噪声
 %         Train = fun_TrainData_K(N,L,rouR,mu);%%产生的训练数据,协方差矩阵为rouR的复合高斯杂波——K分布
 %         x0 = fun_TrainData_K(N,1,rouR,mu); % 接收信号仅包括杂波和噪声
         %%%%协方差估计
@@ -160,8 +163,8 @@ for m=1:length(SNRout)
         Taed=tmp;                             %%%%%% 能量检测器  
         %%%%%% CLGLRT
         a = (s'*iR_ICL1*x0)/(s'*iR_ICL1*s);
-        tmp1 = ((x0 - a*s)'*iR_ICL1*(x0 - a*s)+1/mu)^(-lamda-N);
-        tmp2 = (x0'*iR_ICL1*x0+1/mu)^(-lamda-N);
+        tmp1 = det(iR_ICL1)*((x0 - a*s)'*iR_ICL1*(x0 - a*s)+1/mu)^(-lamda-N);
+        tmp2 = det(iR_ICL0)*(x0'*iR_ICL0*x0+1/mu)^(-lamda-N);
         Tclglrt =  abs(tmp1/tmp2);%%%%%% 色加载的GLRT
         if Tamf>Th_AMF;         counter_amf=counter_amf+1;          end            
         if Tglrt>Th_KGLRT;      counter_glrt=counter_glrt+1;        end                

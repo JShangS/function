@@ -6,7 +6,7 @@ function [ Train ] = fun_TrainData_IGCC( N,L,M,lamda,mu,opt)
 %%M，复高斯协方差
 %%lamda：形状参数
 %%mu：尺度参数
-%%opt:1:每个距离单元的纹理值不一样，2：每个单元纹理值一样，此时退化为SIRP
+%%opt:1:每个距离单元的纹理值不一样，2：每个
 if nargin ==5
     opt = 1;
 end
@@ -15,9 +15,6 @@ if opt==1
     X = fun_TrainData_gauss(N,L,M);
     Train=(ones(N,1)*pct.').*X;
 elseif opt==2
-    pct=sqrt(1./gamrnd(lamda,mu,1,1));
-    X = fun_TrainData_gauss(N,L,M);
-    Train=(ones(N,L)*pct.').*X;
 else
     error('只有1，2两种选择')
 end
