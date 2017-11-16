@@ -1,0 +1,31 @@
+%%%%%%%%%%%%%%%%%%%  n1/n2取不同的值对盲速的影响 
+clc; 
+fofr=0.01:0.001:32; 
+fofr1=0.01:0.001:17; 
+ 
+a=63.0/64.0;         %%%%%%% n1/n2=63/64 
+a1=33.0/34.0;        %%%%%%% n1/n2=33/34 
+term1=(1-2.*cos(a*2*pi*fofr)+cos(4*pi*fofr)).^2; 
+term11=(1-2.*cos(a1*2*pi*fofr1)+cos(4*pi*fofr1)).^2; 
+term2=(-2*sin(a*2*pi*fofr)+sin(4*pi*fofr)).^2; 
+term22=(-2*sin(a1*2*pi*fofr1)+sin(4*pi*fofr1)).^2; 
+ 
+resp=.25.*sqrt(term1+term2); 
+resp1=.25.*sqrt(term11+term22); 
+ 
+resp=10.*log(resp); 
+resp1=10.*log(resp1); 
+subplot(2,1,1); 
+plot(fofr,resp,'r'); 
+xlabel('盲速提高的倍率，n1/n2=63/64'); 
+ylabel('Filter response(dB)'); 
+axis([0 32 -40 0]); 
+grid; 
+ 
+subplot(2,1,2); 
+plot(fofr1,resp1); 
+xlabel('盲速提高的倍率，n1/n2=33/34'); 
+ylabel('Filter response(dB)'); 
+axis([0 17 -40 0]); 
+grid; 
+

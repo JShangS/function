@@ -1,13 +1,13 @@
-clear all;
+clear ;
 close all;
 clc;
-
+%《Geometric barycenters for covariance estimation in compound-Gaussian clutter》
  
 N=8;   %% the number of pulse in a CPI
 K=10;   %% the number of secondary data
 
 fd=0.15; %% the doppler of target
-P=exp(j*2*pi*fd*(0:1:N-1)).'; %% streer vector
+P=exp(1j*2*pi*fd*(0:1:N-1)).'; %% streer vector
 
 %% =====Covariance matrix of clutter====%%%%%
 v=0.5;  %% the parameters of the clutter
@@ -20,7 +20,7 @@ delt=10.^(deltdB/10);
 Sigma0=zeros(N,N); % covariance matrix of clutter
 for ii=1:N
     for k=1:N
-         Sigma0(ii,k)=delt*(rou^(abs(ii-k)))*exp(j*2*pi*fdc*(ii-k));
+         Sigma0(ii,k)=delt*(rou^(abs(ii-k)))*exp(1j*2*pi*fdc*(ii-k));
     end
 end
 
@@ -28,7 +28,7 @@ Sigma=zeros(N,N); % matrix of disturbance
 Sigma=Sigma0+eye(N); % clutter plus noise
 
 [E,D]=eig(Sigma);    % Transform matrix 
-RT=E*D.^0.5;
+RT=E*D.^0.5;%%%
 
 eig_valu=diag(D);
 eig_valu_max=max(eig_valu);
@@ -50,9 +50,10 @@ vet_C=zeros(1,num_pfa);
 for h=1:num_pfa
      h
       %%%%=== generate the secondary data========%%%%%
+      %%%%纹理是个K分布的纹理 
       Snd_r=zeros(N,K);
       for k=1:K
-            gs=sqrt(1/2)*(randn(N,1)+j*randn(N,1)); 
+            gs=sqrt(1/2)*(randn(N,1)+1j*randn(N,1)); 
             taos=gamrnd(v,1/v,1,1);  %K-distribution clutter
             Snd_r(:,k)=sqrt(taos)*(RT*gs);
       end
@@ -146,14 +147,15 @@ for ll1=1:num_pd
           Re_C=stima_cholesky(Sk);     
                   
           %%%%===generate the received data of the CUT=======%%%%%%%%%
+          %%%generate the clutter  of the CUT
           rc=zeros(N,1);  
-          gc=sqrt(1/2)*(randn(N,1)+j*randn(N,1)); %k-distribution clutter
+          gc=sqrt(1/2)*(randn(N,1)+1j*randn(N,1)); %k-distribution clutter
           taoc=gamrnd(v,1/v,1,1);
           rc=sqrt(taoc)*(RT*gc);
-          
+          %%%SNIR of steer vector
           Tamplite=(10^(SINR(ll2)/10))/(P'*inv(Sigma)*P);
 %           Talfai=sqrt(Tamplite/2)*(randn(1,1)+j*randn(1,1)); %%  target fluctuation
-          r=sqrt(Tamplite)*exp(j*2*pi*rand(1))*P+rc;  
+          r=sqrt(Tamplite)*exp(1j*2*pi*rand(1))*P+rc; %% recived signal
           
           %%%====test design
           T_GLRT=((abs(P'*inv(Sigma)*r))^2)/((P'*inv(Sigma)*P)*(r'*inv(Sigma)*r));

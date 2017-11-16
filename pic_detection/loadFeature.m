@@ -3,7 +3,7 @@ clear
 close all
 %%直接loade训练好的feature
 load cnnPooledFeatures.mat
-load MTDData_fu17dB.mat
+load MTDData_fu20dB.mat
 trainImages = trainData;
 [~,~,numImages_JS] = size(trainImages);
 numTrainImages = numImages_JS;

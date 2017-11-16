@@ -16,7 +16,7 @@ R_start1=L/2*delt_R;%目标1初始位置%170
 lamda=C/fc;
 PRF=10000;
 Tr=1/PRF;
-Vr_start1=290;%1初始速度
+Vr_start1=100;%1初始速度
 fd = 2*(Vr_start1+3)/lamda;
 pusle_num=64;%脉冲数
 PV=PRF*lamda/4;
@@ -37,7 +37,7 @@ end
     ht=conj(fliplr(ht_t));
     ht_fft=fftshift(fft(ht));%fftshift
 A1=1; 
-SNR = -20
+SNR = 25
 for i=1:pusle_num
     echo(i,:)=A1*exp(-1j*2*pi*(mu/2*(t+delt_t1(i)).^2)+-1j*2*pi*(fc)*(delt_t1(i)));
     echo(i,:)=awgn(echo(i,:),SNR);%%加噪声

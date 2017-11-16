@@ -7,7 +7,7 @@ close all
 Na=4;     % 阵元数
 Np=4;     % 脉冲数
 N=Na*Np;
-L=round(2*N); 
+L=round(1*N); 
 SNRout=0:1:20; % 输出SNR
 cos2=0.9;
 PFA=1e-3;% PFA=1e-4;
@@ -49,8 +49,9 @@ Tprao = zeros(1,MonteCarloPfa);
 Tdnamf = zeros(1,MonteCarloPfa);
 Taed = zeros(1,MonteCarloPfa);
 tic    
+h = waitbar(0,'Please wait...');
 for i=1:MonteCarloPfa
-%     i
+    waitbar(i/MonteCarloPfa,h,sprintf([num2str(i/MonteCarloPfa*100),'%%']));
     X=(randn(N,L)+1i*randn(N,L))/sqrt(2); % 产生方差为1的复高斯白噪声 % Rwhite1=1/snapshot1*X1*X1'; eig(Rwhite1); % round(mean(abs(eig(Rwhite1)))) == 1
     S=(R_half*X)*(R_half*X)'; % 有L个训练样本估计的杂波与噪声的协方差矩阵(Rhalf*X表示接收的L个训练数据)
     iS=inv(S);
@@ -67,6 +68,7 @@ for i=1:MonteCarloPfa
     Tdnamf(i)=Tace_bar/tmp;                     %%%%%% DNAMF  % eq.(24) 检测统计量
     Taed(i)=tmp;                                %%%%%% 能量检测器 
 end
+close(h)
 TAMF=sort(Tamf,'descend');
 TACE=sort(Tace,'descend');
 TKGLRT=sort(Tglrt,'descend');
@@ -106,8 +108,10 @@ Pd_WABORT_mc = zeros(1,length(SNRout));
 Pd_DMRao_mc = zeros(1,length(SNRout));
 Pd_DNAMF_mc = zeros(1,length(SNRout));
 Pd_AED_mc = zeros(1,length(SNRout));
+h = waitbar(0,'Please wait...');
 for m=1:length(SNRout)
     for i=1:MonteCarloPd
+        waitbar(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd,h,sprintf([num2str(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd*100),'%%']));
         X=(randn(N,L)+1i*randn(N,L))/sqrt(2); % 产生方差为1的复高斯白噪声 % Rwhite1=1/snapshot1*X1*X1'; eig(Rwhite1); % round(mean(abs(eig(Rwhite1)))) == 1
         S=(R_half*X)*(R_half*X)'; % 有L个训练样本估计的杂波与噪声的协方差矩阵(Rhalf*X表示接收的L个训练数据)
         iS=inv(S);
@@ -146,6 +150,7 @@ for m=1:length(SNRout)
 
     m
 end
+close(h)
 toc
 
 figure(2);

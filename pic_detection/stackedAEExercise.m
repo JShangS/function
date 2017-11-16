@@ -58,7 +58,7 @@ beta = 3;              % weight of sparsity penalty term
 %     trainLabels(i,1)=2;
 %     trainLabels(i+30000,1)=1;
 % end
-load MTDData_0dB.mat
+load MTDData_20dB.mat
 trainData = reshape(trainData,64*64,1000);
 testData = reshape(testData,64*64,1000);
 % trainLabels(trainLabels == 0) = 10; % Remap 0 to 10 since our labels need to start from 1
