@@ -1,6 +1,7 @@
 function [ Train ] = fun_TrainData_IGCC( N,L,M,lamda,mu,opt)
 %FUN_TRAINDATA_IGCC 此处显示有关此函数的摘要
 %   此处显示详细说明
+%JerryShang，2017.11.16
 %%逆gamma纹理的复合高斯杂波
 %%N,L行列,导向矢量维度，参考单元数目
 %%M，复高斯协方差

@@ -14,8 +14,7 @@ MonteCarloPfa=1/PFA*100;
 MonteCarloPd=1e4;
 rou = 0.95;  %%协方差矩阵生成的迟滞因子
 rouR = zeros(N,N);  %%真实的杂波协方差
-l = 2;
-L=round(l*N); 
+L=round(2*N); 
 theta_sig = 0.1;
 nn = 0:N-1;
 s = exp(-1i*2*pi*nn*theta_sig)'; %%%%%% 系统导向矢量
@@ -43,8 +42,8 @@ Weight=weight(Index);
 s_real=Weight*s+(1-Weight)*s_v;
 % figure; plot(weight,cos2_tmpt);
 %%%%%正式开始%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-lamda = 2;
-mu = 1;
+lamda = 1;
+mu = 10;
 %%%门限计算
  h = waitbar(0,'Please wait...');
 for i = 1:MonteCarloPfa
@@ -209,6 +208,5 @@ xlabel('SNR/dB','FontSize',20)
 ylabel('Pd','FontSize',20)
 set(gca,'FontSize',20)
 grid on
-str=['Pd_CLGLRT_',num2str(l),'K','_mu',num2str(mu),'_lamda',num2str(lamda),'.mat'];
-save(str,'lamda','mu','SNRout','Pd_ABORT_mc','Pd_ACE_mc','Pd_AED_mc','Pd_AMF_mc',...
-    'Pd_CLGLRT_mc','Pd_DMRao_mc','Pd_DNAMF_mc','Pd_KGLRT_mc','Pd_WABORT_mc');
+str=['']
+save()
