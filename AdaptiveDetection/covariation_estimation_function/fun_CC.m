@@ -9,7 +9,7 @@ function [ R_CC,alpha0] = fun_CC( X,R,R_KA )
 [M,N]=size(X);
 rou_ba_t = 0;
 for i = 1:N
-    rou_ba_t = rou_ba_t+norm(X(:,i),'fro')^4/N^2;
+    rou_ba_t = rou_ba_t+norm(X(:,i),'fro')^4/(N^2);
 end
 rou_ba = rou_ba_t-norm(R,'fro')^2/N;
 alpha0 = rou_ba/(rou_ba+norm(R-R_KA,'fro')^2);
