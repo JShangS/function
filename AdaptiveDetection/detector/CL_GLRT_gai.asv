@@ -7,7 +7,6 @@ n = 2;
 lamda = 3;
 mu = 1;
 opt = 1;
-str_train = 'g';
 %%%%假设参数设置
 Na = 4;     % 阵元数
 Np = 4;     % 脉冲数
@@ -53,11 +52,11 @@ s_real=Weight*s+(1-Weight)*s_v;
 h = waitbar(0,'Please wait...');
 for i = 1:MonteCarloPfa
     waitbar(i/MonteCarloPfa,h,sprintf([num2str(i/MonteCarloPfa*100),'%%']));
-%%%%%%%%%%%训练数据产生%%%%%%%%%%%%%%
-    Train = fun_TrainData_gauss(N,L,rouR);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
-    x0 = fun_TrainData_gauss(N,1,rouR); % 接收信号仅包括杂波和噪声
-%     Train = fun_TrainData_IGCC(N,L,rouR,lamda,mu,opt);%%产生的训练数据,协方差矩阵为rouR的逆gamma纹理复合高斯杂波
-%     x0 = fun_TrainData_IGCC(N,1,rouR,lamda,mu,opt); % 接收信号仅包括杂波和噪声
+%%%%%%%%%%%
+%     Train = fun_TrainData_gauss(N,L,rouR);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
+%     x0 = fun_TrainData_gauss(N,1,rouR); % 接收信号仅包括杂波和噪声
+    Train = fun_TrainData_IGCC(N,L,rouR,lamda,mu,opt);%%产生的训练数据,协方差矩阵为rouR的逆gamma纹理复合高斯杂波
+    x0 = fun_TrainData_IGCC(N,1,rouR,lamda,mu,opt); % 接收信号仅包括杂波和噪声
 %     Train = fun_TrainData_K(N,L,rouR,mu);%%产生的训练数据,协方差矩阵为rouR的复合高斯杂波——K分布
 %     x0 = fun_TrainData_K(N,1,rouR,mu); % 接收信号仅包括杂波和噪声
     %%%%协方差估计%%%%%%%%%%%%%%%%%%%%%%
@@ -146,9 +145,12 @@ h = waitbar(0,'Please wait...');
 for m=1:length(SNRout)
     for i=1:MonteCarloPd 
         waitbar(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd,h,sprintf([num2str(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd*100),'%%']));
-        %%%%%%%%%%%训练数据产生%%%%%%%%%%%%%%
-        Train = fun_TrainData('g',N,L,rouR);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
-        x0 = fun_TrainData('g',N,1,rouR); % 接收信号仅包括杂波和噪声
+        Train = fun_TrainData_gauss(N,L,rouR);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
+        x0 = fun_TrainData_gauss(N,1,rouR); % 接收信号仅包括杂波和噪声
+%         Train = fun_TrainData_IGCC(N,L,rouR,lamda,mu,opt);%%产生的训练数据,协方差矩阵为rouR的逆gamma纹理复合高斯杂波
+%         x0 = fun_TrainData_IGCC(N,1,rouR,lamda,mu,opt); % 接收信号仅包括杂波和噪声
+%         Train = fun_TrainData_K(N,L,rouR,mu);%%产生的训练数据,协方差矩阵为rouR的复合高斯杂波——K分布
+%         x0 = fun_TrainData_K(N,1,rouR,mu); % 接收信号仅包括杂波和噪声
         %%%%协方差估计%%%%%%%%%%%%%%%%%%%%%%
         R_SCM = (fun_SCM(Train));
         iR_SCM = inv(R_SCM);
@@ -228,6 +230,6 @@ xlabel('SNR/dB','FontSize',20)
 ylabel('Pd','FontSize',20)
 set(gca,'FontSize',20)
 grid on
-str=['Pd_CLGLRT_',num2str(n),'K','mu',num2str(mu),'lamda',num2str(lamda),'s',num2str(sigma_t),'o',num2str(opt),'_',str_train,'.mat'];
+str=['Pd_CLGLRT_',num2str(n),'K','mu',num2str(mu),'lamda',num2str(lamda),'s',num2str(sigma_t),'o',num2str(opt),'.mat'];
 save(str,'lamda','mu','sigma_t','SNRout','Pd_ABORT_mc','Pd_ACE_mc','Pd_AED_mc','Pd_AMF_mc',...
     'Pd_CLGLRT_mc','Pd_DMRao_mc','Pd_DNAMF_mc','Pd_KGLRT_mc','Pd_WABORT_mc','Pd_KGLRTCC_mc','Pd_AMFCC_mc');

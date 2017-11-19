@@ -1,6 +1,7 @@
 function [ Train ] = fun_TrainData_K( N,L, M, v)
 %FUN_TRAINDATA_K 此处显示有关此函数的摘要
 %   此处显示详细说明
+%JerryShang，2017.11.10
 %%K纹理分布的复合高斯分布
 %%N,L行列
 %%M，复高斯协方差
