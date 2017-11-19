@@ -6,7 +6,7 @@ close all
 Na = 4;     % 阵元数
 Np = 4;     % 脉冲数
 N = Na*Np;
-SNRout=0:1:20; % 输出SNR
+SNRout=0:1:40; % 输出SNR
 cos2=0.9;
 PFA=1e-3;% PFA=1e-4;
 SNRnum=10.^(SNRout/10);
@@ -14,8 +14,8 @@ MonteCarloPfa=1/PFA*100;
 MonteCarloPd=1e4;
 rou = 0.95;  %%协方差矩阵生成的迟滞因子
 rouR = zeros(N,N);  %%真实的杂波协方差
-l = 2;
-L=round(l*N); 
+n = 2;
+L=round(n*N); 
 theta_sig = 0.1;
 nn = 0:N-1;
 s = exp(-1i*2*pi*nn*theta_sig)'; %%%%%% 系统导向矢量
@@ -26,7 +26,8 @@ for i=1:N
 end
 irouR=inv(rouR);
 rouR_abs=abs(rouR);
-t = normrnd(1,0.1,N,1);%%0~0.5%%失配向量
+sigma_t = 0.1;
+t = normrnd(1,sigma_t,N,1);%%0~0.5%%失配向量
 R_KA = rouR.*(t*t');
 % R_KA_inv = inv(R_KA);
 rouR_half=rouR^0.5;
@@ -43,7 +44,7 @@ Weight=weight(Index);
 s_real=Weight*s+(1-Weight)*s_v;
 % figure; plot(weight,cos2_tmpt);
 %%%%%正式开始%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-lamda = 2;
+lamda = 1.2;
 mu = 1;
 %%%门限计算
  h = waitbar(0,'Please wait...');
@@ -60,8 +61,8 @@ for i = 1:MonteCarloPfa
     iR_SCM = inv(R_SCM);
 %     R_NSCM = fun_NSCM(Train);
 %     iR_NSCM = inv(R_NSCM);
-%     R_CC = fun_CC(Train,R_SCM,R_KA);
-%     iR_CC = inv(R_CC);
+    R_CC = fun_CC(Train,R_SCM,R_KA);
+    iR_CC = inv(R_CC);
 %     R_ICL1 = (fun_ICL(s,x0,inv(R_KA),inv(R_SCM),lamda,mu,1));
 %     R_ICL0 = (fun_ICL(s,x0,inv(R_KA),inv(R_SCM),lamda,mu,0));
 %     iR_ICL1 = inv(R_ICL1);
@@ -71,9 +72,10 @@ for i = 1:MonteCarloPfa
     tmp=abs(x0'*iR_SCM*x0);
 %     Tamf(i) = abs(s'*iR_NSCM*x0)^2/abs(s'*iR_NSCM*s);     %%%%%% AMF或者wald
 %     tmp=abs(x0'*iR_NSCM*x0);
-%     Tamf(i) = abs(s'*iR_CC*x0)^2/abs(s'*iR_CC*s);     %%%%%% AMF或者wald
-%     tmp=abs(x0'*iR_CC*x0);
+    Tamf_CC(i) = abs(s'*iR_CC*x0)^2/abs(s'*iR_CC*s);     %%%%%% AMF_CC或者wald
+    tmp_CC=abs(x0'*iR_CC*x0);
     Tglrt(i) = Tamf(i)/(1+tmp);                   %%%%%% KGLRT
+    Tglrt_CC(i) = Tamf_CC(i)/(1+tmp_CC);         %%%%%% KGLRT_CC
     Tace(i)=Tamf(i)/tmp;                        %%%%%% ACE
     Tabort(i)=(1+Tamf(i))/(2+tmp);              %%%%%% ABORT  % eq.(16) 检测统计量
     Twabort(i)=1/(1+tmp)/(1-Tglrt(i))^2;        %%%%%% ABORT  % 见会议论文中的eq.(18)
@@ -98,6 +100,8 @@ TDMRao=sort(Tprao,'descend');
 TDNAMF=sort(Tdnamf,'descend');
 TAED=sort(Taed,'descend');
 TCLGLRT=sort(Tclglrt,'descend');
+TKGLRTCC = sort(Tglrt_CC,'descend');
+TAMFCC=sort(Tamf_CC,'descend');
 
 Th_AMF=(TAMF(floor(MonteCarloPfa*PFA-1))+TAMF(floor(MonteCarloPfa*PFA)))/2;
 Th_ACE=(TACE(floor(MonteCarloPfa*PFA-1))+TACE(floor(MonteCarloPfa*PFA)))/2;
@@ -108,7 +112,9 @@ Th_DMRao=(TDMRao(floor(MonteCarloPfa*PFA-1))+TDMRao(floor(MonteCarloPfa*PFA)))/2
 Th_DNAMF=(TDNAMF(floor(MonteCarloPfa*PFA-1))+TDNAMF(floor(MonteCarloPfa*PFA)))/2;
 Th_AED=(TAED(floor(MonteCarloPfa*PFA-1))+TAED(floor(MonteCarloPfa*PFA)))/2;
 Th_CLGLRT=(TCLGLRT(floor(MonteCarloPfa*PFA-1))+TCLGLRT(floor(MonteCarloPfa*PFA)))/2;
-
+Th_KGLRTCC=(TKGLRTCC(floor(MonteCarloPfa*PFA-1))+TKGLRTCC(floor(MonteCarloPfa*PFA)))/2;
+Th_AMFCC=(TAMFCC(floor(MonteCarloPfa*PFA-1))+TAMFCC(floor(MonteCarloPfa*PFA)))/2;
+%%%%检测曲线%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 counter_amf=0;
 counter_ace=0;
 counter_glrt=0;
@@ -118,6 +124,8 @@ counter_prao=0;
 counter_dnamf=0;
 counter_aed=0;
 counter_clglrt=0;
+counter_amfcc=0;
+counter_glrtcc=0;
 Pd_AMF_mc = zeros(1,length(SNRout));
 Pd_KGLRT_mc = zeros(1,length(SNRout));
 Pd_ACE_mc = zeros(1,length(SNRout));
@@ -127,9 +135,12 @@ Pd_DMRao_mc = zeros(1,length(SNRout));
 Pd_DNAMF_mc = zeros(1,length(SNRout));
 Pd_AED_mc = zeros(1,length(SNRout));
 Pd_CLGLRT_mc = zeros(1,length(SNRout));
+Pd_KGLRTCC_mc = zeros(1,length(SNRout));
+Pd_AMFCC_mc = zeros(1,length(SNRout));
 alpha=sqrt(SNRnum/abs(s_real'*irouR*s_real)); % 根据SNR=|alpha|^2*s'*R^(-1)*s求得|alpha|
 h = waitbar(0,'Please wait...');
 for m=1:length(SNRout)
+    m
     for i=1:MonteCarloPd 
         waitbar(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd,h,sprintf([num2str(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd*100),'%%']));
 %         Train = fun_TrainData_gauss(N,L,rouR);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
@@ -143,8 +154,8 @@ for m=1:length(SNRout)
         iR_SCM = inv(R_SCM);
 %         R_NSCM = (fun_NSCM(Train));
 %         iR_NSCM = inv(R_NSCM);
-%         R_CC = fun_CC(Train,R_SCM,R_KA);
-%         iR_CC = inv(R_CC);
+        R_CC = fun_CC(Train,R_SCM,R_KA);
+        iR_CC = inv(R_CC);
         x0=alpha(m)*s_real+x0;%+pp;    %%%%%%%  重要  %%%%%%%%%%%%%
 %         R_ICL1 = (fun_ICL(s,x0,inv(R_KA),inv(R_SCM),lamda,mu,1));
 %         R_ICL0 = (fun_ICL(s,x0,inv(R_KA),inv(R_SCM),lamda,mu,0));
@@ -155,9 +166,10 @@ for m=1:length(SNRout)
         tmp=abs(x0'*iR_SCM*x0);
 %         Tamf = abs(s'*iR_NSCM*x0)^2/abs(s'*iR_NSCM*s);     %%%%%% AMF或者wald
 %         tmp=abs(x0'*iR_NSCM*x0);
-%         Tamf = abs(s'*iR_CC*x0)^2/abs(s'*iR_CC*s);     %%%%%% AMF或者wald
-%         tmp=abs(x0'*iR_CC*x0);
+        Tamf_CC = abs(s'*iR_CC*x0)^2/abs(s'*iR_CC*s);     %%%%%% AMF或者wald
+        tmp_CC=abs(x0'*iR_CC*x0);
         Tglrt = Tamf/(1+tmp);                   %%%%%% KGLRT
+        Tglrt_CC = Tamf_CC/(1+tmp_CC);   
         Tace=Tamf/tmp;                        %%%%%% ACE
         Tabort=(1+Tamf)/(2+tmp);              %%%%%% ABORT  % eq.(16) 检测统计量
         Twabort=1/(1+tmp)/(1-Tglrt)^2;        %%%%%% ABORT  % 见会议论文中的eq.(18)
@@ -179,7 +191,9 @@ for m=1:length(SNRout)
         if Tprao>Th_DMRao;      counter_prao=counter_prao+1;        end          
         if Tdnamf>Th_DNAMF;     counter_dnamf=counter_dnamf+1;      end          
         if Taed>Th_AED;         counter_aed=counter_aed+1;          end            
-        if Tclglrt>Th_CLGLRT;      counter_clglrt=counter_clglrt+1;        end   
+        if Tclglrt>Th_CLGLRT;      counter_clglrt=counter_clglrt+1;        end
+        if Tglrt_CC>Th_KGLRTCC;      counter_glrtcc=counter_glrtcc+1;        end 
+        if Tamf_CC>Th_AMFCC;      counter_amfcc=counter_amfcc+1;        end 
     end
     Pd_AMF_mc(m)=counter_amf/MonteCarloPd;          counter_amf=0;
     Pd_KGLRT_mc(m)=counter_glrt/MonteCarloPd;        counter_glrt=0;
@@ -190,6 +204,8 @@ for m=1:length(SNRout)
     Pd_DNAMF_mc(m)=counter_dnamf/MonteCarloPd;      counter_dnamf=0;
     Pd_AED_mc(m)=counter_aed/MonteCarloPd;          counter_aed=0; 
     Pd_CLGLRT_mc(m)=counter_clglrt/MonteCarloPd;        counter_clglrt=0;
+    Pd_KGLRTCC_mc(m)=counter_glrtcc/MonteCarloPd;        counter_glrtcc=0;
+    Pd_AMFCC_mc(m)=counter_amfcc/MonteCarloPd;        counter_amfcc=0;
 end
 close(h)
 figure(2);
@@ -203,12 +219,15 @@ plot(SNRout,Pd_DMRao_mc,'r-o','linewidth',2)
 plot(SNRout,Pd_AED_mc,'r-d','linewidth',2)
 plot(SNRout,Pd_DNAMF_mc,'g-s','linewidth',2);
 plot(SNRout,Pd_CLGLRT_mc,'k.-')
-legend('KGLRT','AMF/DMwald','ACE','ABORT','WABORT','DMRao','AED','DNAMF','CLGLRT')
+plot(SNRout,Pd_KGLRTCC_mc,'b-s')
+plot(SNRout,Pd_AMFCC_mc,'g-o')
+legend('KGLRT','AMF/DMwald','ACE','ABORT','WABORT','DMRao','AED','DNAMF','CLGLRT','KGLRTCC','AMFCC')
 % legend({'KGLRT','AMF/DMwald','DMRao'},'FontSize',20)
 xlabel('SNR/dB','FontSize',20)
 ylabel('Pd','FontSize',20)
 set(gca,'FontSize',20)
 grid on
-str=['Pd_CLGLRT_',num2str(l),'K','_mu',num2str(mu),'_lamda',num2str(lamda),'.mat'];
+str=['Pd_CLGLRT_',num2str(n),'K','_mu',num2str(mu),'_lamda',num2str(lamda),'_sigma',num2str(sigma_t),'.mat'];
 save(str,'lamda','mu','SNRout','Pd_ABORT_mc','Pd_ACE_mc','Pd_AED_mc','Pd_AMF_mc',...
-    'Pd_CLGLRT_mc','Pd_DMRao_mc','Pd_DNAMF_mc','Pd_KGLRT_mc','Pd_WABORT_mc');
+    'Pd_CLGLRT_mc','Pd_DMRao_mc','Pd_DNAMF_mc','Pd_KGLRT_mc','Pd_WABORT_mc',...
+    'Pd_KGLRTCC_mc', 'Pd_AMFCC_mc');

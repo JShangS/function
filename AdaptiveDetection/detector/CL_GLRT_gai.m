@@ -4,10 +4,12 @@ clear
 close all
 %%%%参数设置
 n = 2;
-lamda = 3;
-mu = 1;
-opt = 1;
 str_train = 'g';
+lambda = 3;
+mu = 1;
+opt = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
+%%%Pd_CLGLRT_2Kmu1lamda3s0.1o1_p：2K：训练单元数目，mu，lambda，s：失配向量方差，
+%%o1:opt=1，p：IG纹理复合高斯
 %%%%假设参数设置
 Na = 4;     % 阵元数
 Np = 4;     % 脉冲数
@@ -49,10 +51,14 @@ Weight=weight(Index);
 s_real=Weight*s+(1-Weight)*s_v;
 % figure; plot(weight,cos2_tmpt);
 %%%%%正式开始%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%门限计算
-h = waitbar(0,'Please wait...');
-for i = 1:MonteCarloPfa
-    waitbar(i/MonteCarloPfa,h,sprintf([num2str(i/MonteCarloPfa*100),'%%']));
+%%%门限计算%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% h = waitbar(0,'Please wait...');
+% r = ones(MonteCarloPfa,1);
+block = round(MonteCarloPfa/100);
+tic
+parfor i = 1:MonteCarloPfa
+%     waitbar(i/MonteCarloPfa,h,sprintf([num2str(i/MonteCarloPfa*100),'%%']));
 %%%%%%%%%%%训练数据产生%%%%%%%%%%%%%%
     Train = fun_TrainData_gauss(N,L,rouR);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
     x0 = fun_TrainData_gauss(N,1,rouR); % 接收信号仅包括杂波和噪声
@@ -88,13 +94,14 @@ for i = 1:MonteCarloPfa
     Tdnamf(i)=Tace_bar/tmp;                     %%%%%% DNAMF  % eq.(24) 检测统计量
     Taed(i)=tmp;                                %%%%%% 能量检测器 
     %%%%%% CLGLRT
-    Tclglrt(i) = fun_CLGRT(lamda,mu,R_KA,R_SCM,x0,s);
+    Tclglrt(i) = fun_CLGRT(lambda,mu,R_KA,R_SCM,x0,s);
 %     a = (s'*iR_ICL1*x0)/(s'*iR_ICL1*s);
 %     tmp1 = det(iR_ICL1)*((x0 - a*s)'*iR_ICL1*(x0 - a*s)+1/mu)^(-lamda-N);
 %     tmp2 = det(iR_ICL0)*(x0'*iR_ICL0*x0+1/mu)^(-lamda-N);
 %     Tclglrt(i) =  abs(tmp1/tmp2);%%%%%% 色加载的GLRT
 end
-close(h)
+toc
+% close(h)
 TAMF=sort(Tamf,'descend');
 TACE=sort(Tace,'descend');
 TKGLRT=sort(Tglrt,'descend');
@@ -118,7 +125,7 @@ Th_AED=(TAED(floor(MonteCarloPfa*PFA-1))+TAED(floor(MonteCarloPfa*PFA)))/2;
 Th_CLGLRT=(TCLGLRT(floor(MonteCarloPfa*PFA-1))+TCLGLRT(floor(MonteCarloPfa*PFA)))/2;
 Th_KGLRTCC=(TKGLRTCC(floor(MonteCarloPfa*PFA-1))+TKGLRTCC(floor(MonteCarloPfa*PFA)))/2;
 Th_AMFCC=(TAMFCC(floor(MonteCarloPfa*PFA-1))+TAMFCC(floor(MonteCarloPfa*PFA)))/2;
-
+%%%%%%%%%%%%%%%%%%%%%检测概率%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 counter_amf=0;
 counter_ace=0;
 counter_glrt=0;
@@ -143,12 +150,14 @@ Pd_KGLRTCC_mc = zeros(1,length(SNRout));
 Pd_AMFCC_mc = zeros(1,length(SNRout));
 alpha=sqrt(SNRnum/abs(s_real'*irouR*s_real)); % 根据SNR=|alpha|^2*s'*R^(-1)*s求得|alpha|
 h = waitbar(0,'Please wait...');
+tic
 for m=1:length(SNRout)
-    for i=1:MonteCarloPd 
-        waitbar(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd,h,sprintf([num2str(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd*100),'%%']));
+    waitbar(m/length(SNRout),h,sprintf([num2str(m/length(SNRout)*100),'%%']));
+    parfor i=1:MonteCarloPd 
+%         waitbar(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd,h,sprintf([num2str(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd*100),'%%']));
         %%%%%%%%%%%训练数据产生%%%%%%%%%%%%%%
-        Train = fun_TrainData('g',N,L,rouR);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
-        x0 = fun_TrainData('g',N,1,rouR); % 接收信号仅包括杂波和噪声
+        Train = fun_TrainData(str_train,N,L,rouR);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
+        x0 = fun_TrainData(str_train,N,1,rouR); % 接收信号仅包括杂波和噪声
         %%%%协方差估计%%%%%%%%%%%%%%%%%%%%%%
         R_SCM = (fun_SCM(Train));
         iR_SCM = inv(R_SCM);
@@ -178,7 +187,7 @@ for m=1:length(SNRout)
         Tdnamf=Tace_bar/tmp;                  %%%%%% DNAMF  % eq.(24) 检测统计量
         Taed=tmp;                             %%%%%% 能量检测器  
         %%%%%% CLGLRT
-          Tclglrt = fun_CLGRT(lamda,mu,R_KA,R_SCM,x0,s);
+          Tclglrt = fun_CLGRT(lambda,mu,R_KA,R_SCM,x0,s);
 %         a = (s'*iR_ICL1*x0)/(s'*iR_ICL1*s);
 %         tmp1 = det(iR_ICL1)*((x0 - a*s)'*iR_ICL1*(x0 - a*s)+1/mu)^(-lamda-N);
 %         tmp2 = det(iR_ICL0)*(x0'*iR_ICL0*x0+1/mu)^(-lamda-N);
@@ -209,10 +218,11 @@ for m=1:length(SNRout)
     Pd_AMFCC_mc(m)=counter_amfcc/MonteCarloPd;        counter_amfcc=0;
 end
 close(h)
+toc
 figure(2);
 hold on
 plot(SNRout,Pd_KGLRT_mc,'b-+','linewidth',2)
-plot(SNRout,Pd_AMF_mc,'g.-')
+plot(SNRout,Pd_AMF_mc,'g.-','linewidth',2)
 plot(SNRout,Pd_ACE_mc,'r-x','linewidth',2)
 plot(SNRout,Pd_ABORT_mc,'c-*','linewidth',2)
 plot(SNRout,Pd_WABORT_mc,'m-P','linewidth',2)
@@ -228,6 +238,6 @@ xlabel('SNR/dB','FontSize',20)
 ylabel('Pd','FontSize',20)
 set(gca,'FontSize',20)
 grid on
-str=['Pd_CLGLRT_',num2str(n),'K','mu',num2str(mu),'lamda',num2str(lamda),'s',num2str(sigma_t),'o',num2str(opt),'_',str_train,'.mat'];
-save(str,'lamda','mu','sigma_t','SNRout','Pd_ABORT_mc','Pd_ACE_mc','Pd_AED_mc','Pd_AMF_mc',...
+str=['Pd_CLGLRT_',num2str(n),'K','mu',num2str(mu),'lamda',num2str(lambda),'s',num2str(sigma_t),'o',num2str(opt),'_',str_train,'.mat'];
+save(str,'lambda','mu','sigma_t','SNRout','Pd_ABORT_mc','Pd_ACE_mc','Pd_AED_mc','Pd_AMF_mc',...
     'Pd_CLGLRT_mc','Pd_DMRao_mc','Pd_DNAMF_mc','Pd_KGLRT_mc','Pd_WABORT_mc','Pd_KGLRTCC_mc','Pd_AMFCC_mc');
