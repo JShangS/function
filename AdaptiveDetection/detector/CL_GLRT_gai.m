@@ -4,11 +4,12 @@ clear
 close all
 %%%%参数设置
 n = 2;
-str_train = 'g';
+str_train = 'p';%%p:IG纹理复合高斯，k：k分布，g：gauss
 lambda = 3;
 mu = 1;
-opt = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
-%%%Pd_CLGLRT_2Kmu1lamda3s0.1o1_p：2K：训练单元数目，mu，lambda，s：失配向量方差，
+opt_train = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
+sigma_t = 0.1;
+%%%Pd_CLGLRT_2Kmu1lambda3s0.1o1_p：2K：训练单元数目，mu，lambda，s：失配向量方差，
 %%o1:opt=1，p：IG纹理复合高斯
 %%%%假设参数设置
 Na = 4;     % 阵元数
@@ -28,12 +29,11 @@ nn = 0:N-1;
 s = exp(-1i*2*pi*nn*theta_sig)'; %%%%%% 系统导向矢量
 for i=1:N
     for j=1:N
-        rouR(i,j)=rou^abs(i-j);%*exp(1j*2*pi*abs(i-j)*theta_sig)
+        rouR(i,j)=rou^abs(i-j)*exp(1j*2*pi*abs(i-j)*theta_sig);%
     end
 end
 irouR=inv(rouR);
 rouR_abs=abs(rouR);
-sigma_t = 0.1;
 t = normrnd(1,sigma_t,N,1);%%0~0.5%%失配向量
 R_KA = rouR.*(t*t');
 % R_KA_inv = inv(R_KA);
@@ -52,20 +52,14 @@ s_real=Weight*s+(1-Weight)*s_v;
 % figure; plot(weight,cos2_tmpt);
 %%%%%正式开始%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%门限计算%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % h = waitbar(0,'Please wait...');
-% r = ones(MonteCarloPfa,1);
-block = round(MonteCarloPfa/100);
 tic
 parfor i = 1:MonteCarloPfa
 %     waitbar(i/MonteCarloPfa,h,sprintf([num2str(i/MonteCarloPfa*100),'%%']));
 %%%%%%%%%%%训练数据产生%%%%%%%%%%%%%%
-    Train = fun_TrainData_gauss(N,L,rouR);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
-    x0 = fun_TrainData_gauss(N,1,rouR); % 接收信号仅包括杂波和噪声
-%     Train = fun_TrainData_IGCC(N,L,rouR,lamda,mu,opt);%%产生的训练数据,协方差矩阵为rouR的逆gamma纹理复合高斯杂波
-%     x0 = fun_TrainData_IGCC(N,1,rouR,lamda,mu,opt); % 接收信号仅包括杂波和噪声
-%     Train = fun_TrainData_K(N,L,rouR,mu);%%产生的训练数据,协方差矩阵为rouR的复合高斯杂波——K分布
-%     x0 = fun_TrainData_K(N,1,rouR,mu); % 接收信号仅包括杂波和噪声
+    Train = fun_TrainData(str_train,N,L,rouR,lambda,mu,opt_train);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
+    x0 = fun_TrainData(str_train,N,1,rouR,lambda,mu,opt_train); % 接收信号仅包括杂波和噪声
     %%%%协方差估计%%%%%%%%%%%%%%%%%%%%%%
     R_SCM = (fun_SCM(Train));
     iR_SCM = inv(R_SCM);
@@ -73,10 +67,6 @@ parfor i = 1:MonteCarloPfa
 %     iR_NSCM = inv(R_NSCM);
     R_CC = fun_CC(Train,R_SCM,R_KA);
     iR_CC = inv(R_CC);
-%     R_ICL1 = (fun_ICL(s,x0,inv(R_KA),inv(R_SCM),lamda,mu,1));
-%     R_ICL0 = (fun_ICL(s,x0,inv(R_KA),inv(R_SCM),lamda,mu,0));
-%     iR_ICL1 = inv(R_ICL1);
-%     iR_ICL0 = inv(R_ICL0);
     %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     Tamf(i) = abs(s'*iR_SCM*x0)^2/abs(s'*iR_SCM*s);     %%%%%% AMF或者wald
     tmp=abs(x0'*iR_SCM*x0);
@@ -125,7 +115,8 @@ Th_AED=(TAED(floor(MonteCarloPfa*PFA-1))+TAED(floor(MonteCarloPfa*PFA)))/2;
 Th_CLGLRT=(TCLGLRT(floor(MonteCarloPfa*PFA-1))+TCLGLRT(floor(MonteCarloPfa*PFA)))/2;
 Th_KGLRTCC=(TKGLRTCC(floor(MonteCarloPfa*PFA-1))+TKGLRTCC(floor(MonteCarloPfa*PFA)))/2;
 Th_AMFCC=(TAMFCC(floor(MonteCarloPfa*PFA-1))+TAMFCC(floor(MonteCarloPfa*PFA)))/2;
-%%%%%%%%%%%%%%%%%%%%%检测概率%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%检测概率%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 counter_amf=0;
 counter_ace=0;
 counter_glrt=0;
@@ -156,8 +147,8 @@ for m=1:length(SNRout)
     parfor i=1:MonteCarloPd 
 %         waitbar(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd,h,sprintf([num2str(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd*100),'%%']));
         %%%%%%%%%%%训练数据产生%%%%%%%%%%%%%%
-        Train = fun_TrainData(str_train,N,L,rouR);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
-        x0 = fun_TrainData(str_train,N,1,rouR); % 接收信号仅包括杂波和噪声
+        Train = fun_TrainData(str_train,N,L,rouR,lambda,mu,opt_train);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
+        x0 = fun_TrainData(str_train,N,1,rouR,lambda,mu,opt_train); % 接收信号仅包括杂波和噪声
         %%%%协方差估计%%%%%%%%%%%%%%%%%%%%%%
         R_SCM = (fun_SCM(Train));
         iR_SCM = inv(R_SCM);
@@ -238,6 +229,6 @@ xlabel('SNR/dB','FontSize',20)
 ylabel('Pd','FontSize',20)
 set(gca,'FontSize',20)
 grid on
-str=['Pd_CLGLRT_',num2str(n),'K','mu',num2str(mu),'lamda',num2str(lambda),'s',num2str(sigma_t),'o',num2str(opt),'_',str_train,'.mat'];
+str=['Pd_CLGLRT_',num2str(n),'K','mu',num2str(mu),'lambda',num2str(lambda),'s',num2str(sigma_t),'o',num2str(opt_train),'_',str_train,'.mat'];
 save(str,'lambda','mu','sigma_t','SNRout','Pd_ABORT_mc','Pd_ACE_mc','Pd_AED_mc','Pd_AMF_mc',...
     'Pd_CLGLRT_mc','Pd_DMRao_mc','Pd_DNAMF_mc','Pd_KGLRT_mc','Pd_WABORT_mc','Pd_KGLRTCC_mc','Pd_AMFCC_mc');

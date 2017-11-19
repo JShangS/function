@@ -9,7 +9,7 @@ function [ R ] = fun_TrainData( varargin )
 str = varargin{1}; %%%判断要实现的分布类型:
 switch str
     case 'g'
-        if nargin ~= 4
+        if nargin < 4
            error('Gauss分布训练数据输入参数为4个：g 选项，导向矢量维数，训练数据长度，协方差'); 
         end
         N = varargin{2};
@@ -17,7 +17,7 @@ switch str
         M = varargin{4};
         R = fun_TrainData_gauss(N,L, M);
     case 'k'
-        if nargin ~= 5
+        if nargin < 5
            error('K分布训练数据输入参数为5个：k 选项，导向矢量维数，训练数据长度，协方差,形状参数'); 
         end
         N = varargin{2};
@@ -35,9 +35,13 @@ switch str
         lamda = varargin{5};
         mu = varargin{6};
         if nargin == 6
-            opt = 1;
+            opt_train = 1;
+            R = fun_TrainData_IGCC( N,L,M,lamda,mu,opt_train);
+        else
+           opt_train = varargin{7};
+           R = fun_TrainData_IGCC( N,L,M,lamda,mu,opt_train);
         end
-        R = fun_TrainData_IGCC( N,L,M,lamda,mu,opt);
+        
     otherwise
             error('现在只有3种');
 end

@@ -9,7 +9,7 @@ function [ R_CLGRT ] = fun_CLGLRT_covariance( lamda,mu,RKA,R,x0,p,opt )
 iRKA = inv(RKA);
 iR = inv(R);
 [N,~] = size(x0);
-if opt ==1 %%H1假设下的协方差估计
+if opt == 1 %%H1假设下的协方差估计
    %%%alpha1
    a1 = (p'*iRKA*x0)/(p'*iRKA*p);
    tmp11 = (lamda+N)*iRKA;
@@ -22,7 +22,7 @@ if opt ==1 %%H1假设下的协方差估计
    beta1 = mu*(tmp11-tmp12)/N;
    %%%R_CLGRT
    R_CLGRT = alpha1*RKA+beta1*R;
-elseif opt==0%H0假设下的协方差估计
+elseif opt == 0%H0假设下的协方差估计
     %%%alpha0
     tmp01 = (lamda+N)*iRKA;
     tmp02 = N*(x0'*iRKA*x0);
@@ -33,7 +33,5 @@ elseif opt==0%H0假设下的协方差估计
     beta0 = mu*(tmp01-tmp02)/N;
     R_CLGRT = alpha0*RKA+beta0*R;
 end
-
-
 end
 
