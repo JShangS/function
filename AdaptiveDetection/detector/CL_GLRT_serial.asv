@@ -8,7 +8,7 @@ str_train = 'p';%%p:IG纹理复合高斯，k：k分布，g：gauss
 lambda = 4;
 mu = 1;
 opt_train = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
-sigma_t = 0.1;
+sigma_t = 0.2;
 %%%Pd_CLGLRT_2Kmu1lambda3s0.1o1_p：2K：训练单元数目，mu，lambda，s：失配向量方差，
 %%o1:opt=1，p：IG纹理复合高斯
 %%%%假设参数设置
