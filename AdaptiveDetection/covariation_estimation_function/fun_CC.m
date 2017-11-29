@@ -11,7 +11,7 @@ rou_ba_t = 0;
 for i = 1:N
     rou_ba_t = rou_ba_t+norm(X(:,i),'fro')^4/(N^2);
 end
-rou_ba = rou_ba_t-norm(R,'fro')^2/N;
+rou_ba = rou_ba_t-norm(R,'fro')^2/N;%R_KA
 alpha0 = rou_ba/(rou_ba+norm(R-R_KA,'fro')^2);
 % rou_ba = sum(diag(X'*X).^2)/N^2-sum(sum(abs(R).^2))/N;%£¨18£©Ê½,
 % alpha0 = rou_ba/(rou_ba+sum(sum(abs(R-R_KA).^2)));

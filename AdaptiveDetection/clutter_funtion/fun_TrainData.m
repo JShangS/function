@@ -1,4 +1,4 @@
-function [ R ] = fun_TrainData( varargin )
+function [ X ] = fun_TrainData( varargin )
 %FUN_TRAINDATA 此处显示有关此函数的摘要
 %   此处显示详细说明
 %JerryShang，2017.11.17
@@ -14,32 +14,32 @@ switch str
         end
         N = varargin{2};
         L = varargin{3};
-        M = varargin{4};
-        R = fun_TrainData_gauss(N,L, M);
+        R = varargin{4}; %%协方差
+        X = fun_TrainData_gauss(N,L, R);
     case 'k'
         if nargin < 5
            error('K分布训练数据输入参数为5个：k 选项，导向矢量维数，训练数据长度，协方差,形状参数'); 
         end
         N = varargin{2};
         L = varargin{3};
-        M = varargin{4};
+        R = varargin{4};
         v = varargin{5};
-        R = fun_TrainData_K( N,L, M, v);
+        X = fun_TrainData_K( N,L, R, v);
     case 'p'
         if nargin < 6
            error('IG分布训练数据输入参数至少6个：p 选项，导向矢量维数，训练数据长度，协方差,形状参数,尺度参数，SIRP选项'); 
         end
         N = varargin{2};
         L = varargin{3};
-        M = varargin{4};
+        R = varargin{4};
         lamda = varargin{5};
         mu = varargin{6};
         if nargin == 6
             opt_train = 1;
-            R = fun_TrainData_IGCC( N,L,M,lamda,mu,opt_train);
+            X = fun_TrainData_IGCC( N,L,R,lamda,mu,opt_train);
         else
            opt_train = varargin{7};
-           R = fun_TrainData_IGCC( N,L,M,lamda,mu,opt_train);
+           X = fun_TrainData_IGCC( N,L,R,lamda,mu,opt_train);
         end
         
     otherwise
