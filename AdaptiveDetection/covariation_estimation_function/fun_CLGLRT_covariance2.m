@@ -13,15 +13,15 @@ if opt == 1 %%H1假设下的协方差估计
    a1 = (p'*iRKA*x0)/(p'*iRKA*p);
    a2 = (p'*iR*x0)/(p'*iR*p);
    fai1 = (((x0-a1*p)'*iRKA*(x0-a1*p))/((x0-a2*p)'*iR*(x0-a2*p)));
-   alpha1 = abs(1/(1+fai1));
-   beta1 = abs(fai1/(1+fai1));
+   alpha1 = (1/(1+fai1));
+   beta1 = (fai1/(1+fai1));
    %%%R_CLGRT
    R_CLGRT = alpha1*RKA+beta1*R;
 %     R_CLGRT = alpha1*RKA + beta1*R;
 elseif opt == 0%H0假设下的协方差估计
     fai0 =  ((x0'*iRKA*x0)/(x0'*iR*x0));
-    alpha0 = abs(1/(1+fai0));
-    beta0 = abs(fai0/(1+fai0));
+    alpha0 = (1/(1+fai0));
+    beta0 = (fai0/(1+fai0));
     R_CLGRT = alpha0*RKA+beta0*R;
 end
 end

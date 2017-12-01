@@ -1,4 +1,4 @@
-function [ Tclglrt ] = fun_CLGLRT2( lambda,mu,RKA,R,x0,p )
+function [ Tclglrt ] = fun_CLGLRT2( RKA,R,x0,p )
 %FUN_CLGRT 此处显示有关此函数的摘要
 %   此处显示详细说明
 %%色加载的GLRT的结果

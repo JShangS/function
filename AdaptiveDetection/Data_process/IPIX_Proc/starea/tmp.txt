@@ -1,0 +1,46 @@
+File: 19931108_220902_starea.cdf
+
+%% Variables:
+            RF_frequency =       9.39 GHz
+            Pulse_length =        200 nanoseconds
+                     PRF =       1000 Hertz
+        Unambig_velocity =     7.9872 metres per second
+                   range = [2574 2589 ..range.. 2769] metres
+           azimuth_angle = [127.0734 127.0734 ..azimuth_angle.. 127.0624] degrees
+         elevation_angle = [359.6924 359.6924 ..elevation_angle.. 359.6924] degrees
+               radar_lat =      44.62 degrees
+               radar_lon =      63.43 degrees
+              radar_elev =         30 metres
+       antenna_beamwidth =        0.9 degrees
+            antenna_gain =       45.7 dB
+             like_stc_RF =          0 volts
+            cross_stc_RF =          0 volts
+             like_stc_IF =    0.84961 volts
+            cross_stc_IF =    0.84961 volts
+              decimation =          1 none
+              adc_like_I =          0 
+              adc_like_Q =          1 
+             adc_cross_I =          2 
+             adc_cross_Q =          3 
+                adc_data = [adc_data x adc_data x adc_data x adc_data] ADC output
+
+%% Dimensions:
+                  nrange =         14
+                  nsweep =     131072
+                  ntxpol =          2
+                    nadc =          4
+
+%% Global attributes:
+            Organization = McMaster University
+         Instrument_name = IPIX X-band Polarimetric Coherent Radar
+                Campaign = OHGR - Dartmouth
+                    Site = Osborne Head, NS
+    Data_collection_date = 1993/11/08 22:09:02
+         TX_polarization =          A
+        NetCDF_file_name = 19931108_220902_starea.cdf
+ NetCDF_creation_routine = make_Dartmouth_ncdf
+    NetCDF_creation_date = Thu May 17 18:25:58 2001
+           Field_CD_name =   ohgr0014
+          Field_file_dir =   Nov0893a
+         Field_file_name = starea7527965420
+      Field_dataset_name = /data/Nov8/starea0

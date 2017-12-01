@@ -1,0 +1,16 @@
+                    File                                            Target range bins
+                                                                 Primary        Secondary
+19931107_135603_starea.cdf                        9                    8:11
+19931107_141630_starea.cdf                        9                    8:11
+19931107_145028_starea.cdf                        8                    7:9
+19931108_213827_starea.cdf                        7                    6:8
+19931108_220902_starea.cdf                        7                    6:8
+19931109_191449_starea.cdf                        7                    6:8
+19931109_202217_starea.cdf                        7                    6:9
+19931110_001635_starea.cdf                        7                    5:8
+19931111_163625_starea.cdf                        8                    7:10
+19931118_023604_stareC0000.cdf                8                    7:10
+19931118_035737_stareC0000.cdf                10                  8:12
+19931118_162155_stareC0000.cdf                7                    6:9
+19931118_162658_stareC0000.cdf                7                    6:9
+19931118_174259_stareC0000.cdf                7                    6:9

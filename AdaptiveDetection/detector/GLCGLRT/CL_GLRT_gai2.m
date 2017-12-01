@@ -101,7 +101,7 @@ parfor i = 1:MonteCarloPfa
     Tdnamf(i)=Tace_bar/tmp;                     %%%%%% DNAMF  % eq.(24) 检测统计量
     Taed(i)=tmp;                                %%%%%% 能量检测器 
     %%%%%% CLGLRT
-    Tclglrt(i) = fun_CLGLRT2(lambda,mu,R_KA,R_SCM,x0,s);
+    Tclglrt(i) = fun_CLGLRT2(R_KA,R_SCM,x0,s);
 %     a = (s'*iR_ICL1*x0)/(s'*iR_ICL1*s);
 %     tmp1 = det(iR_ICL1)*((x0 - a*s)'*iR_ICL1*(x0 - a*s)+1/mu)^(-lamda-N);
 %     tmp2 = det(iR_ICL0)*(x0'*iR_ICL0*x0+1/mu)^(-lamda-N);
@@ -178,7 +178,7 @@ for m=1:length(SNRout)
         iR_NSCM = inv(R_NSCM);
         R_CC = fun_CC(Train,R_SCM,R_KA);
         iR_CC = inv(R_CC);
-        x0=alpha(m)*s_real+x0;%+pp;    %%%%%%%  重要  %%%%%%%%%%%%%
+        x0=alpha(m)*s+x0;%+pp;    %%%%%%%  重要  %%%%%%%%%%%%%
         %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%% AMF或者wald
         Tamf = abs(s'*iR_SCM*x0)^2/abs(s'*iR_SCM*s);   
@@ -209,7 +209,7 @@ for m=1:length(SNRout)
         %%%%%% 能量检测器  
         Taed=tmp;                            
         %%%%%% CLGLRT
-        Tclglrt = fun_CLGLRT2(lambda,mu,R_KA,R_SCM,x0,s);
+        Tclglrt = fun_CLGLRT2(R_KA,R_SCM,x0,s);
         %%%判断%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         if Tamf>Th_AMF;             counter_amf=counter_amf+1;          end            
         if Tglrt>Th_KGLRT;          counter_glrt=counter_glrt+1;        end                
