@@ -4,10 +4,10 @@ close all
 % 刘维建，2017.09.15
 % 多种检测器的检测性能仿真
 %%
-Na=4;     % 阵元数
+Na=2;     % 阵元数
 Np=4;     % 脉冲数
 N=Na*Np;
-L=round(1*N); 
+L=round(4*N); 
 SNRout=0:1:20; % 输出SNR
 cos2=0.9;
 PFA=1e-3;% PFA=1e-4;
@@ -49,14 +49,17 @@ Tprao = zeros(1,MonteCarloPfa);
 Tdnamf = zeros(1,MonteCarloPfa);
 Taed = zeros(1,MonteCarloPfa);
 tic    
-h = waitbar(0,'Please wait...');
-for i=1:MonteCarloPfa
-    waitbar(i/MonteCarloPfa,h,sprintf([num2str(i/MonteCarloPfa*100),'%%']));
-    X=(randn(N,L)+1i*randn(N,L))/sqrt(2); % 产生方差为1的复高斯白噪声 % Rwhite1=1/snapshot1*X1*X1'; eig(Rwhite1); % round(mean(abs(eig(Rwhite1)))) == 1
-    S=(R_half*X)*(R_half*X)'; % 有L个训练样本估计的杂波与噪声的协方差矩阵(Rhalf*X表示接收的L个训练数据)
+% h = waitbar(0,'Please wait...');
+parfor i=1:MonteCarloPfa
+%     waitbar(i/MonteCarloPfa,h,sprintf([num2str(i/MonteCarloPfa*100),'%%']));
+%     X=(randn(N,L)+1i*randn(N,L))/sqrt(2); % 产生方差为1的复高斯白噪声 % Rwhite1=1/snapshot1*X1*X1'; eig(Rwhite1); % round(mean(abs(eig(Rwhite1)))) == 1
+%     S=(R_half*X)*(R_half*X)'; % 有L个训练样本估计的杂波与噪声的协方差矩阵(Rhalf*X表示接收的L个训练数据)
+    Train = fun_TrainData('g',N,L,R);
+    S = fun_SCM(Train);
     iS=inv(S);
-    W=(randn(N,1)+1i*randn(N,1))/sqrt(2); % 1i == -i
-    x=R_half*W;%+pp; % noise=(randn(N,1)+j*randn(N,1))/sqrt(2);  % 接收信号仅包括杂波和噪声
+%     W=(randn(N,1)+1i*randn(N,1))/sqrt(2); % 1i == -i
+%     x=R_half*W;%+pp; % noise=(randn(N,1)+j*randn(N,1))/sqrt(2);  % 接收信号仅包括杂波和噪声
+    x = fun_TrainData('g',N,1,R);
     Tamf(i)=abs(vt'*iS*x)^2/abs(vt'*iS*vt);     %%%%%% AMF或者wald
     tmp=abs(x'*iS*x);
     Tglrt(i)=Tamf(i)/(1+tmp);                   %%%%%% KGLRT
@@ -68,7 +71,6 @@ for i=1:MonteCarloPfa
     Tdnamf(i)=Tace_bar/tmp;                     %%%%%% DNAMF  % eq.(24) 检测统计量
     Taed(i)=tmp;                                %%%%%% 能量检测器 
 end
-close(h)
 TAMF=sort(Tamf,'descend');
 TACE=sort(Tace,'descend');
 TKGLRT=sort(Tglrt,'descend');
@@ -110,16 +112,18 @@ Pd_DNAMF_mc = zeros(1,length(SNRout));
 Pd_AED_mc = zeros(1,length(SNRout));
 h = waitbar(0,'Please wait...');
 for m=1:length(SNRout)
-    for i=1:MonteCarloPd
-        waitbar(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd,h,sprintf([num2str(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd*100),'%%']));
-        X=(randn(N,L)+1i*randn(N,L))/sqrt(2); % 产生方差为1的复高斯白噪声 % Rwhite1=1/snapshot1*X1*X1'; eig(Rwhite1); % round(mean(abs(eig(Rwhite1)))) == 1
-        S=(R_half*X)*(R_half*X)'; % 有L个训练样本估计的杂波与噪声的协方差矩阵(Rhalf*X表示接收的L个训练数据)
+    waitbar(m/length(SNRout),h,sprintf([num2str(m/length(SNRout)*100),'%%']));
+    parfor i=1:MonteCarloPd
+%         X=(randn(N,L)+1i*randn(N,L))/sqrt(2); % 产生方差为1的复高斯白噪声 % Rwhite1=1/snapshot1*X1*X1'; eig(Rwhite1); % round(mean(abs(eig(Rwhite1)))) == 1
+%         S=(R_half*X)*(R_half*X)'; % 有L个训练样本估计的杂波与噪声的协方差矩阵(Rhalf*X表示接收的L个训练数据)
+        Train = fun_TrainData('g',N,L,R);
+        S = fun_SCM(Train);
         iS=inv(S);
         W=(randn(N,1)+1i*randn(N,1))/sqrt(2); % 1i == -i
     %     THETA=a+(b-a)*rand; % 产出0--2*pi的均匀分布随机相位
     %         x=alpha(m)*exp(1i*THETA)*vt+Clutter;%+pp;
-        x=alpha(m)*vt_real+R_half*W;%+pp;    %%%%%%%  重要  %%%%%%%%%%%%%
-
+        x = fun_TrainData('g',N,1,R);
+        x=alpha(m)*vt_real+x;%+pp;    %%%%%%%  重要  %%%%%%%%%%%%%
         Tamf=abs(vt'*iS*x)^2/abs(vt'*iS*vt);  %%%%%% AMF
         tmp=abs(x'*iS*x);
         Tglrt=Tamf/(1+tmp);                   %%%%%% KGLRT
@@ -157,14 +161,14 @@ figure(2);
 hold on
 plot(SNRout,Pd_KGLRT_mc,'b-+','linewidth',2)
 plot(SNRout,Pd_AMF_mc,'g.-')
-% plot(SNRout,Pd_ACE_mc,'r-x','linewidth',2)
-% plot(SNRout,Pd_ABORT_mc,'c-*','linewidth',2)
-% plot(SNRout,Pd_WABORT_mc,'m-P','linewidth',2)
+plot(SNRout,Pd_ACE_mc,'r-x','linewidth',2)
+plot(SNRout,Pd_ABORT_mc,'c-*','linewidth',2)
+plot(SNRout,Pd_WABORT_mc,'m-P','linewidth',2)
 plot(SNRout,Pd_DMRao_mc,'r-o','linewidth',2)
-% plot(SNRout,Pd_AED_mc,'r-d','linewidth',2)
-% plot(SNRout,Pd_DNAMF_mc,'g-s','linewidth',2);    
-% legend('KGLRT','AMF/DMwald','ACE','ABORT','WABORT','DMRao','AED','DNAMF')
-legend({'KGLRT','AMF/DMwald','DMRao'},'FontSize',20)
+plot(SNRout,Pd_AED_mc,'r-d','linewidth',2)
+plot(SNRout,Pd_DNAMF_mc,'g-s','linewidth',2);    
+legend('KGLRT','AMF/DMwald','ACE','ABORT','WABORT','DMRao','AED','DNAMF')
+% legend({'KGLRT','AMF/DMwald','DMRao'},'FontSize',20)
 xlabel('SNR/dB','FontSize',20)
 ylabel('Pd','FontSize',20)
 set(gca,'FontSize',20)

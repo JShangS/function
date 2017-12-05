@@ -1,12 +1,14 @@
 %%%实现一个基于色加载的GLRT检测器
 %%%%用化简后的公式
 %%8维的导向矢量，函数用的是GL3
+%%高斯情况下:GLC用SCMN，CC用SCMN，KGLRT用SCM，NSCM用NSCM
+%%非高斯情况下:GLC用SCMN，CC用SCMN，KGLRT用SCM，NSCM用NSCM
 clc
 clear 
 close all
 %%%%参数设置
-n = 1; %几倍的样本
-str_train = 'g';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
+n = 3; %几倍的样本
+str_train = 'p';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
 lambda = 3;
 mu = 1;
 opt_train = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
@@ -73,30 +75,36 @@ parfor i = 1:MonteCarloPfa
     R_SCM = (fun_SCM(Train));
     iR_SCM = inv(R_SCM);
     
+    R_SCMN = (fun_SCMN(Train));
+    iR_SCMN = inv(R_SCMN);
+    
     R_NSCM = fun_NSCM(Train);
     iR_NSCM = inv(R_NSCM);
     
-    R_CC = fun_CC(Train,R_SCM,R_KA);
+    R_NSCMN = fun_NSCMN(Train);
+    iR_NSCMN = inv(R_NSCMN);
+    
+    R_CC = fun_CC(Train,R_SCMN,R_KA);
     iR_CC = inv(R_CC);
     %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%% AMF或者wald
     Tamf(i) = abs(s'*iR_SCM*x0)^2/abs(s'*iR_SCM*s);    
     tmp=abs(x0'*iR_SCM*x0);
+    %%%%%% KGLRT
+    Tglrt(i) = Tamf(i)/(1+tmp);  
     %%%%%% AMFCC或者wald_CC
     Tamfcc(i) = abs(s'*iR_CC*x0)^2/abs(s'*iR_CC*s);     
     tmpcc=abs(x0'*iR_CC*x0);
-    %%%%%%%%%%% AMFNSCM
-    Tamfnscm(i) = abs(s'*iR_NSCM*x0)^2/abs(s'*iR_NSCM*s);     
-    tmpnscm=abs(x0'*iR_NSCM*x0);
-    %%%%%% KGLRT
-    Tglrt(i) = Tamf(i)/(1+tmp);     
     %%%%%% KGLRTCC
     Tglrtcc(i) = Tamfcc(i)/(1+tmpcc);
+    %%%%%%%%%%% AMFNSCM
+    Tamfnscm(i) = abs(s'*iR_NSCM*x0)^2/abs(s'*iR_NSCM*s);     
+    tmpnscm=abs(x0'*iR_NSCM*x0); 
     %%%%%% KGLRTNSCM
     Tglrtnscm(i) = Tamfnscm(i)/(1+tmpnscm);
     %%%%%% CLGLRT
 %     Tclglrt(i) = fun_CLGLRT2(R_KA,R_SCM,x0,s);
-    Tclglrt(i) = fun_CLGLRT3(lambda,mu,R_KA,R_SCM,x0,s);
+    Tclglrt(i) = fun_CLGLRT3(lambda,mu,R_KA,R_SCMN,x0,s);
 end
 toc
 % close(h)
@@ -133,30 +141,38 @@ for m=1:length(SNRout)
         %%%%协方差估计%%%%%%%%%%%%%%%%%%%%%%
         R_SCM = (fun_SCM(Train));
         iR_SCM = inv(R_SCM);
+        
+        R_SCMN = (fun_SCMN(Train));
+        iR_SCMN = inv(R_SCMN);
+        
         R_NSCM = (fun_NSCM(Train));
         iR_NSCM = inv(R_NSCM);
-        R_CC = fun_CC(Train,R_SCM,R_KA);
+        
+        R_NSCMN = fun_NSCMN(Train);
+        iR_NSCMN = inv(R_NSCMN);
+        
+        R_CC = fun_CC(Train,R_SCMN,R_KA);
         iR_CC = inv(R_CC);
         x0=alpha(m)*s+x0;%+pp;    %%%%%%%  重要  %%%%%%%%%%%%%
         %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %%%%%% AMF或者wald
-        Tamf = abs(s'*iR_SCM*x0)^2/abs(s'*iR_SCM*s);   
-        tmp=abs(x0'*iR_SCM*x0);
         %%%%%% AMFCC或者wald
         Tamfcc = abs(s'*iR_CC*x0)^2/abs(s'*iR_CC*s);    
         tmpcc = abs(x0'*iR_CC*x0);
+        %%%%%% KGLRTCC
+        Tglrtcc = Tamfcc/(1+tmpcc);
+        %%%%%% AMF或者wald
+        Tamf = abs(s'*iR_SCM*x0)^2/abs(s'*iR_SCM*s);   
+        tmp=abs(x0'*iR_SCM*x0);
+        %%%%%% KGLRT
+        Tglrt = Tamf/(1+tmp); 
         %%%%%% AMF-NSCM或者wald即NAMF
         Tamfnscm = abs(s'*iR_NSCM*x0)^2/abs(s'*iR_NSCM*s);    
         tmpnscm = abs(x0'*iR_NSCM*x0);
-        %%%%%% KGLRT
-        Tglrt = Tamf/(1+tmp); 
-        %%%%%% KGLRTCC
-        Tglrtcc = Tamfcc/(1+tmpcc);
         %%%%%% KGLRTNSCM
-        Tglrtnscm = Tamfnscm/(1+tmpnscm);   
+        Tglrtnscm = Tamfnscm/(1+tmpnscm);         
         %%%%%% CLGLRT
 %         Tclglrt = fun_CLGLRT2(R_KA,R_SCM,x0,s);
-        Tclglrt = fun_CLGLRT3(lambda,mu,R_KA,R_SCM,x0,s);
+        Tclglrt = fun_CLGLRT3(lambda,mu,R_KA,R_SCMN,x0,s);
         %%%判断%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
         if Tglrt>Th_KGLRT;          counter_glrt=counter_glrt+1;        end                
         if Tclglrt>Th_CLGLRT;       counter_clglrt=counter_clglrt+1;    end   
@@ -177,10 +193,11 @@ plot(SNRout,Pd_CLGLRT_mc,'k.-','linewidth',2)
 plot(SNRout,Pd_KGLRTCC_mc,'g-s','linewidth',2)
 plot(SNRout,Pd_KGLRT_mc,'b-+','linewidth',2)
 plot(SNRout,Pd_KGLRTNSCM_mc,'c-o','linewidth',2)
-legend('CLGLRT','KGLRTCC','KGLRT','KGLRTNSCM');
+h_leg = legend('CLGLRT','KGLRTCC','KGLRT','KGLRTNSCM');
 xlabel('SNR/dB','FontSize',20)
 ylabel('Pd','FontSize',20)
 set(gca,'FontSize',20)
+set(h_leg,'Location','SouthEast')
 grid on
 % % str=['Pd_CLGLRT_',num2str(N),'N','_',num2str(n),'K','mu',num2str(mu),'lambda',num2str(lambda),'s',num2str(sigma_t),'o',num2str(opt_train),'_',str_train,'.mat'];
 str=['Pd_CLGLRT4_',num2str(n),'K','mu',num2str(mu),...

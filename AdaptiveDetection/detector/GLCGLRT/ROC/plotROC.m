@@ -26,5 +26,7 @@ ylabel('Pd','FontSize',20)
 set(gca,'FontSize',20)
 set(h_leg,'Location','SouthEast')
 set(gcf,'Position',[700 0 1200 1000])
+set(gca,'Xscale','log')
+axis([1e-4,1e-1,0,1])
 grid on
 box on

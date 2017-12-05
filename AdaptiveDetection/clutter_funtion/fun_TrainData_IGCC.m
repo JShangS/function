@@ -1,4 +1,4 @@
-function [ Train ] = fun_TrainData_IGCC( N,L,M,lamda,mu,opt_train)
+function [ Train ] = fun_TrainData_IGCC( N,L,M,lambda,mu,opt_train)
 %FUN_TRAINDATA_IGCC 此处显示有关此函数的摘要
 %   此处显示详细说明
 %JerryShang，2017.11.16
@@ -12,11 +12,11 @@ if nargin == 5
     opt_train = 1;
 end
 if opt_train == 1
-    pct=sqrt(ones(L,1)./gamrnd(lamda,mu,L,1));
+    pct=sqrt(ones(L,1)./gamrnd(lambda,mu,L,1));
     X = fun_TrainData_gauss(N,L,M);
     Train=(ones(N,1)*pct.').*X;
 elseif opt_train == 2
-    pct=sqrt(1./gamrnd(lamda,mu,1,1));
+    pct=sqrt(1./gamrnd(lambda,mu,1,1));
     X = fun_TrainData_gauss(N,L,M);
     Train=(ones(N,L)*pct.').*X;
 else

@@ -1,6 +1,6 @@
 %%%实现一个基于色加载的GLRT检测器
-%%%%MIT Lincoln Laboratory Phase One radar 1985年数据
-%%%%《CFAR Behavior of Adaptive Detectors: An Experimental Analysis》
+%%%%
+%%%%
 clc
 clear 
 close all
@@ -9,7 +9,7 @@ load 19980205_170935_IPIX.mat
 n = 3; %几倍的样本
 sigma_t = 0;
 % range = 14;
-lambda = 2;
+lambda = 3;
 mu = 1;
 % str_train = 'p';
 % opt_train = 1;
@@ -65,10 +65,13 @@ parfor i = 1:MonteCarloPfa
     R_SCM = (fun_SCM(Train));
     iR_SCM = inv(R_SCM);
     
+    R_SCMN = (fun_SCMN(Train));
+    iR_SCMN = inv(R_SCMN);
+    
     R_NSCM = fun_NSCM(Train);
     iR_NSCM = inv(R_NSCM);
     
-    R_CC = fun_CC(Train,R_SCM,R_KA);
+    R_CC = fun_CC(Train,R_SCMN,R_KA);
     iR_CC = inv(R_CC);
     %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%% AMF或者wald
@@ -89,7 +92,7 @@ parfor i = 1:MonteCarloPfa
     %%%%%% CLGLRT
 %     Tclglrt(i) = fun_CLGLRT2(R_KA,R_SCM,x0,s);
 %     Tclglrt(i) = fun_CLGLRT(lambda,mu,R_KA,R_SCM,x0,s);
-    Tclglrt(i) = fun_CLGLRT3(lambda,mu,R_KA,R_SCM,x0,s);
+    Tclglrt(i) = fun_CLGLRT3(lambda,mu,R_KA,R_SCMN,x0,s);
 end
 toc
 % close(h)
@@ -133,9 +136,11 @@ for m=1:length(SNRout)
         %%%%协方差估计%%%%%%%%%%%%%%%%%%%%%%
         R_SCM = (fun_SCM(Train));
         iR_SCM = inv(R_SCM);
+        R_SCMN = (fun_SCMN(Train));
+        iR_SCMN = inv(R_SCMN);
         R_NSCM = (fun_NSCM(Train));
         iR_NSCM = inv(R_NSCM);
-        R_CC = fun_CC(Train,R_SCM,R_KA);
+        R_CC = fun_CC(Train,R_SCMN,R_KA);
         iR_CC = inv(R_CC);
         x0=alpha(m)*s+x0;%+pp;    %%%%%%%  重要  %%%%%%%%%%%%%
         %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -156,7 +161,7 @@ for m=1:length(SNRout)
         Tglrtnscm = Tamfnscm/(1+tmpnscm);       
         %%%%%% CLGLRT
 %         Tclglrt = fun_CLGLRT2(R_KA,R_SCM,x0,s);
-        Tclglrt = fun_CLGLRT3(lambda,mu,R_KA,R_SCM,x0,s);
+        Tclglrt = fun_CLGLRT3(lambda,mu,R_KA,R_SCMN,x0,s);
 %          Tclglrt = fun_CLGLRT(lambda,mu,R_KA,R_SCM,x0,s);
         %%%判断%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%     
         if Tglrt>Th_KGLRT;          counter_glrt=counter_glrt+1;        end                          
@@ -185,5 +190,5 @@ ylabel('Pd','FontSize',20)
 set(gca,'FontSize',20)
 grid on
 % str=['Pd_CLGLRT_',num2str(N),'N','_',num2str(n),'K','mu',num2str(mu),'lambda',num2str(lambda),'s',num2str(sigma_t),'o',num2str(opt_train),'_',str_train,'.mat'];
-str=['Pd_CLGLRT_IPIX3_',num2str(n),'K','s',num2str(sigma_t),'.mat'];
+str=['Pd_CLGLRT_IPIX4_',num2str(n),'K','s',num2str(sigma_t),'.mat'];
 save(str,'SNRout','Pd_CLGLRT_mc','Pd_KGLRT_mc','Pd_KGLRTCC_mc','Pd_KGLRTNSCM_mc');
