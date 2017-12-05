@@ -6,7 +6,7 @@ clear
 close all
 load 19980205_170935_IPIX.mat
 %%%%参数设置
-n = 3; %几倍的样本
+n = 1; %几倍的样本
 sigma_t = 0;
 % range = 14;
 lambda = 3;

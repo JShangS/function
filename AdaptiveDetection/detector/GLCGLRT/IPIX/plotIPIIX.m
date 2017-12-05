@@ -3,7 +3,7 @@ clear
 close all
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%Êµ²âÊý¾ÝIPIX%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-load Pd_CLGLRT_IPIX3_1Ks0.mat
+load Pd_CLGLRT_IPIX4_1Ks0.mat
 figure
 hold on
 SNRout = SNRout -15;
@@ -11,13 +11,13 @@ plot(SNRout,Pd_CLGLRT_mc,'k-o','linewidth',2,'markersize',10);
 plot(SNRout,Pd_KGLRTCC_mc,'g-o','linewidth',2,'markersize',10);
 plot(SNRout,Pd_KGLRT_mc,'b-o','linewidth',2,'markersize',10);
 plot(SNRout,Pd_KGLRTNSCM_mc,'c-o','linewidth',2,'markersize',10);
-load Pd_CLGLRT_IPIX3_2Ks0.mat
+load Pd_CLGLRT_IPIX4_2Ks0.mat
 SNRout = SNRout -15;
 plot(SNRout,Pd_CLGLRT_mc,'k-s','linewidth',2,'markersize',10);
 plot(SNRout,Pd_KGLRTCC_mc,'g-s','linewidth',2,'markersize',10);
 plot(SNRout,Pd_KGLRT_mc,'b-s','linewidth',2,'markersize',10);
 plot(SNRout,Pd_KGLRTNSCM_mc,'c-s','linewidth',2,'markersize',10);
-load Pd_CLGLRT_IPIX3_3Ks0.mat
+load Pd_CLGLRT_IPIX4_3Ks0.mat
 SNRout = SNRout -15;
 plot(SNRout,Pd_CLGLRT_mc,'k-*','linewidth',2,'markersize',10);
 plot(SNRout,Pd_KGLRTCC_mc,'g-*','linewidth',2,'markersize',10);
