@@ -10,11 +10,11 @@ n = 1; %几倍的样本
 sigma_t = 0;
 lambda = 3;
 mu = 1;
-% str_train = 'p';
-% opt_train = 1;
+str_train = 'g';
+opt_train = 1;
 %%%%参数设置
 N = 8;
-SNRout=10:1:45; % 输出SNR
+SNRout=-5:1:25; % 输出SNR
 cos2=0.9;
 PFA=1e-3;% PFA=1e-4;
 SNRnum=10.^(SNRout/10);
@@ -49,16 +49,17 @@ s_real=Weight*s+(1-Weight)*s_v;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % h = waitbar(0,'Please wait...');
 tic
+M = 30720;
 parfor i = 1:MonteCarloPfa
 %     waitbar(i/MonteCarloPfa,h,sprintf([num2str(i/MonteCarloPfa*100),'%%']));
-%%%%%%%%%%%训练数据产生%%%%%%%%%%%%%%
-%       Train = fun_TrainData(str_train,N,L,rouR,lambda,mu,opt_train);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
-%       x0 = fun_TrainData(str_train,N,1,rouR,lambda,mu,opt_train); % 接收信号仅包括杂波和噪声
-    index_t1 = ceil(rand()*3000);
-    Train1 = Zhh((index_t1-1)*N+1:index_t1*N,Range-L/2:Range-1);
-    Train2 = Zhh((index_t1-1)*N+1:index_t1*N,Range+1:Range+L/2);
+%%%%%%%%%%%训练数据产生%%%%%%%%%%%%%%   
+%     Train = fun_TrainData(str_train,N,L,rouR,lambda,mu,opt_train);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
+%     x0 = fun_TrainData(str_train,N,1,rouR,lambda,mu,opt_train); % 接收信号仅包括杂波和噪声
+    index_t1 = ceil(rand()*(M-10));
+    Train1 = Zhh(index_t1:index_t1+7,Range-L/2:Range-1);
+    Train2 = Zhh(index_t1:index_t1+7,Range+1:Range+L/2);
     Train = [Train1,Train2];%%产生的训练数据,协方差矩阵为rouR的高斯杂波
-    x0 = Zhh((index_t1-1)*N+1:index_t1*N,Range) ; % 接收信号仅包括杂波和噪声
+    x0 = Zhh(index_t1:index_t1+7,Range) ; % 接收信号仅包括杂波和噪声
     %%%%协方差估计%%%%%%%%%%%%%%%%%%%%%%
     R_SCM = (fun_SCM(Train));
     iR_SCM = inv(R_SCM);
@@ -68,6 +69,9 @@ parfor i = 1:MonteCarloPfa
     
     R_NSCM = fun_NSCM(Train);
     iR_NSCM = inv(R_NSCM);
+    
+    R_NSCMN = fun_NSCM(Train);
+    iR_NSCMN = inv(R_NSCMN);
     
     R_CC = fun_CC(Train,R_SCMN,R_KA);
     iR_CC = inv(R_CC);
@@ -125,11 +129,12 @@ for m=1:length(SNRout)
         %%%%%%%%%%%训练数据产生%%%%%%%%%%%%%%
 %         Train = fun_TrainData(str_train,N,L,rouR,lambda,mu,opt_train);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
 %         x0 = fun_TrainData(str_train,N,1,rouR,lambda,mu,opt_train); % 接收信号仅包括杂波和噪声
-        index_t1 = ceil(rand()*3000);
-        Train1 = Zhh((index_t1-1)*N+1:index_t1*N,Range-L/2:Range-1);
-        Train2 = Zhh((index_t1-1)*N+1:index_t1*N,Range+1:Range+L/2);
+        index_t1 = ceil(rand()*(M-10));
+        Train1 = Zhh(index_t1:index_t1+7,Range-L/2:Range-1);
+        Train2 = Zhh(index_t1:index_t1+7,Range+1:Range+L/2);
         Train = [Train1,Train2];%%产生的训练数据,协方差矩阵为rouR的高斯杂波
-        x0 = Zhh((index_t1-1)*N+1:index_t1*N,Range) ; % 接收信号仅包括杂波和噪声
+        x0 = Zhh(index_t1:index_t1+7,Range) ; % 接收信号仅包括杂波和噪声
+        x0=alpha(m)*s+x0;%+pp;    %%%%%%%  重要  %%%%%%%%%%%%%
         %%%%协方差估计%%%%%%%%%%%%%%%%%%%%%%
         R_SCM = (fun_SCM(Train));
         iR_SCM = inv(R_SCM);
@@ -139,9 +144,12 @@ for m=1:length(SNRout)
         
         R_NSCM = (fun_NSCM(Train));
         iR_NSCM = inv(R_NSCM);
+        
+        R_NSCMN = fun_NSCM(Train);
+        iR_NSCMN = inv(R_NSCMN);
         R_CC = fun_CC(Train,R_SCMN,R_KA);
         iR_CC = inv(R_CC);
-        x0=alpha(m)*s+x0;%+pp;    %%%%%%%  重要  %%%%%%%%%%%%%
+        
         %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%% AMF或者wald
         Tamf = abs(s'*iR_SCM*x0)^2/abs(s'*iR_SCM*s);   
@@ -182,11 +190,11 @@ plot(SNRout,Pd_KGLRTCC_mc,'g->','linewidth',2)
 plot(SNRout,Pd_KGLRT_mc,'b-o','linewidth',2)
 plot(SNRout,Pd_KGLRTNSCM_mc,'c-s','linewidth',2)
 legend('CLGLRT','KGLRTCC','KGLRT','KGLRTNSCM');
-% legend({'KGLRT','AMF/DMwald','DMRao'},'FontSize',20)
 xlabel('SNR/dB','FontSize',20)
 ylabel('Pd','FontSize',20)
 set(gca,'FontSize',20)
 grid on
 % str=['Pd_CLGLRT_',num2str(N),'N','_',num2str(n),'K','mu',num2str(mu),'lambda',num2str(lambda),'s',num2str(sigma_t),'o',num2str(opt_train),'_',str_train,'.mat'];
+% str=['Pd_CLGLRT4_PhaseOne_',num2str(n),'K','s',num2str(sigma_t),'_',str_train,'.mat'];
 str=['Pd_CLGLRT4_PhaseOne_',num2str(n),'K','s',num2str(sigma_t),'.mat'];
 save(str,'SNRout','Pd_CLGLRT_mc','Pd_KGLRT_mc','Pd_KGLRTCC_mc','Pd_KGLRTNSCM_mc');

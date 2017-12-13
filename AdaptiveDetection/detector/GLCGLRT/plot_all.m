@@ -80,38 +80,38 @@ grid on
 box on
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%高斯环境下%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% figure(3)
-% hold on
-% load Pd_CLGLRT2_1Kmu1lambda3s0.1o1_g.mat
-% SNRout_real=0:1:20; % 输出SNR
-% L = length(SNRout_real);
-% plot(SNRout_real,Pd_CLGLRT_mc(1:L),'b-s','linewidth',2,'markersize',10);
-% plot(SNRout_real,Pd_KGLRTCC_mc(1:L),'r-s','linewidth',2,'markersize',10);
-% plot(SNRout_real,Pd_KGLRT_mc(1:L),'g-s','linewidth',2,'markersize',10);
-% plot(SNRout_real,Pd_KGLRTNSCM_mc(1:L),'k-s','linewidth',2,'markersize',10);
-% load Pd_CLGLRT2_2Kmu1lambda3s0.1o1_g.mat
-% plot(SNRout_real,Pd_CLGLRT_mc(1:L),'b->','linewidth',2,'markersize',10);
-% plot(SNRout_real,Pd_KGLRTCC_mc(1:L),'r->','linewidth',2,'markersize',10);
-% plot(SNRout_real,Pd_KGLRT_mc(1:L),'g->','linewidth',2,'markersize',10);
-% plot(SNRout_real,Pd_KGLRTNSCM_mc(1:L),'k->','linewidth',2,'markersize',10);
-% load Pd_CLGLRT2_4Kmu1lambda3s0.1o1_g.mat
-% plot(SNRout_real,Pd_CLGLRT_mc(1:L),'b-o','linewidth',2,'markersize',10);
-% plot(SNRout_real,Pd_KGLRTCC_mc(1:L),'r-o','linewidth',2,'markersize',10);
-% plot(SNRout_real,Pd_KGLRT_mc(1:L),'g-o','linewidth',2,'markersize',10);
-% plot(SNRout_real,Pd_KGLRTNSCM_mc(1:L),'k-o','linewidth',2,'markersize',10);
-% h_leg = legend('GLC-GLRT,K=16','1S-GLRT with CC,K=16',...
-%                '1S-GLRT with SCM,K=16','1S-GLRT with NSCM,K=16',...
-%                'GLC-GLRT,K=32','1S-GLRT with CC,K=32',...
-%                '1S-GLRT with SCM,K=32','1S-GLRT with NSCM,K=32',...
-%                'GLC-GLRT,K=64','1S-GLRT with CC,K=64',...
-%                '1S-GLRT with SCM,K=64','1S-GLRT with NSCM,K=64');
-% xlabel('SNR/dB','FontSize',20)
-% ylabel('Pd','FontSize',20)
-% set(gca,'FontSize',20)
-% set(gcf,'Position',[700 0 1200 1000])
-% set(h_leg,'Location','SouthEast')
-% grid on
-% box on
+figure(3)
+hold on
+load Pd_CLGLRT2_1Kmu1lambda3s0.1o1_g.mat
+SNRout_real=0:1:20; % 输出SNR
+L = length(SNRout_real);
+plot(SNRout_real,Pd_CLGLRT_mc(1:L),'b-s','linewidth',2,'markersize',10);
+plot(SNRout_real,Pd_KGLRTCC_mc(1:L),'r-s','linewidth',2,'markersize',10);
+plot(SNRout_real,Pd_KGLRT_mc(1:L),'g-s','linewidth',2,'markersize',10);
+plot(SNRout_real,Pd_KGLRTNSCM_mc(1:L),'k-s','linewidth',2,'markersize',10);
+load Pd_CLGLRT2_2Kmu1lambda3s0.1o1_g.mat
+plot(SNRout_real,Pd_CLGLRT_mc(1:L),'b->','linewidth',2,'markersize',10);
+plot(SNRout_real,Pd_KGLRTCC_mc(1:L),'r->','linewidth',2,'markersize',10);
+plot(SNRout_real,Pd_KGLRT_mc(1:L),'g->','linewidth',2,'markersize',10);
+plot(SNRout_real,Pd_KGLRTNSCM_mc(1:L),'k->','linewidth',2,'markersize',10);
+load Pd_CLGLRT2_4Kmu1lambda3s0.1o1_g.mat
+plot(SNRout_real,Pd_CLGLRT_mc(1:L),'b-o','linewidth',2,'markersize',10);
+plot(SNRout_real,Pd_KGLRTCC_mc(1:L),'r-o','linewidth',2,'markersize',10);
+plot(SNRout_real,Pd_KGLRT_mc(1:L),'g-o','linewidth',2,'markersize',10);
+plot(SNRout_real,Pd_KGLRTNSCM_mc(1:L),'k-o','linewidth',2,'markersize',10);
+h_leg = legend('GLC-GLRT,K=16','1S-GLRT with CC,K=16',...
+               '1S-GLRT with SCM,K=16','1S-GLRT with NSCM,K=16',...
+               'GLC-GLRT,K=32','1S-GLRT with CC,K=32',...
+               '1S-GLRT with SCM,K=32','1S-GLRT with NSCM,K=32',...
+               'GLC-GLRT,K=64','1S-GLRT with CC,K=64',...
+               '1S-GLRT with SCM,K=64','1S-GLRT with NSCM,K=64');
+xlabel('SNR/dB','FontSize',20)
+ylabel('Pd','FontSize',20)
+set(gca,'FontSize',20)
+set(gcf,'Position',[700 0 1200 1000])
+set(h_leg,'Location','SouthEast')
+grid on
+box on
 %%%%%%%%%%%%%%%%%%%%%%%%%%不同lambda下的检测概率%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % figure(4)

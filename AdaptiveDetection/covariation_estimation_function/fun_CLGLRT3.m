@@ -8,8 +8,8 @@ R0 = fun_CLGLRT_covariance2(RKA,R,x0,p,0);%%H0下的协方差估计结果
 iR1 = inv(R1);
 iR0 = inv(R0);
 a = (p'*iR1*x0)/(p'*iR1*p);
-tmp1 = det(R0)*((x0-a*p)'*iR1*(x0-a*p)+1/mu)^(-(lambda+N));
-tmp0 = det(R1)*(x0'*iR0*x0+1/mu)^(-(lambda+N));
+tmp1 = det(R0)*((x0-a*p)'*iR1*(x0-a*p)+1/mu)^(-(+N));%lambda
+tmp0 = det(R1)*(x0'*iR0*x0+1/mu)^(-(+N));%lambda
 Tclglrt = abs(tmp1/tmp0);
 end
 

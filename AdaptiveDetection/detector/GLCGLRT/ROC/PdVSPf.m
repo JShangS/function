@@ -17,7 +17,7 @@ Np = 4;     % 脉冲数
 N = Na*Np;
 SNRout=[-5,5,15]; % 输出SNR
 cos2=0.9;
-PFA=[1e-4,1e-3,linspace(1e-2,1e-1,10)];% PFA=1e-4;
+PFA=[1e-4,1e-3:1e-2:1e-1+1e-2];% PFA=1e-4;
 SNRnum=10.^(SNRout/10);
 MonteCarloPfa=round(1./PFA*100);
 L_Pfa = length(MonteCarloPfa);
@@ -61,63 +61,66 @@ s_real=Weight*s+(1-Weight)*s_v;
 % %%%%%正式开始%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%门限计算%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% h = waitbar(0,'Please wait...');
-% for i_Pfa = 1:L_Pfa
-%     waitbar((i_Pfa/L_Pfa),h,sprintf([num2str(i_Pfa/L_Pfa*100),'%%']));
-%     Tamf = zeros(MonteCarloPfa(i_Pfa),1);
-%     Tamfcc = zeros(MonteCarloPfa(i_Pfa),1);
-%     Tamfnscm = zeros(MonteCarloPfa(i_Pfa),1);
-%     Tglrt = zeros(MonteCarloPfa(i_Pfa),1);
-%     Tglrtcc = zeros(MonteCarloPfa(i_Pfa),1);
-%     Tglrtnscm = zeros(MonteCarloPfa(i_Pfa),1);
-%     Tclglrt = zeros(MonteCarloPfa(i_Pfa),1);
-%     parfor i = 1:MonteCarloPfa(i_Pfa)
-% %     waitbar(i/MonteCarloPfa,h,sprintf([num2str(i/MonteCarloPfa*100),'%%']));
-% %%%%%%%%%%%训练数据产生%%%%%%%%%%%%%%
-%     Train = fun_TrainData(str_train,N,L,rouR,lambda,mu,opt_train);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
-%     x0 = fun_TrainData(str_train,N,1,rouR,lambda,mu,opt_train); % 接收信号仅包括杂波和噪声
-%     %%%%协方差估计%%%%%%%%%%%%%%%%%%%%%%
-%     R_SCM = (fun_SCM(Train));
-%     iR_SCM = inv(R_SCM);
-%     
-%     R_NSCM = fun_NSCM(Train);
-%     iR_NSCM = inv(R_NSCM);
-%     
-%     R_CC = fun_CC(Train,R_SCM,R_KA);
-%     iR_CC = inv(R_CC);
-%     %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     %%%%%% AMF或者wald
-%     Tamf(i) = abs(s'*iR_SCM*x0)^2/abs(s'*iR_SCM*s);    
-%     tmp=abs(x0'*iR_SCM*x0);
-%     %%%%%% AMFCC或者wald_CC
-%     Tamfcc(i) = abs(s'*iR_CC*x0)^2/abs(s'*iR_CC*s);     
-%     tmpcc=abs(x0'*iR_CC*x0);
-%     %%%%%%%%%%% AMFNSCM
-%     Tamfnscm(i) = abs(s'*iR_NSCM*x0)^2/abs(s'*iR_NSCM*s);     
-%     tmpnscm=abs(x0'*iR_NSCM*x0);
-%     %%%%%% KGLRT
-%     Tglrt(i) = Tamf(i)/(1+tmp);     
-%     %%%%%% KGLRTCC
-%     Tglrtcc(i) = Tamfcc(i)/(1+tmpcc);
-%     %%%%%% KGLRTNSCM
-%     Tglrtnscm(i) = Tamfnscm(i)/(1+tmpnscm);
-%     %%%%%% CLGLRT
-%     Tclglrt(i) = fun_CLGLRT3(lambda,mu,R_KA,R_SCM,x0,s);
-%     end
-%     % close(h)
-%     TKGLRT=sort(Tglrt,'descend');
-%     TCLGLRT=sort(Tclglrt,'descend');
-%     TKGLRTCC=sort(Tglrtcc,'descend');
-%     TKGLRTNSCM=sort(Tglrtnscm,'descend');
-% 
-%     Th_KGLRT(i_Pfa)=(TKGLRT(floor(MonteCarloPfa(i_Pfa)*PFA(i_Pfa)-1))+TKGLRT(floor(MonteCarloPfa(i_Pfa)*PFA(i_Pfa))))/2;
-%     Th_CLGLRT(i_Pfa)=(TCLGLRT(floor(MonteCarloPfa(i_Pfa)*PFA(i_Pfa)-1))+TCLGLRT(floor(MonteCarloPfa(i_Pfa)*PFA(i_Pfa))))/2;
-%     Th_KGLRTCC(i_Pfa)=(TKGLRTCC(floor(MonteCarloPfa(i_Pfa)*PFA(i_Pfa)-1))+TKGLRTCC(floor(MonteCarloPfa(i_Pfa)*PFA(i_Pfa))))/2;
-%     Th_KGLRTNSCM(i_Pfa)=(TKGLRTNSCM(floor(MonteCarloPfa(i_Pfa)*PFA(i_Pfa)-1))+TKGLRTNSCM(floor(MonteCarloPfa(i_Pfa)*PFA(i_Pfa))))/2;
-% end
-% close(h)
-% save('ThPfa','PFA','Th_KGLRT','Th_CLGLRT','Th_KGLRTCC','Th_KGLRTNSCM','L',...
-%     'str_train','lambda','mu');
+h = waitbar(0,'Please wait...');
+for i_Pfa = 1:L_Pfa
+    waitbar((i_Pfa/L_Pfa),h,sprintf([num2str(i_Pfa/L_Pfa*100),'%%']));
+    Tamf = zeros(MonteCarloPfa(i_Pfa),1);
+    Tamfcc = zeros(MonteCarloPfa(i_Pfa),1);
+    Tamfnscm = zeros(MonteCarloPfa(i_Pfa),1);
+    Tglrt = zeros(MonteCarloPfa(i_Pfa),1);
+    Tglrtcc = zeros(MonteCarloPfa(i_Pfa),1);
+    Tglrtnscm = zeros(MonteCarloPfa(i_Pfa),1);
+    Tclglrt = zeros(MonteCarloPfa(i_Pfa),1);
+    parfor i = 1:MonteCarloPfa(i_Pfa)
+%     waitbar(i/MonteCarloPfa,h,sprintf([num2str(i/MonteCarloPfa*100),'%%']));
+%%%%%%%%%%%训练数据产生%%%%%%%%%%%%%%
+    Train = fun_TrainData(str_train,N,L,rouR,lambda,mu,opt_train);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
+    x0 = fun_TrainData(str_train,N,1,rouR,lambda,mu,opt_train); % 接收信号仅包括杂波和噪声
+    %%%%协方差估计%%%%%%%%%%%%%%%%%%%%%%
+    R_SCM = (fun_SCM(Train));
+    iR_SCM = inv(R_SCM);
+    
+    R_SCMN = (fun_SCMN(Train));
+    iR_SCMN = inv(R_SCMN);
+    
+    R_NSCM = fun_NSCM(Train);
+    iR_NSCM = inv(R_NSCM);
+    
+    R_CC = fun_CC(Train,R_SCMN,R_KA);
+    iR_CC = inv(R_CC);
+    %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%% AMF或者wald
+    Tamf(i) = abs(s'*iR_SCM*x0)^2/abs(s'*iR_SCM*s);    
+    tmp=abs(x0'*iR_SCM*x0);
+    %%%%%% AMFCC或者wald_CC
+    Tamfcc(i) = abs(s'*iR_CC*x0)^2/abs(s'*iR_CC*s);     
+    tmpcc=abs(x0'*iR_CC*x0);
+    %%%%%%%%%%% AMFNSCM
+    Tamfnscm(i) = abs(s'*iR_NSCM*x0)^2/abs(s'*iR_NSCM*s);     
+    tmpnscm=abs(x0'*iR_NSCM*x0);
+    %%%%%% KGLRT
+    Tglrt(i) = Tamf(i)/(1+tmp);     
+    %%%%%% KGLRTCC
+    Tglrtcc(i) = Tamfcc(i)/(1+tmpcc);
+    %%%%%% KGLRTNSCM
+    Tglrtnscm(i) = Tamfnscm(i)/(1+tmpnscm);
+    %%%%%% CLGLRT
+    Tclglrt(i) = fun_CLGLRT3(lambda,mu,R_KA,R_SCMN,x0,s);
+    end
+    % close(h)
+    TKGLRT=sort(Tglrt,'descend');
+    TCLGLRT=sort(Tclglrt,'descend');
+    TKGLRTCC=sort(Tglrtcc,'descend');
+    TKGLRTNSCM=sort(Tglrtnscm,'descend');
+
+    Th_KGLRT(i_Pfa)=(TKGLRT(floor(MonteCarloPfa(i_Pfa)*PFA(i_Pfa)-1))+TKGLRT(floor(MonteCarloPfa(i_Pfa)*PFA(i_Pfa))))/2;
+    Th_CLGLRT(i_Pfa)=(TCLGLRT(floor(MonteCarloPfa(i_Pfa)*PFA(i_Pfa)-1))+TCLGLRT(floor(MonteCarloPfa(i_Pfa)*PFA(i_Pfa))))/2;
+    Th_KGLRTCC(i_Pfa)=(TKGLRTCC(floor(MonteCarloPfa(i_Pfa)*PFA(i_Pfa)-1))+TKGLRTCC(floor(MonteCarloPfa(i_Pfa)*PFA(i_Pfa))))/2;
+    Th_KGLRTNSCM(i_Pfa)=(TKGLRTNSCM(floor(MonteCarloPfa(i_Pfa)*PFA(i_Pfa)-1))+TKGLRTNSCM(floor(MonteCarloPfa(i_Pfa)*PFA(i_Pfa))))/2;
+end
+close(h)
+save('ThPfa2','PFA','Th_KGLRT','Th_CLGLRT','Th_KGLRTCC','Th_KGLRTNSCM','L',...
+    'str_train','lambda','mu');
 % %%%%%%%%%%%%%%%%%%%%%检测概率%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 load ThPfa.mat
@@ -146,9 +149,11 @@ for i_Pfa = 1:L_Pfa %%虚警
             %%%%协方差估计%%%%%%%%%%%%%%%%%%%%%%
             R_SCM = (fun_SCM(Train));
             iR_SCM = inv(R_SCM);
+            R_SCMN = (fun_SCMN(Train));
+            iR_SCMN = inv(R_SCMN);
             R_NSCM = (fun_NSCM(Train));
             iR_NSCM = inv(R_NSCM);
-            R_CC = fun_CC(Train,R_SCM,R_KA);
+            R_CC = fun_CC(Train,R_SCMN,R_KA);
             iR_CC = inv(R_CC);
             x0=alpha(m)*s_real+x0;%+pp;    %%%%%%%  重要  %%%%%%%%%%%%%
             %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -168,7 +173,7 @@ for i_Pfa = 1:L_Pfa %%虚警
             %%%%%% KGLRTNSCM
             Tglrtnscm = Tamfnscm/(1+tmpnscm);                                 
             %%%%%% CLGLRT
-            Tclglrt = fun_CLGLRT3(lambda,mu,R_KA,R_SCM,x0,s);
+            Tclglrt = fun_CLGLRT3(lambda,mu,R_KA,R_SCMN,x0,s);
             %%%判断%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
             if Tglrt>Th_KGLRT(i_Pfa);          counter_glrt=counter_glrt+1;        end                  
             if Tclglrt>Th_CLGLRT(i_Pfa);       counter_clglrt=counter_clglrt+1;    end   
@@ -186,10 +191,10 @@ close(h)
 toc
 figure(2);
 hold on
-plot(PFA,Pd_CLGLRT_Mlti_mc(:,1),'ks','linewidth',2,'MarkerSize',15)
-plot(PFA,Pd_KGLRTCC_Mlti_mc(:,1),'ko','linewidth',2,'MarkerSize',15)
-plot(PFA,Pd_KGLRT_Mlti_mc(:,1),'k>','linewidth',2,'MarkerSize',15)
-plot(PFA,Pd_KGLRTNSCM_Mlti_mc(:,1),'k*','linewidth',2,'MarkerSize',15)
+% plot(PFA,Pd_CLGLRT_Mlti_mc(:,1),'ks','linewidth',2,'MarkerSize',15)
+% plot(PFA,Pd_KGLRTCC_Mlti_mc(:,1),'ko','linewidth',2,'MarkerSize',15)
+% plot(PFA,Pd_KGLRT_Mlti_mc(:,1),'k>','linewidth',2,'MarkerSize',15)
+% plot(PFA,Pd_KGLRTNSCM_Mlti_mc(:,1),'k*','linewidth',2,'MarkerSize',15)
 %%5dB
 plot(PFA,Pd_CLGLRT_Mlti_mc(:,1),'k-s','linewidth',2,'MarkerSize',15)
 plot(PFA,Pd_KGLRTCC_Mlti_mc(:,1),'k-o','linewidth',2,'MarkerSize',15)
@@ -212,7 +217,7 @@ set(gca,'FontSize',20)
 set(h_leg,'Location','SouthEast')
 grid on
 box on
-str=['Pd_CLGLRT2_ROC2',num2str(n),'K','mu',num2str(mu),...
+str=['Pd_CLGLRT2_ROC3',num2str(n),'K','mu',num2str(mu),...
      'lambda', num2str(lambda),'s',num2str(sigma_t),...
      'o',num2str(opt_train),'_',str_train,'.mat'];
 save(str,'lambda','mu','sigma_t','SNRout','PFA','Pd_CLGLRT_Mlti_mc','Pd_KGLRT_Mlti_mc',...

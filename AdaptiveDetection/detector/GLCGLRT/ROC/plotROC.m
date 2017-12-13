@@ -19,8 +19,8 @@ plot(PFA,Pd_CLGLRT_Mlti_mc(:,3),'k-s','linewidth',2,'MarkerSize',15)
 plot(PFA,Pd_KGLRTCC_Mlti_mc(:,3),'g-o','linewidth',2,'MarkerSize',15)
 plot(PFA,Pd_KGLRT_Mlti_mc(:,3),'b->','linewidth',2,'MarkerSize',15)
 plot(PFA,Pd_KGLRTNSCM_Mlti_mc(:,3),'c-*','linewidth',2,'MarkerSize',15)
-h_leg = legend('GLC-GLRT,K=16','1S-GLRT with CC,K=16','1S-GLRT with SCM,K=16',...
-               '1S-GLRT with NSCM,K=16');
+h_leg = legend('GLC-GLRT,K=2N','1S-GLRT with CC,K=2N','1S-GLRT with SCM,K=2N',...
+               '1S-GLRT with NSCM,K=2N');
 xlabel('Pfa','FontSize',20)
 ylabel('Pd','FontSize',20)
 set(gca,'FontSize',20)

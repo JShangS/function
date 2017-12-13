@@ -7,6 +7,8 @@ Range = 30;
 pulse = 1*N:2*N-1;
 pulse_num = length(pulse);
 Zhh_test = Zhh(pulse,:);
+figure()
+plot(abs(Zhh(30,:)))
 figure(1)
 imagesc(abs(Zhh))
 [X,Y]=meshgrid(1:76,linspace(-1,1,pulse_num));
@@ -17,7 +19,7 @@ R_KA = zeros(N,N);
 L_KA = 3800;
 for i = 1:L_KA
     X_KA = Zhh((i-1)*N+1:i*N,Range);
-    R_KA = R_KA+X_KA*X_KA'/76/L_KA;
+    R_KA = R_KA+X_KA*X_KA'/L_KA;
 end
 % X_KA = Zhh(40:end,Rang);
 % L_KA = length(X_KA);

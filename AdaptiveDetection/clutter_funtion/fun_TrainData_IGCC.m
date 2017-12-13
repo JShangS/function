@@ -7,7 +7,9 @@ function [ Train ] = fun_TrainData_IGCC( N,L,M,lambda,mu,opt_train)
 %%M，复高斯协方差
 %%lamda：形状参数
 %%mu：尺度参数
-%%opt:1:每个距离单元的纹理值不一样，2：每个单元纹理值一样，此时退化为SIRP
+%%opt:1:每个距离单元的纹理值不一样在CPI内每个距离单元的纹理值一样，为SIRP
+%%%%%%2：每个单元纹理值一样，
+%%%%%%3：每个单元纹理值每时每刻都不一样，最广义的compound Gaussian
 if nargin == 5
     opt_train = 1;
 end
@@ -19,8 +21,15 @@ elseif opt_train == 2
     pct=sqrt(1./gamrnd(lambda,mu,1,1));
     X = fun_TrainData_gauss(N,L,M);
     Train=(ones(N,L)*pct.').*X;
+elseif opt_train == 2
+    pct = zeros(N,L);
+    for i = 1:N
+        pct(i,:)=sqrt(1./gamrnd(lambda,mu,1,L));
+    end  
+    X = fun_TrainData_gauss(N,L,M);
+    Train=pct.*X;
 else
-    error('只有1，2两种选择')
+    error('只有1，2, 3三种选择')
 end
 
 end
