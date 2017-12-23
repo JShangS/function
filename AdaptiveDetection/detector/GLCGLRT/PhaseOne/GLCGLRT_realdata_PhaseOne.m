@@ -6,7 +6,7 @@ clear
 close all
 load Real_data_PhaseOneRadar_range30.mat
 %%%%参数设置
-n = 1; %几倍的样本
+n = 2; %几倍的样本
 sigma_t = 0;
 lambda = 3;
 mu = 1;
@@ -14,7 +14,7 @@ str_train = 'g';
 opt_train = 1;
 %%%%参数设置
 N = 8;
-SNRout=-5:1:25; % 输出SNR
+SNRout=-5:1:15; % 输出SNR
 cos2=0.9;
 PFA=1e-3;% PFA=1e-4;
 SNRnum=10.^(SNRout/10);
@@ -194,7 +194,6 @@ xlabel('SNR/dB','FontSize',20)
 ylabel('Pd','FontSize',20)
 set(gca,'FontSize',20)
 grid on
-% str=['Pd_CLGLRT_',num2str(N),'N','_',num2str(n),'K','mu',num2str(mu),'lambda',num2str(lambda),'s',num2str(sigma_t),'o',num2str(opt_train),'_',str_train,'.mat'];
-% str=['Pd_CLGLRT4_PhaseOne_',num2str(n),'K','s',num2str(sigma_t),'_',str_train,'.mat'];
-str=['Pd_CLGLRT4_PhaseOne_',num2str(n),'K','s',num2str(sigma_t),'.mat'];
-save(str,'SNRout','Pd_CLGLRT_mc','Pd_KGLRT_mc','Pd_KGLRTCC_mc','Pd_KGLRTNSCM_mc');
+
+% str=['Pd_CLGLRT4_PhaseOne_',num2str(n),'K','s',num2str(sigma_t),'.mat'];
+% save(str,'SNRout','Pd_CLGLRT_mc','Pd_KGLRT_mc','Pd_KGLRTCC_mc','Pd_KGLRTNSCM_mc');
