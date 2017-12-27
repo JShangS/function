@@ -11,9 +11,12 @@ load(matFile)
 n = 1; %几倍的样本
 sigma_t = 0;
 % range = 14;
+%%参数设置来自《Maximum Likelihood Estimation for
+%%%            Compound-Gaussian Clutter with Inverse GammaTexture》lambda = 1.55;% mu = 2.3102e3;
+
 lambda = 3;
 mu = 1;
-str_train = 'g';
+str_train = 'p';
 opt_train = 1;
 %%%%参数设置
 % N = 8;
@@ -91,11 +94,14 @@ parfor i = 1:MonteCarloPfa
     Tamfnscm(i) = abs(s'*iR_NSCM*x0)^2/abs(s'*iR_NSCM*s);     
     tmpnscm=abs(x0'*iR_NSCM*x0);
     %%%%%% KGLRT
-    Tglrt(i) = Tamf(i)/(1+tmp);     
+%     Tglrt(i) = Tamf(i)/(1+tmp);  
+    Tglrt(i) = fun_1SGLRT(R_SCM,x0,s,mu);
     %%%%%% KGLRTCC
-    Tglrtcc(i) = Tamfcc(i)/(1+tmpcc);
+%     Tglrtcc(i) = Tamfcc(i)/(1+tmpcc);
+    Tglrtcc(i) = fun_1SGLRT(R_CC,x0,s,mu);
     %%%%%% KGLRTNSCM
-    Tglrtnscm(i) = Tamfnscm(i)/(1+tmpnscm);
+%     Tglrtnscm(i) = Tamfnscm(i)/(1+tmpnscm);
+    Tglrtnscm(i) = fun_1SGLRT(R_NSCM,x0,s,mu);
     %%%%%% CLGLRT
 %       Tclglrt(i) = fun_CLGLRT(lambda,mu,R_KA,R_SCM,x0,s);
 %     Tclglrt(i) = fun_CLGLRT2(R_KA,R_SCM,x0,s);
@@ -163,11 +169,14 @@ for m=1:length(SNRout)
         Tamfnscm = abs(s'*iR_NSCM*x0)^2/abs(s'*iR_NSCM*s);    
         tmpnscm = abs(x0'*iR_NSCM*x0);
         %%%%%% KGLRT
-        Tglrt = Tamf/(1+tmp); 
+%         Tglrt = Tamf/(1+tmp); 
+        Tglrt = fun_1SGLRT(R_SCM,x0,s,mu);
         %%%%%% KGLRTCC
-        Tglrtcc = Tamfcc/(1+tmpcc);
+        Tglrtcc = fun_1SGLRT(R_CC,x0,s,mu);
+%         Tglrtcc = Tamfcc/(1+tmpcc);
         %%%%%% KGLRTNSCM
-        Tglrtnscm = Tamfnscm/(1+tmpnscm);       
+        Tglrtnscm = fun_1SGLRT(R_NSCM,x0,s,mu);
+%         Tglrtnscm = Tamfnscm/(1+tmpnscm);       
         %%%%%% CLGLRT
 %         Tclglrt = fun_CLGLRT(lambda,mu,R_KA,R_SCM,x0,s);
 %         Tclglrt = fun_CLGLRT2(R_KA,R_SCM,x0,s);

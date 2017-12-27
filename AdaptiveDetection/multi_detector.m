@@ -9,7 +9,7 @@ Np=4;     % 脉冲数
 N=Na*Np;
 L=round(4*N); 
 SNRout=0:1:20; % 输出SNR
-cos2=0.9;
+cos2=1;%%%失配情况
 PFA=1e-3;% PFA=1e-4;
 SNRnum=10.^(SNRout/10);
 MonteCarloPfa=1/PFA*100;
