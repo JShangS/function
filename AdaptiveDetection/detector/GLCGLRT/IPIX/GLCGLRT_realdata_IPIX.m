@@ -14,8 +14,10 @@ sigma_t = 0;
 %%参数设置来自《Maximum Likelihood Estimation for
 %%%            Compound-Gaussian Clutter with Inverse GammaTexture》lambda = 1.55;% mu = 2.3102e3;
 
-lambda = 3;
-mu = 1;
+% lambda = 3;
+% mu = 1;
+lambda = 1.4495;
+mu = 1.3820;
 str_train = 'p';
 opt_train = 1;
 %%%%参数设置
@@ -67,7 +69,7 @@ parfor i = 1:MonteCarloPfa
     Train1 = Zhh(index_t1:index_t1+7,Range-L/2:Range-1);
     Train2 = Zhh(index_t1:index_t1+7,Range+1:Range+L/2);
     Train = [Train1,Train2];%%产生的训练数据,协方差矩阵为rouR的高斯杂波
-    x0 = Zhh(index_t1:index_t1+7,Range) ; % 接收信号仅包括杂波和噪声
+    x0 = Zhh(index_t1:index_t1+N-1,Range) ; % 接收信号仅包括杂波和噪声
     %%%%协方差估计%%%%%%%%%%%%%%%%%%%%%%
     R_SCM = (fun_SCM(Train));
     iR_SCM = inv(R_SCM);
@@ -212,5 +214,5 @@ grid on
 box on
 matFile(end-4:end)=[];
 % str=['Pd_CLGLRT_',matFile,'_',num2str(n),'K','s',num2str(sigma_t),'_',str_train,'.mat'];
-str=['Pd_CLGLRT_',matFile,'_',num2str(n),'K','s',num2str(sigma_t),'.mat'];
+% str=['Pd_CLGLRT_',matFile,'_',num2str(n),'K','s',num2str(sigma_t),'.mat'];
 % save(str,'SNRout','Pd_CLGLRT_mc','Pd_KGLRT_mc','Pd_KGLRTCC_mc','Pd_KGLRTNSCM_mc');

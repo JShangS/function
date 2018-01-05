@@ -27,7 +27,7 @@ s1 = A1 * exp(1j*2*pi*(fc1 * t + 0.5*mu1*t.^2))';
 s2 = A2 * exp(1j*2*pi*(fc2 * t + 0.5*mu2*t.^2))';
 s3 = A3 * exp(1j*2*pi*(fc3 * t + 0.5*mu3*t.^2))';
 s = s1+s2+s3;
-s = awgn(s,-10);
+s = awgn(s,10);
 % s = hilbert(s);
 figure()
 plot(real(s))
