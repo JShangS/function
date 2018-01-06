@@ -7,12 +7,12 @@ clc
 clear 
 close all
 %%%%参数设置
-n = 2; %几倍的样本
+n = 1; %几倍的样本
 str_train = 'p';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
 lambda = 3;
 mu = 1;
 opt_train = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
-sigma_t = 0.5;
+sigma_t = 0.1;
 rou = 0.95;  %%协方差矩阵生成的迟滞因子
 %%%Pd_CLGLRT_2Kmu1lambda3s0.1o1_p：2K：训练单元数目，mu，lambda，s：失配向量方差，
 %%o1:opt=1，p：IG纹理复合高斯
@@ -39,13 +39,11 @@ end
 irouR=inv(rouR);
 rouR_abs=abs(rouR);
 R_KA = zeros(size(rouR));
-tic
 for i = 1:10000
     t = normrnd(1,sigma_t,N,1);%%0~0.5%%失配向量
     R_KA = R_KA+rouR.*(t*t')/10000;
 end
 iR_KA = inv(R_KA);
-toc
 % R_KA_inv = inv(R_KA);
 rouR_half=rouR^0.5;
 %%%%导向矢量设置
@@ -128,7 +126,8 @@ Pd_KGLRT_mc = zeros(1,length(SNRout));
 Pd_CLGLRT_mc = zeros(1,length(SNRout));
 Pd_KGLRTCC_mc = zeros(1,length(SNRout));
 Pd_KGLRTNSCM_mc = zeros(1,length(SNRout));
-alpha=sqrt(SNRnum/abs(s_real'*irouR*s_real)); % 根据SNR=|alpha|^2*s'*R^(-1)*s求得|alpha|
+% alpha=sqrt(SNRnum/abs(s_real'*irouR*s_real)); % 根据SNR=|alpha|^2*s'*R^(-1)*s求得|alpha|
+alpha=sqrt(SNRnum/abs(s'*irouR*s)); % 根据SNR=|alpha|^2*s'*R^(-1)*s求得|alpha|
 h = waitbar(0,'Please wait...');
 tic
 for m=1:length(SNRout)

@@ -12,7 +12,8 @@ mkft = 10;
 figure
 hold on
 load Pd_CLGLRT_19980204_224024_IPI_1Ks0.mat
-plot(SNRout-0.2,Pd_CLGLRT_mc,'k-o','linewidth',linewide1,'markersize',mkft);
+% Pd_CLGLRT_mc(1:end-1)=Pd_CLGLRT_mc(2:end);
+plot(SNRout,Pd_CLGLRT_mc,'k-o','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRTCC_mc,'g-o','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRT_mc,'b-o','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRTNSCM_mc,'c-o','linewidth',linewide1,'markersize',mkft);
@@ -30,13 +31,15 @@ plot(SNRout,Pd_KGLRTNSCM_mc,'c-o','linewidth',linewide1,'markersize',mkft);
 % plot(SNRout,Pd_KGLRTNSCM_mc,'c-p','linewidth',linewide1,'markersize',labeltsize);
 
 load Pd_CLGLRT_19980204_224024_IPI_2Ks0.mat
-plot(SNRout-0.2,Pd_CLGLRT_mc,'k-*','linewidth',linewide1,'markersize',mkft);
+% Pd_CLGLRT_mc(1:end-1)=Pd_CLGLRT_mc(2:end);
+plot(SNRout,Pd_CLGLRT_mc,'k-*','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRTCC_mc,'g-*','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRT_mc,'b-*','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRTNSCM_mc,'c-*','linewidth',linewide1,'markersize',mkft);
 
 load Pd_CLGLRT_19980204_224024_IPI_3Ks0.mat
-plot(SNRout-0.2,Pd_CLGLRT_mc,'k->','linewidth',linewide1,'markersize',mkft);
+% Pd_CLGLRT_mc(1:end-1)=Pd_CLGLRT_mc(2:end);
+plot(SNRout,Pd_CLGLRT_mc,'k->','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRTCC_mc,'g->','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRT_mc,'b->','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRTNSCM_mc,'c->','linewidth',linewide1,'markersize',mkft);
