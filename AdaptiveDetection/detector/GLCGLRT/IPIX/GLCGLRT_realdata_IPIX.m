@@ -73,17 +73,12 @@ parfor i = 1:MonteCarloPfa
     iR_CC = inv(R_CC);
     %%%¼ì²âÆ÷%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%% KGLRT
-%     Tglrt(i) = Tamf(i)/(1+tmp);  
-    Tglrt(i) = fun_1SGLRT(R_SCM,x0,s,mu);
+    Tglrt(i) = fun_1SGLRT(R_SCMN,x0,s,mu);
     %%%%%% KGLRTCC
-%     Tglrtcc(i) = Tamfcc(i)/(1+tmpcc);
     Tglrtcc(i) = fun_1SGLRT(R_CC,x0,s,mu);
     %%%%%% KGLRTNSCM
-%     Tglrtnscm(i) = Tamfnscm(i)/(1+tmpnscm);
-    Tglrtnscm(i) = fun_1SGLRT(R_NSCM,x0,s,mu);
+    Tglrtnscm(i) = fun_1SGLRT(R_NSCMN,x0,s,mu);
     %%%%%% CLGLRT
-%       Tclglrt(i) = fun_CLGLRT(lambda,mu,R_KA,R_SCM,x0,s);
-%     Tclglrt(i) = fun_CLGLRT2(R_KA,R_SCM,x0,s);
     Tclglrt(i) = fun_CLGLRT3(lambda,mu,R_KA,R_SCMN,x0,s);
 end
 toc
@@ -146,19 +141,13 @@ for m=1:length(SNRout)
         iR_CC = inv(R_CC);
         %%%¼ì²âÆ÷%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%% KGLRT
-%         Tglrt = Tamf/(1+tmp); 
-        Tglrt = fun_1SGLRT(R_SCM,x0,s,mu);
+        Tglrt = fun_1SGLRT(R_SCMN,x0,s,mu);
         %%%%%% KGLRTCC
         Tglrtcc = fun_1SGLRT(R_CC,x0,s,mu);
-%         Tglrtcc = Tamfcc/(1+tmpcc);
         %%%%%% KGLRTNSCM
-        Tglrtnscm = fun_1SGLRT(R_NSCM,x0,s,mu);
-%         Tglrtnscm = Tamfnscm/(1+tmpnscm);       
+        Tglrtnscm = fun_1SGLRT(R_NSCMN,x0,s,mu);
         %%%%%% CLGLRT
-%         Tclglrt = fun_CLGLRT(lambda,mu,R_KA,R_SCM,x0,s);
-%         Tclglrt = fun_CLGLRT2(R_KA,R_SCM,x0,s);
         Tclglrt = fun_CLGLRT3(lambda,mu,R_KA,R_SCMN,x0,s);
-
         %%%ÅÐ¶Ï%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%     
         if Tglrt>Th_KGLRT;          counter_glrt=counter_glrt+1;        end                          
         if Tclglrt>Th_CLGLRT;       counter_clglrt=counter_clglrt+1;    end   
@@ -189,5 +178,5 @@ grid on
 box on
 matFile(end-4:end)=[];
 % str=['Pd_CLGLRT_',matFile,'_',num2str(n),'K','s',num2str(sigma_t),'_',str_train,'.mat'];
-% str=['Pd_CLGLRT_',matFile,'_',num2str(n),'K','s',num2str(sigma_t),'.mat'];
-% save(str,'SNRout','Pd_CLGLRT_mc','Pd_KGLRT_mc','Pd_KGLRTCC_mc','Pd_KGLRTNSCM_mc');
+str=['Pd_CLGLRT_',matFile,'_',num2str(n),'K','s',num2str(sigma_t),'.mat'];
+save(str,'SNRout','Pd_CLGLRT_mc','Pd_KGLRT_mc','Pd_KGLRTCC_mc','Pd_KGLRTNSCM_mc');

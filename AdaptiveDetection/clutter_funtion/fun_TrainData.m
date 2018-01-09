@@ -41,7 +41,6 @@ switch str
            opt_train = varargin{7};
            X = fun_TrainData_IGCC( N,L,R,lamda,mu,opt_train);
         end
-        
     otherwise
             error('现在只有3种');
 end

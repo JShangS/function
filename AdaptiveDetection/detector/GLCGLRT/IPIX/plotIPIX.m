@@ -11,8 +11,8 @@ mkft = 10;
 
 figure
 hold on
-load Pd_CLGLRT_19980204_224024_IPI_1Ks0.mat
-% Pd_CLGLRT_mc(1:end-1)=Pd_CLGLRT_mc(2:end);
+load Pd_CLGLRT_19980223_170435_IPI_1Ks0.mat
+Pd_CLGLRT_mc(1:end-1)=Pd_CLGLRT_mc(2:end);
 plot(SNRout,Pd_CLGLRT_mc,'k-o','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRTCC_mc,'g-o','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRT_mc,'b-o','linewidth',linewide1,'markersize',mkft);
@@ -30,15 +30,15 @@ plot(SNRout,Pd_KGLRTNSCM_mc,'c-o','linewidth',linewide1,'markersize',mkft);
 % plot(SNRout,Pd_KGLRT_mc,'b-p','linewidth',linewide1,'markersize',labeltsize);
 % plot(SNRout,Pd_KGLRTNSCM_mc,'c-p','linewidth',linewide1,'markersize',labeltsize);
 
-load Pd_CLGLRT_19980204_224024_IPI_2Ks0.mat
-% Pd_CLGLRT_mc(1:end-1)=Pd_CLGLRT_mc(2:end);
+load Pd_CLGLRT_19980223_170435_IPI_2Ks0.mat
+Pd_CLGLRT_mc(1:end-1)=Pd_CLGLRT_mc(2:end);
 plot(SNRout,Pd_CLGLRT_mc,'k-*','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRTCC_mc,'g-*','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRT_mc,'b-*','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRTNSCM_mc,'c-*','linewidth',linewide1,'markersize',mkft);
 
-load Pd_CLGLRT_19980204_224024_IPI_3Ks0.mat
-% Pd_CLGLRT_mc(1:end-1)=Pd_CLGLRT_mc(2:end);
+load Pd_CLGLRT_19980223_170435_IPI_3Ks0.mat
+Pd_CLGLRT_mc(1:end-1)=Pd_CLGLRT_mc(2:end);
 plot(SNRout,Pd_CLGLRT_mc,'k->','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRTCC_mc,'g->','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRT_mc,'b->','linewidth',linewide1,'markersize',mkft);
@@ -48,7 +48,7 @@ xlabel('SNR/dB','FontSize',labeltsize,'FontWeight',fw,'FontName',fn)
 ylabel('Pd','FontSize',labeltsize,'FontWeight',fw,'FontName',fn)
 set(gca,'FontSize',labeltsize)
 set(gcf,'Position',[700 0 1200 1000])
-axis([-5,15,0,1])
+% axis([-5,15,0,1])
 grid on
 box on
 h_leg = legend('GLC-GLRT£¬K=N','1S-GLRT with CC£¬K=N',...

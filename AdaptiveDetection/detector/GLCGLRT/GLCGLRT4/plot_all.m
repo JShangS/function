@@ -49,19 +49,19 @@ box on
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 figure(2)
 hold on
-load Pd_CLGLRT3_1Kmu1lambda3s0.1o1_p.mat
+load Pd_CLGLRT4_1Kmu1lambda3s0.1o1_p.mat
 % Pd_CLGLRT_mc(1:4)=Pd_CLGLRT_mc(1:4)*0.8;
 % Pd_CLGLRT_mc(5:end)=Pd_CLGLRT_mc(1:end-4);
 plot(SNRout,Pd_CLGLRT_mc,'k-p','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRTCC_mc,'g-p','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRT_mc,'b-p','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRTNSCM_mc,'c-p','linewidth',linewide1,'markersize',mkft);
-load Pd_CLGLRT3_2Kmu1lambda3s0.1o1_p.mat
+load Pd_CLGLRT4_2Kmu1lambda3s0.1o1_p.mat
 plot(SNRout,Pd_CLGLRT_mc,'k->','linewidth',linewide1,'markersize',mkft);%Pd_CLGLRT_mc/2+Pd_KGLRTCC_mc/2
 plot(SNRout,Pd_KGLRTCC_mc,'g->','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRT_mc,'b->','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRTNSCM_mc,'c->','linewidth',linewide1,'markersize',mkft);
-load Pd_CLGLRT3_3Kmu1lambda3s0.1o1_p.mat
+load Pd_CLGLRT4_3Kmu1lambda3s0.1o1_p.mat
 plot(SNRout,Pd_CLGLRT_mc,'k-o','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRTCC_mc,'g-o','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRT_mc,'b-o','linewidth',linewide1,'markersize',mkft);
@@ -90,16 +90,19 @@ box on
 figure(3)
 hold on
 load Pd_CLGLRT4_1Kmu1lambda3s0.1o1_g.mat
+% SNRout = SNRout-5;
 plot(SNRout,Pd_CLGLRT_mc,'k-p','linewidth',linewide1,'markersize',mkft);%Pd_CLGLRT_mc/2+Pd_KGLRTCC_mc/2
 plot(SNRout,Pd_KGLRTCC_mc,'g-p','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRT_mc,'b-p','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRTNSCM_mc,'c-p','linewidth',linewide1,'markersize',mkft);
 load Pd_CLGLRT4_2Kmu1lambda3s0.1o1_g.mat
+% SNRout = SNRout-5;
 plot(SNRout,Pd_CLGLRT_mc,'k->','linewidth',linewide1,'markersize',mkft);%Pd_CLGLRT_mc/2+Pd_KGLRTCC_mc/2
 plot(SNRout,Pd_KGLRTCC_mc,'g->','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRT_mc,'b->','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRTNSCM_mc,'c->','linewidth',linewide1,'markersize',mkft);
 load Pd_CLGLRT4_3Kmu1lambda3s0.1o1_g.mat
+% SNRout = SNRout-5;
 plot(SNRout,Pd_CLGLRT_mc,'k-o','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRTCC_mc,'g-o','linewidth',linewide1,'markersize',mkft);
 plot(SNRout,Pd_KGLRT_mc,'b-o','linewidth',linewide1,'markersize',mkft);
@@ -112,6 +115,7 @@ h_leg = legend('GLC-GLRT£¬K=N','1S-GLRT with CC£¬K=N',...
                 '1S-GLRT with SCM£¬K=3N','1S-GLRT with NSCM£¬K=3N');
 xlabel('SNR/dB','FontSize',labeltsize,'FontWeight',fw,'FontName',fn)
 ylabel('Pd','FontSize',labeltsize,'FontWeight',fw,'FontName',fn)
+% axis([-5,15,0,1])
 set(gca,'FontSize',labeltsize)
 set(gcf,'Position',[700 0 1200 1000])
 set(h_leg,'Location','SouthEast')

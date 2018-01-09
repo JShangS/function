@@ -7,7 +7,7 @@ close all
 Na=2;     % 阵元数
 Np=4;     % 脉冲数
 N=Na*Np;
-L=round(4*N); 
+L=round(2*N); 
 SNRout=0:1:20; % 输出SNR
 cos2=1;%%%失配情况
 PFA=1e-3;% PFA=1e-4;
@@ -55,7 +55,7 @@ parfor i=1:MonteCarloPfa
 %     X=(randn(N,L)+1i*randn(N,L))/sqrt(2); % 产生方差为1的复高斯白噪声 % Rwhite1=1/snapshot1*X1*X1'; eig(Rwhite1); % round(mean(abs(eig(Rwhite1)))) == 1
 %     S=(R_half*X)*(R_half*X)'; % 有L个训练样本估计的杂波与噪声的协方差矩阵(Rhalf*X表示接收的L个训练数据)
     Train = fun_TrainData('g',N,L,R);
-    S = fun_SCM(Train);
+    S = fun_SCMN(Train);
     iS=inv(S);
 %     W=(randn(N,1)+1i*randn(N,1))/sqrt(2); % 1i == -i
 %     x=R_half*W;%+pp; % noise=(randn(N,1)+j*randn(N,1))/sqrt(2);  % 接收信号仅包括杂波和噪声
@@ -117,7 +117,7 @@ for m=1:length(SNRout)
 %         X=(randn(N,L)+1i*randn(N,L))/sqrt(2); % 产生方差为1的复高斯白噪声 % Rwhite1=1/snapshot1*X1*X1'; eig(Rwhite1); % round(mean(abs(eig(Rwhite1)))) == 1
 %         S=(R_half*X)*(R_half*X)'; % 有L个训练样本估计的杂波与噪声的协方差矩阵(Rhalf*X表示接收的L个训练数据)
         Train = fun_TrainData('g',N,L,R);
-        S = fun_SCM(Train);
+        S = fun_SCMN(Train);
         iS=inv(S);
         W=(randn(N,1)+1i*randn(N,1))/sqrt(2); % 1i == -i
     %     THETA=a+(b-a)*rand; % 产出0--2*pi的均匀分布随机相位
