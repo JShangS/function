@@ -1,7 +1,7 @@
 clc
 clear 
 close all
-rou = 0.99;  %%协方差矩阵生成的迟滞因子
+rou = 1;  %%协方差矩阵生成的迟滞因子
 N = 8;
 theta_sig = 0.1;
 for i=1:N

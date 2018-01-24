@@ -3,16 +3,17 @@
 %%8维的导向矢量，函数用的是GL3
 %%高斯情况下:GLC用SCMN，CC用SCMN，KGLRT用SCM，NSCM用NSCM
 %%%非高斯情况下:都要用除N的。
+%%%cf：每一组实验，R_KA要固定不变。
 clc
 clear 
 close all
 %%%%参数设置
-n = 3; %几倍的样本
-str_train = 'g';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
+n = 1; %几倍的样本
+str_train = 'p';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
 lambda = 3;
 mu = 1;
 opt_train = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
-sigma_t = 0.1;
+sigma_t = 1;
 rou = 0.95;  %%协方差矩阵生成的迟滞因子
 %%%Pd_CLGLRT_2Kmu1lambda3s0.1o1_p：2K：训练单元数目，mu，lambda，s：失配向量方差，
 %%o1:opt=1，p：IG纹理复合高斯
@@ -36,16 +37,13 @@ for i=1:N
         rouR(i,j)=rou^abs(i-j);%*exp(1j*2*pi*abs(i-j)*theta_sig);
     end
 end
-irouR=inv(rouR);
 rouR_abs=abs(rouR);
-R_KA = zeros(size(rouR));
-for i = 1:10000
-    t = normrnd(1,sigma_t,N,1);%%0~0.5%%失配向量
-    R_KA = R_KA+rouR.*(t*t')/10000;
-end
-iR_KA = inv(R_KA);
-% R_KA_inv = inv(R_KA);
 rouR_half=rouR^0.5;
+irouR=inv(rouR);
+% t = normrnd(1,sigma_t,N,1);%%0~0.5%%失配向量
+% R_KA = rouR.*(t*t');
+load R_KA_g_0.1.mat
+iR_KA = inv(R_KA);
 %%%%导向矢量设置
 [UU,SS,VV]=svd(irouR*s);
 s_v=UU(:,2); %%%%%% 与vt在白化空间正交，即：s^H*iR*s_v==0
@@ -65,6 +63,8 @@ s_real=Weight*s+(1-Weight)*s_v;
 % h = waitbar(0,'Please wait...');
 tic
 parfor i = 1:MonteCarloPfa
+    warning('off')
+%     warning('query')
 %     waitbar(i/MonteCarloPfa,h,sprintf([num2str(i/MonteCarloPfa*100),'%%']));
 %%%%%%%%%%%训练数据产生%%%%%%%%%%%%%%
     Train = fun_TrainData(str_train,N,L,rouR,lambda,mu,opt_train);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
@@ -92,6 +92,7 @@ parfor i = 1:MonteCarloPfa
     %%%%%% KGLRTNSCM
     Tglrtnscm(i) = fun_1SGLRT(R_NSCM,x0,s,mu);
     %%%%%% CLGLRT
+%     Tclglrt(i) = fun_CLGLRT2(lambda,mu,R_KA,R_SCMN,x0,s);
     Tclglrt(i) = fun_CLGLRT3(lambda,mu,R_KA,R_SCMN,x0,s);
 end
 toc
@@ -122,8 +123,9 @@ h = waitbar(0,'Please wait...');
 tic
 for m=1:length(SNRout)
     waitbar(m/length(SNRout),h,sprintf([num2str(m/length(SNRout)*100),'%%']));
-    parfor i=1:MonteCarloPd 
-%         waitbar(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd,h,sprintf([num2str(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd*100),'%%']));
+    parfor i=1:MonteCarloPd
+        warning('off')
+%       waitbar(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd,h,sprintf([num2str(((m-1)*MonteCarloPd+i)/length(SNRout)/MonteCarloPd*100),'%%']));
         %%%%%%%%%%%训练数据产生%%%%%%%%%%%%%%
         Train = fun_TrainData(str_train,N,L,rouR,lambda,mu,opt_train);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
         x0 = fun_TrainData(str_train,N,1,rouR,lambda,mu,opt_train); % 接收信号仅包括杂波和噪声
@@ -151,6 +153,7 @@ for m=1:length(SNRout)
         %%%%%% 1SGLRTNSCM
         Tglrtnscm = fun_1SGLRT(R_NSCM,x0,s,mu);
         %%%%%% GLCGLRT
+%         Tclglrt = fun_CLGLRT2(lambda,mu,R_KA,R_SCMN,x0,s);
         Tclglrt = fun_CLGLRT3(lambda,mu,R_KA,R_SCMN,x0,s);
         %%%判断%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
         if Tglrt>Th_KGLRT;          counter_glrt=counter_glrt+1;        end                
@@ -179,7 +182,7 @@ set(gca,'FontSize',20)
 set(h_leg,'Location','SouthEast')
 grid on
 % % str=['Pd_CLGLRT_',num2str(N),'N','_',num2str(n),'K','mu',num2str(mu),'lambda',num2str(lambda),'s',num2str(sigma_t),'o',num2str(opt_train),'_',str_train,'.mat'];
-str=['Pd_CLGLRT4_',num2str(n),'K','mu',num2str(mu),...
+str=['Pd_CLGLRT4_3_',num2str(n),'K','mu',num2str(mu),...
      'lambda', num2str(lambda),'s',num2str(sigma_t),...
      'o',num2str(opt_train),'_',str_train,'.mat'];
 save(str,'lambda','mu','sigma_t','SNRout','Pd_CLGLRT_mc','Pd_KGLRT_mc',...

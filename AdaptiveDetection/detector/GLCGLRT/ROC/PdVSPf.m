@@ -37,10 +37,8 @@ irouR=inv(rouR);
 rouR_abs=abs(rouR);
 R_KA = zeros(size(rouR));
 tic
-for i = 1:10000
-    t = normrnd(1,sigma_t,N,1);%%0~0.5%%失配向量
-    R_KA = R_KA+rouR.*(t*t')/10000;
-end
+t = normrnd(1,sigma_t,N,1);%%0~0.5%%失配向量
+R_KA = R_KA+rouR.*(t*t')/10000;
 iR_KA = inv(R_KA);
 toc
 % R_KA_inv = inv(R_KA);

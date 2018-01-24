@@ -9,7 +9,7 @@ Data_process
 load(matFile) 
 %%%%参数设置
 n = 1; %几倍的样本
-sigma_t = 0;
+sigma_t = 0.0;
 % range = 14;
 %%参数估计来自《Maximum Likelihood Estimation for
 %%%            Compound-Gaussian Clutter with Inverse GammaTexture》
@@ -18,24 +18,26 @@ sigma_t = 0;
 % mu = 1;
 lambda = 1.4495;
 mu = 1.3820;
-str_train = 'p';
+str_train = 'g';
 opt_train = 1;
 %%%%参数设置
 % N = 8;
 SNRout=-5:1:25; % 输出SNR
 PFA=1e-3;% PFA=1e-4;
 SNRnum=10.^(SNRout/10);
-MonteCarloPfa=1/PFA*100;
+MonteCarloPfa=100/PFA;
 MonteCarloPd=1e4;
 % rou = 0.95;  %%协方差矩阵生成的迟滞因子
+% load rou_19980223_170435.mat
 rouR = R_KA;  %%真实的杂波协方差
 irouR = inv(rouR);
 L=round(n*N); 
-theta_sig = 0.4;
+theta_sig = 0.1;
 nn = 0:N-1;
 s = exp(-1i*2*pi*nn*theta_sig)'; %%%%%% 系统导向矢量
-t = normrnd(1,sigma_t,N,1);%%0~0.5%%失配向量
-R_KA = rouR.*(t*t');
+% t = normrnd(1,sigma_t,N,1);%%0~0.5%%失配向量
+% load R_KA.mat
+% R_KA = rouR.*(t*t');
 iR_KA = inv(R_KA);
 rouR_half=rouR^0.5;
 %%%%%正式开始%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -178,5 +180,5 @@ grid on
 box on
 matFile(end-4:end)=[];
 % str=['Pd_CLGLRT_',matFile,'_',num2str(n),'K','s',num2str(sigma_t),'_',str_train,'.mat'];
-str=['Pd_CLGLRT_',matFile,'_',num2str(n),'K','s',num2str(sigma_t),'.mat'];
+str=['Pd_CLGLRT_2_',matFile,'_',num2str(n),'K','s',num2str(sigma_t),'.mat'];
 save(str,'SNRout','Pd_CLGLRT_mc','Pd_KGLRT_mc','Pd_KGLRTCC_mc','Pd_KGLRTNSCM_mc');

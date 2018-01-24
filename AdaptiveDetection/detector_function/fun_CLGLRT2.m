@@ -1,9 +1,9 @@
-function [ Tclglrt ] = fun_CLGLRT2( RKA,R,x0,p )
+function [ Tclglrt ] = fun_CLGLRT2( lambda,mu,RKA,R,x0,p )
 %FUN_CLGRT 此处显示有关此函数的摘要
 %   此处显示详细说明
 %%色加载的GLRT的结果
-R1 = fun_CLGLRT_covariance2(RKA,R,x0,p,1);%%H1下的协方差估计结果
-R0 = fun_CLGLRT_covariance2(RKA,R,x0,p,0);%%H0下的协方差估计结果
+R1 = fun_CLGLRT_covariance(lambda,mu,RKA,R,x0,p,1);%%H1下的协方差估计结果
+R0 = fun_CLGLRT_covariance(lambda,mu,RKA,R,x0,p,0);%%H0下的协方差估计结果
 [N,~]=size(x0);
 iR1 = inv(R1);
 iR0 = inv(R0);
