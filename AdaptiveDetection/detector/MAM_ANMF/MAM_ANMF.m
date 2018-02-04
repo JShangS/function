@@ -11,8 +11,8 @@ lambda = 3;
 mu = 1;
 opt_train = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
 sigma_t = 1;
-rou = 0.95;  %%协方差矩阵生成的迟滞因子
-rouM=[0.9,0.94,0.945];%%%%%%%%%MAM模型
+rou = 0.94;  %%协方差矩阵生成的迟滞因子
+rouM=[0.9,0.95,0.99];%%%%%%%%%MAM模型
 %%%Pd_CLGLRT_2Kmu1lambda3s0.1o1_p：2K：训练单元数目，mu，lambda，s：失配向量方差，
 %%o1:opt=1，p：IG纹理复合高斯
 %%%%假设参数设置
@@ -56,7 +56,7 @@ irouR=inv(rouR);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % h = waitbar(0,'Please wait...');
 tic
-for i = 1:MonteCarloPfa
+parfor i = 1:MonteCarloPfa
     warning('off')
 %     warning('query')
 %     waitbar(i/MonteCarloPfa,h,sprintf([num2str(i/MonteCarloPfa*100),'%%']));
@@ -79,27 +79,33 @@ for i = 1:MonteCarloPfa
     Tanmf_SCM(i) = fun_ANMF(R_SCM,x0,s);
     %%%%%% ANMF_NSCM
     Tanmf_NSCM(i) = fun_ANMF(R_NSCM,x0,s);
-    %%%%%% KGLRTNSCM
+    %%%%%% ANMF_MAM
     Tanmf_MAM(i) = fun_ANMF(R_MAM,x0,s);
+    %%%%%% GLRT_MAM
+    Tglrt_mam(i) = fun_MAM_GLRT(R_MAM,x0,s,lambda,mu);
 end
 toc
 % close(h)
 TANMF_SCM=sort(Tanmf_SCM,'descend');
 TANMF_NSCM=sort(Tanmf_NSCM,'descend');
 TANMF_MAM=sort(Tanmf_MAM,'descend');
+TGLRT_MAM=sort(Tglrt_mam,'descend');
 
 Th_SCM=(TANMF_SCM(floor(MonteCarloPfa*PFA-1))+TANMF_SCM(floor(MonteCarloPfa*PFA)))/2;
 Th_NSCM=(TANMF_NSCM(floor(MonteCarloPfa*PFA-1))+TANMF_NSCM(floor(MonteCarloPfa*PFA)))/2;
 Th_MAM=(TANMF_MAM(floor(MonteCarloPfa*PFA-1))+TANMF_MAM(floor(MonteCarloPfa*PFA)))/2;
+Th_GLRTMAM=(TGLRT_MAM(floor(MonteCarloPfa*PFA-1))+TGLRT_MAM(floor(MonteCarloPfa*PFA)))/2;
 %%%%%%%%%%%%%%%%%%%%%检测概率%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 counter_scm=0;
 counter_nscm=0;
 counter_mam=0;
+counter_glrtmam=0;
 
 Pd_SCM_mc = zeros(1,length(SNRout));
 Pd_NSCM_mc = zeros(1,length(SNRout));
 Pd_MAM_mc = zeros(1,length(SNRout));
+Pd_GLRTMAM_mc = zeros(1,length(SNRout));
 % alpha=sqrt(SNRnum/abs(s_real'*irouR*s_real)); % 根据SNR=|alpha|^2*s'*R^(-1)*s求得|alpha|
 alpha=sqrt(SNRnum/abs(s'*irouR*s)); % 根据SNR=|alpha|^2*s'*R^(-1)*s求得|alpha|
 h = waitbar(0,'Please wait...');
@@ -128,16 +134,20 @@ for m=1:length(SNRout)
         Tscm = fun_ANMF(R_SCM,x0,s);
         %%%%%% ANMF_NSCM
         Tnscm = fun_ANMF(R_NSCM,x0,s);
-        %%%%%% KGLRTNSCM
+        %%%%%% ANMF_MAM
         Tmam = fun_ANMF(R_MAM,x0,s);
+        %%%%%% GLRT_MAM
+        Tglrtmam = fun_MAM_GLRT(R_MAM,x0,s,lambda,mu);
         %%%判断%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
         if Tscm>Th_SCM;          counter_scm=counter_scm+1;        end                
         if Tnscm>Th_NSCM;       counter_nscm=counter_nscm+1;    end   
         if Tmam>Th_MAM;      counter_mam=counter_mam+1;    end
+        if Tglrtmam>Th_GLRTMAM;      counter_glrtmam=counter_glrtmam+1;    end
     end
     Pd_SCM_mc(m)=counter_scm/MonteCarloPd;           counter_scm=0;
     Pd_NSCM_mc(m)=counter_nscm/MonteCarloPd;        counter_nscm=0;
     Pd_MAM_mc(m)=counter_mam/MonteCarloPd;       counter_mam=0; 
+    Pd_GLRTMAM_mc(m)=counter_glrtmam/MonteCarloPd;       counter_glrtmam=0; 
 end
 close(h)
 toc
@@ -146,12 +156,13 @@ hold on
 plot(SNRout,Pd_SCM_mc,'b-+','linewidth',2)
 plot(SNRout,Pd_NSCM_mc,'k.-','linewidth',2)
 plot(SNRout,Pd_MAM_mc,'g-s','linewidth',2)
-h_leg = legend('ANMF with SCM','ANMF with NSCM','ANMF with MAM');
+plot(SNRout,Pd_GLRTMAM_mc,'y-o','linewidth',2)
+h_leg = legend('ANMF with SCM','ANMF with NSCM','ANMF with MAM','GLRT with MAM');
 xlabel('SNR/dB','FontSize',20)
 ylabel('Pd','FontSize',20)
 set(gca,'FontSize',20)
 set(h_leg,'Location','SouthEast')
 grid on
-str=['Pd_MAM_',num2str(n),'K','_',str_train,'.mat'];
-save(str,'SNRout','Pd_SCM_mc','Pd_NSCM_mc',...
-         'Pd_MAM_mc');
+% str=['Pd_MAM_',num2str(n),'K','_',str_train,'.mat'];
+% save(str,'SNRout','Pd_SCM_mc','Pd_NSCM_mc',...
+%          'Pd_MAM_mc');

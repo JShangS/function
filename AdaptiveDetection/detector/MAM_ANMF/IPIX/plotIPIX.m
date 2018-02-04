@@ -14,8 +14,8 @@ hold on
 load Pd_MAM_IPIX_2K_19980223_170435_.mat
 % Pd_CLGLRT_mc(1:end-1)=Pd_CLGLRT_mc(2:end);
 plot(SNRout,Pd_SCM_mc,'k-*','linewidth',linewide1,'markersize',mkft);
-plot(SNRout,Pd_KGLRTCC_mc,'g-*','linewidth',linewide1,'markersize',mkft);
-plot(SNRout,Pd_KGLRT_mc,'b-*','linewidth',linewide1,'markersize',mkft);
+plot(SNRout,Pd_NSCM_mc,'g-*','linewidth',linewide1,'markersize',mkft);
+plot(SNRout,Pd_MAM_mc,'b-*','linewidth',linewide1,'markersize',mkft);
 
 load Pd_CLGLRT_19980223_170435_IPI_2Ks0.mat
 % Pd_CLGLRT_mc(1:end-1)=Pd_CLGLRT_mc(2:end);

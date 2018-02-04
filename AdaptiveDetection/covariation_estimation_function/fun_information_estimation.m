@@ -15,6 +15,6 @@ ratio = exp(-distance)/Sum_ratio;
 ratio = reshape(ratio,1,1,L);
 ratio = repmat(ratio,N,N,1);
 R_MAM = sum(ratio.*MAM,3);
-ratio = ratio(1,1,1:L);
+% ratio = ratio(1,1,1:L);
 end
 
