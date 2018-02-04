@@ -18,7 +18,7 @@ switch str
         X = fun_TrainData_gauss(N,L, R);
     case 'k'
         if nargin < 5
-           error('K分布训练数据输入参数为5个：k 选项，导向矢量维数，训练数据长度，协方差,形状参数'); 
+           error('K分布训练数据输入参数为5个：k 选项，N导向矢量维数，L训练数据长度，R协方差,v形状参数'); 
         end
         N = varargin{2};
         L = varargin{3};
