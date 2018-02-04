@@ -155,6 +155,6 @@ ylabel('Pd','FontSize',20)
 set(gca,'FontSize',20)
 set(h_leg,'Location','SouthEast')
 grid on
-str=['Pd_MAM_IPIX',num2str(n),'K','_',str_train,'.mat'];
+str=['Pd_MAM_IPIX_',num2str(n),'K','_',cdfFile_t,'.mat'];
 save(str,'SNRout','Pd_SCM_mc','Pd_NSCM_mc',...
          'Pd_MAM_mc');
