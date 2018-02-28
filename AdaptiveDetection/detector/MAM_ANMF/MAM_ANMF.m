@@ -6,13 +6,13 @@ clear
 close all
 %%%%参数设置
 n = 2; %几倍的样本
-str_train = 'g';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
-lambda = 3;
+str_train = 'p';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
+lambda = 2;
 mu = 1;
 opt_train = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
 sigma_t = 1;
-rou = 0.94;  %%协方差矩阵生成的迟滞因子
-rouM=[0.9,0.95,0.99];%%%%%%%%%MAM模型
+rou = 0.95;  %%协方差矩阵生成的迟滞因子
+rouM=[0.9,0.94,0.945];%%%%%%%%%MAM模型
 %%%Pd_CLGLRT_2Kmu1lambda3s0.1o1_p：2K：训练单元数目，mu，lambda，s：失配向量方差，
 %%o1:opt=1，p：IG纹理复合高斯
 %%%%假设参数设置
@@ -82,7 +82,7 @@ parfor i = 1:MonteCarloPfa
     %%%%%% ANMF_MAM
     Tanmf_MAM(i) = fun_ANMF(R_MAM,x0,s);
     %%%%%% GLRT_MAM
-    Tglrt_mam(i) = fun_MAM_GLRT(R_MAM,x0,s,lambda,mu);
+    Tglrt_mam(i) = fun_MAM_GLRT(MAM,x0,s);
 end
 toc
 % close(h)
@@ -137,7 +137,7 @@ for m=1:length(SNRout)
         %%%%%% ANMF_MAM
         Tmam = fun_ANMF(R_MAM,x0,s);
         %%%%%% GLRT_MAM
-        Tglrtmam = fun_MAM_GLRT(R_MAM,x0,s,lambda,mu);
+        Tglrtmam = fun_MAM_GLRT(MAM,x0,s);
         %%%判断%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
         if Tscm>Th_SCM;          counter_scm=counter_scm+1;        end                
         if Tnscm>Th_NSCM;       counter_nscm=counter_nscm+1;    end   

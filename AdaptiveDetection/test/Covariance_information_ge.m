@@ -3,26 +3,27 @@ clc
 clear 
 close all
 rou0=0.95;
-rou=[0.9,0.94,0.945];
+rou=0.1:0.01:0.99;
 N=8;
-L=round(4*N);
+L=round(1*N);
 LL=1000;
 R0=fun_rho(rou0,N);
 for i =1:length(rou)
     R=fun_rho(rou(i),N);
     MAM(:,:,i)=R;
 end
-for i =1:LL
-    x0 = fun_TrainData('k',N,1,R0,1,3,2);
-    X = fun_TrainData('k',N,L,R0,1,3,2);
+
+parfor i =1:LL
+    x0 = fun_TrainData('k',N,1,R0,1,1,2);
+    X = fun_TrainData('k',N,L,R0,1,1,2);
     RX=fun_NSCMN(X);
     Rx0=fun_SCM(x0);
-    [R_MAM,~,ratio]=fun_information_estimation(Rx0,MAM);
-    error_R_MAM(i) = norm(R_MAM-R0,'fro')/norm(R0,'fro');
-    error_Rx0(i) = norm(RX-R0,'fro')/norm(R0,'fro');
+    [R_MAM,~,ratio]=fun_information_estimation(RX,MAM);
+    error_R_MAM(i) = norm(R_MAM-R0,'fro')/norm(R0,'fro');%fun_ReimanDistance(R0,R_MAM);
+    error_RX(i) = norm(RX-R0,'fro')/norm(R0,'fro');%fun_ReimanDistance(R0,RX);
 end
 m_errorR_MAM=mean(error_R_MAM);
-m_errorRx0=mean(error_Rx0);
+m_errorRx0=mean(error_RX);
 
 % distance1x0=0;
 % distance2x0=0;
@@ -44,4 +45,17 @@ m_errorRx0=mean(error_Rx0);
 % m_R_x0=mean(error_R_x0);
 % m_distance1x0=mean(distance1x0);
 % m_distance2x0=mean(distance2x0);
+
+% x0 = fun_TrainData('p',N,1,R0,1,1,2);
+% X = fun_TrainData('p',N,L,R0,1,1,2);
+% RX=fun_NSCMN(X);
+% Rx0=fun_NSCM(x0,1);
+% for i = 1:length(rou)
+%     distance1(i) = fun_ReimanDistance(Rx0,MAM(:,:,i));
+%     distance2(i) = fun_ReimanDistance(RX,MAM(:,:,i));
+% end
+% plot(rou,distance1);
+% figure
+% plot(rou,distance2,'r');
+% rou(find(min(distance2)==distance2))
 

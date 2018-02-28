@@ -8,7 +8,7 @@ Read_Display_Data
 Data_process
 load(matFile) 
 %%%%参数设置
-n = 2; %几倍的样本
+n = 1; %几倍的样本
 sigma_t = 0.0;
 % range = 14;
 %%参数估计来自《Maximum Likelihood Estimation for
@@ -29,7 +29,7 @@ MonteCarloPfa=100/PFA;
 MonteCarloPd=1e4;
 rouR = R_KA;  %%真实的杂波协方差
 irouR = inv(rouR);
-rouM=[0.9,0.95,0.99];%%%%%%%%%MAM模型
+rouM=[0.9,0.95,0.85];%%%%%%%%%MAM模型
 for i =1:length(rouM)
     R = fun_rho(rouM(i),N);
     MAM(:,:,i)=R;
@@ -66,7 +66,7 @@ parfor i = 1:MonteCarloPfa
     R_NSCMN = (fun_NSCMN(Train));
     %%%%%%%MAM协方差估计%%%%%%%%%%%%%
     Rx0=fun_SCM(x0);
-    R_MAM = fun_information_estimation(Rx0,MAM);
+    R_MAM = fun_information_estimation(Rx0,fun_congnition(Train));
     %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%% ANMF_SCM
     Tanmf_SCM(i) = fun_ANMF(R_SCM,x0,s);
@@ -75,7 +75,7 @@ parfor i = 1:MonteCarloPfa
     %%%%%% ANMF_MAM
     Tanmf_MAM(i) = fun_ANMF(R_MAM,x0,s);
     %%%%%% GLRT_MAM
-    Tglrt_mam(i) = fun_MAM_GLRT(R_MAM,x0,s,lambda,mu);
+    Tglrt_mam(i) = fun_MAM_GLRT(MAM,x0,s,lambda,mu);
 end
 toc
 % close(h)
@@ -129,7 +129,7 @@ for m=1:length(SNRout)
         R_NSCMN = (fun_NSCMN(Train));
         %%%%%%%MAM协方差估计%%%%%%%%%%%%%
         Rx0=fun_SCM(x0);
-        R_MAM = fun_information_estimation(Rx0,MAM);     
+        R_MAM = fun_information_estimation(Rx0,fun_congnition(Train));     
         %%%检测信号
         x0=alpha(m)*s+x0;%+pp;    %%%%%%%  重要  %%%%%%%%%%%%%
         %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -140,7 +140,7 @@ for m=1:length(SNRout)
         %%%%%% ANMF_MAM
         Tmam = fun_ANMF(R_MAM,x0,s);
         %%%%%% GLRT_MAM
-        Tglrtmam = fun_MAM_GLRT(R_MAM,x0,s,lambda,mu);
+        Tglrtmam = fun_MAM_GLRT(MAM,x0,s,lambda,mu);
         %%%判断%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
         if Tscm>Th_SCM;          counter_scm=counter_scm+1;        end                
         if Tnscm>Th_NSCM;       counter_nscm=counter_nscm+1;    end   
@@ -159,7 +159,7 @@ hold on
 plot(SNRout,Pd_SCM_mc,'b-+','linewidth',2)
 plot(SNRout,Pd_NSCM_mc,'k.-','linewidth',2)
 plot(SNRout,Pd_MAM_mc,'g-s','linewidth',2)
-plot(SNRout,Pd_GLRTMAM_mc,'y-o','linewidth',2)
+plot(SNRout,Pd_GLRTMAM_mc,'m-o','linewidth',2)
 h_leg = legend('ANMF with SCM','ANMF with NSCM','ANMF with MAM','GLRT with MAM');
 xlabel('SNR/dB','FontSize',20)
 ylabel('Pd','FontSize',20)
