@@ -3,7 +3,7 @@ clc
 clear 
 close all
 rou0=0.95;
-rou=0.1:0.01:0.99;
+rou=0.9:0.01:0.99;
 N=8;
 L=round(1*N);
 LL=1000;
@@ -20,7 +20,7 @@ parfor i =1:LL
     Rx0=fun_SCM(x0);
     [R_MAM,~,ratio]=fun_information_estimation(RX,MAM);
     error_R_MAM(i) = norm(R_MAM-R0,'fro')/norm(R0,'fro');%fun_ReimanDistance(R0,R_MAM);
-    error_RX(i) = norm(RX-R0,'fro')/norm(R0,'fro');%fun_ReimanDistance(R0,RX);
+    error_RX(i) = norm(RX-R0,'fro')/norm(R0,'fro');%fun_ReimanDistance(R0,RX);.
 end
 m_errorR_MAM=mean(error_R_MAM);
 m_errorRx0=mean(error_RX);
