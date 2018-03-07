@@ -1,5 +1,4 @@
 function [ PSD ] = fun_PSD( R,ft,N )
-%PSD 此处显示有关此函数的摘要
 % Capon PSD estimator
 %%《 Estimation of the Covariance Matrix Based on Multiple A-Priori Models, A. De Maio》
 %%N：归一化多普勒点数
@@ -20,5 +19,7 @@ for i = 1:N
     p = exp(1j*2*pi*nn*ft(i));
     PSD(i) = 1/(p'*iR*p);
 end
+% PSD=PSD/max(abs(PSD));
+PSD=abs(fun_value2dB(PSD));
 end
 

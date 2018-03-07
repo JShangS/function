@@ -1,14 +1,50 @@
-function [ R_MAM, distance,ratio] = fun_information_estimation(R0, MAM)
+function [ R_MAM, distance,ratio] = fun_information_estimation(R0, MAM,opt,alpha)
 %FUN_INFORMATION_ESTIMATION 此处显示有关此函数的摘要
 %   此处显示详细说明
 %%%%%%基于信息几何度量的协方差估计方法。
 %%%R0:参考协方差
 %%%MAM:多模型组合协方差为N*N，L为模型个数
+%%%距离选项 r：ReimanDistance，l: Log Euclidean Distance
+%%%e: Euclidean Distance, ro:Root Euclidean Distance
+%%%c: CholeskyDistance, p: Power-Euclidean distance
+
+if nargin==2
+    opt = 'r';%ReimanDistance
+    alpha = 2;
+elseif nargin == 3
+    alpha = 2;
+end
 [N,~,L]=size(MAM); 
 distance = zeros(L,1);
-for i=1:L
-    distance(i) = fun_ReimanDistance(R0,MAM(:,:,i));
+switch opt
+    case 'r'%ReimanDistance
+        for i=1:L
+            distance(i) = fun_ReimanDistance(R0,MAM(:,:,i));
+        end
+    case 'l' %Log Euclidean Distance
+        for i=1:L
+            distance(i) = fun_LogED(R0,MAM(:,:,i));
+        end
+    case 'c' %CholeskyDistance
+        for i=1:L
+            distance(i) = fun_CholeskyDistance(R0,MAM(:,:,i));
+        end
+    case 'e'%Euclidean Distance
+        for i=1:L
+            distance(i) = fun_EuclideanDistance(R0,MAM(:,:,i));
+        end
+    case 'p'%Power-Euclidean distance
+        for i=1:L
+            distance(i) = fun_PowerED(R0,MAM(:,:,i),alpha);
+        end
+    case 'ro'%Root Euclidean Distance
+        for i=1:L
+            distance(i) = fun_RootED(R0,MAM(:,:,i));
+        end
+        
+    otherwise
 end
+
 distance = distance/sum(distance);
 Sum_ratio = sum(exp(-distance));
 ratio = exp(-distance)/Sum_ratio;

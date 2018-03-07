@@ -12,8 +12,8 @@ for i =1:length(rou)
     R=fun_rho(rou(i),N);
     MAM(:,:,i)=R;
 end
-tic
-parfor i =1:LL
+
+for i =1:LL
     x0 = fun_TrainData('k',N,1,R0,1,1,2);
     X = fun_TrainData('k',N,L,R0,1,1,2);
     RX=fun_NSCMN(X);
@@ -35,7 +35,6 @@ parfor i =1:LL
     error_RX(i) = norm(RX-R0,'fro')/norm(R0,'fro');%fun_ReimanDistance(R0,RX);.
     
 end
-toc
 m_errorR_MAM_r=mean(error_R_MAM_r);
 m_errorR_MAM_c=mean(error_R_MAM_r);
 m_errorR_MAM_e=mean(error_R_MAM_r);

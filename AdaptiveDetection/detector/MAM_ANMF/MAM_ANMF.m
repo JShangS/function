@@ -30,10 +30,7 @@ L=round(n*N);
 theta_sig = 0.1;
 nn = 0:N-1;
 s = exp(-1i*2*pi*nn*theta_sig)'; %%%%%% 系统导向矢量
-for i =1:length(rouM)
-    R = fun_rho(rouM(i),N);
-    MAM(:,:,i)=R;
-end
+MAM = fun_rho(rouM,N);
 rouR = fun_rho(rou,N);
 rouR_abs=abs(rouR);
 rouR_half=rouR^0.5;

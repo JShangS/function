@@ -27,7 +27,7 @@ switch str
         X = fun_TrainData_K( N,L, R, v);
     case 'p'
         if nargin < 6
-           error('IG分布训练数据输入参数至少6个：p 选项，导向矢量维数，训练数据长度，协方差,形状参数,尺度参数，SIRP选项'); 
+           error('IGamma分布训练数据输入参数至少6个：p 选项，导向矢量维数，训练数据长度，协方差,形状参数,尺度参数，SIRP选项'); 
         end
         N = varargin{2};
         L = varargin{3};
@@ -41,8 +41,24 @@ switch str
            opt_train = varargin{7};
            X = fun_TrainData_IGCC( N,L,R,lamda,mu,opt_train);
         end
+    case 'gamma'
+        if nargin < 6
+           error('gamma分布训练数据输入参数至少6个：p 选项，导向矢量维数，训练数据长度，协方差,形状参数,尺度参数，SIRP选项'); 
+        end
+        N = varargin{2};
+        L = varargin{3};
+        R = varargin{4};
+        lamda = varargin{5};
+        mu = varargin{6};
+        if nargin == 6
+            opt_train = 1;
+            X = fun_TrainData_GCC( N,L,R,lamda,mu,opt_train);
+        else
+           opt_train = varargin{7};
+           X = fun_TrainData_GCC( N,L,R,lamda,mu,opt_train);
+        end
     otherwise
-            error('现在只有3种');
+            error('现在只有4种');
 end
 end
 
