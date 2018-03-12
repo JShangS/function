@@ -3,7 +3,8 @@ clc
 clear 
 close all
 rou0=0.95;
-rou=0.9:0.01:0.99;
+rou=0.5:0.05:0.99;
+% rou=[0.5,0.6,0.945]
 N=8;
 L=round(1*N);
 LL=1000;
@@ -13,21 +14,21 @@ for i =1:length(rou)
     MAM(:,:,i)=R;
 end
 tic
-parfor i =1:LL
-    x0 = fun_TrainData('k',N,1,R0,1,1,2);
-    X = fun_TrainData('k',N,L,R0,1,1,2);
-    RX=fun_NSCMN(X);
+for i =1:LL
+    x0 = fun_TrainData('p',N,1,R0,3,1,1);
+    X = fun_TrainData('p',N,L,R0,3,1,1);
+    RX=abs(fun_NSCMN(X));
     Rx0=fun_SCM(x0);
     
     [R_MAM_r,~,ratio_r]=fun_information_estimation(RX,MAM,'r');
-    [R_MAM_c,~,ratio_c]=fun_information_estimation(RX,MAM,'c');
+%     [R_MAM_c,~,ratio_c]=fun_information_estimation(RX,MAM,'c');
     [R_MAM_e,~,ratio_e]=fun_information_estimation(RX,MAM,'e');
     [R_MAM_l,~,ratio_l]=fun_information_estimation(RX,MAM,'l');
     [R_MAM_p,~,ratio_p]=fun_information_estimation(RX,MAM,'p');
     [R_MAM_ro,~,ratio_ro]=fun_information_estimation(RX,MAM,'ro');
     
     error_R_MAM_r(i) = norm(R_MAM_r-R0,'fro')/norm(R0,'fro');%fun_ReimanDistance(R0,R_MAM);
-    error_R_MAM_c(i) = norm(R_MAM_c-R0,'fro')/norm(R0,'fro');
+%     error_R_MAM_c(i) = norm(R_MAM_c-R0,'fro')/norm(R0,'fro');
     error_R_MAM_e(i) = norm(R_MAM_e-R0,'fro')/norm(R0,'fro');
     error_R_MAM_l(i) = norm(R_MAM_l-R0,'fro')/norm(R0,'fro');
     error_R_MAM_p(i) = norm(R_MAM_p-R0,'fro')/norm(R0,'fro');
@@ -37,11 +38,11 @@ parfor i =1:LL
 end
 toc
 m_errorR_MAM_r=mean(error_R_MAM_r);
-m_errorR_MAM_c=mean(error_R_MAM_r);
-m_errorR_MAM_e=mean(error_R_MAM_r);
-m_errorR_MAM_l=mean(error_R_MAM_r);
-m_errorR_MAM_p=mean(error_R_MAM_r);
-m_errorR_MAM_ro=mean(error_R_MAM_r);
+% m_errorR_MAM_c=mean(error_R_MAM_c);
+m_errorR_MAM_e=mean(error_R_MAM_e);
+m_errorR_MAM_l=mean(error_R_MAM_l);
+m_errorR_MAM_p=mean(error_R_MAM_p);
+m_errorR_MAM_ro=mean(error_R_MAM_ro);
 m_errorRx0=mean(error_RX);
 
 % distance1x0=0;

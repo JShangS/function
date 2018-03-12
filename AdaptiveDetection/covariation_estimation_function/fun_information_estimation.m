@@ -10,9 +10,9 @@ function [ R_MAM, distance,ratio] = fun_information_estimation(R0, MAM,opt,alpha
 
 if nargin==2
     opt = 'r';%ReimanDistance
-    alpha = 2;
+    alpha = 1;
 elseif nargin == 3
-    alpha = 2;
+    alpha = 1;
 end
 [N,~,L]=size(MAM); 
 distance = zeros(L,1);
@@ -21,18 +21,22 @@ switch opt
         for i=1:L
             distance(i) = fun_ReimanDistance(R0,MAM(:,:,i));
         end
+%         distance = distance/sum(distance);
     case 'l' %Log Euclidean Distance
         for i=1:L
             distance(i) = fun_LogED(R0,MAM(:,:,i));
         end
+%         distance = distance/sum(distance);
     case 'c' %CholeskyDistance
         for i=1:L
             distance(i) = fun_CholeskyDistance(R0,MAM(:,:,i));
         end
+%         distance = distance/sum(distance);
     case 'e'%Euclidean Distance
         for i=1:L
             distance(i) = fun_EuclideanDistance(R0,MAM(:,:,i));
         end
+%         distance = distance/sum(distance);
     case 'p'%Power-Euclidean distance
         for i=1:L
             distance(i) = fun_PowerED(R0,MAM(:,:,i),alpha);
@@ -45,12 +49,12 @@ switch opt
     otherwise
 end
 
-distance = distance/sum(distance);
+% distance = distance/sum(distance);
 Sum_ratio = sum(exp(-distance));
 ratio = exp(-distance)/Sum_ratio;
 ratio = reshape(ratio,1,1,L);
 ratio = repmat(ratio,N,N,1);
 R_MAM = sum(ratio.*MAM,3);
-% ratio = ratio(1,1,1:L);
+ratio = ratio(1,1,1:L);
 end
 

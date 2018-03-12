@@ -5,9 +5,9 @@ function [ distance ] = fun_LogED( A,B )
 %%% 根据文献<Covariance matrix estimation via geometric barycenters 
 % and its application to radar training data selection>
 [UA, LA] = eig(A);
-logA = UA * log(LA) * UA';
-[UB, LB] = eig(B);
-logB = UB * log(LB) * UB';
-distance = sqrt(trace((logA - logB) * (logA - logB)'));
+logA = UA * diag(log(diag(LA))) * UA';
+[UB, LB] = eig(B);%%特征向量，特征值，
+logB = UB * diag(log(diag(LB))) * UB';
+distance = (trace((logA - logB) * (logA - logB)'));
 end
 
