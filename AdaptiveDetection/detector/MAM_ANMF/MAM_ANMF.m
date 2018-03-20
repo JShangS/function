@@ -5,12 +5,11 @@ clc
 clear 
 close all
 %%%%参数设置
-n = 1; %几倍的样本
+n = 2; %几倍的样本
 str_train = 'p';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
 lambda = 2;
 mu = 1;
 opt_train = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
-sigma_t = 1;
 rou = 0.95;  %%协方差矩阵生成的迟滞因子
 rouM=[0.5,0.6,0.945];%%%%%%%%%MAM模型
 %%%Pd_CLGLRT_2Kmu1lambda3s0.1o1_p：2K：训练单元数目，mu，lambda，s：失配向量方差，
@@ -69,22 +68,30 @@ parfor i = 1:MonteCarloPfa
     
     R_NSCMN = (fun_NSCMN(Train));
     %%%%%%%MAM协方差估计%%%%%%%%%%%%%
-    Rx0=fun_SCM(x0);
-    R_MAM_r = fun_information_estimation(R_NSCMN,MAM,'r');
-%     R_MAM_c = fun_information_estimation(Rx0,MAM,'c');
-    R_MAM_e = fun_information_estimation(R_NSCMN,MAM,'e');
-    R_MAM_l = fun_information_estimation(R_NSCMN,MAM,'l');
-    R_MAM_p = fun_information_estimation(R_NSCMN,MAM,'p');
-    R_MAM_ro = fun_information_estimation(R_NSCMN,MAM,'ro');
+    Rx0 = x0*x0';
+    [V,D] = svd(Rx0);
+    Evalue = abs(diag(D));
+    index_1 = find(Evalue<=1);
+    Evalue(index_1) = 1;
+    % Evalue = sort(Evalue,'descend');
+    D = diag(Evalue);
+    Rx0 = abs(V)*D*abs(V');
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    R_MAM_r = fun_information_estimation(Rx0,MAM,'r');%ReimanDistance
+    R_MAM_c = fun_information_estimation(Rx0,MAM,'c');%CholeskyDistance
+    R_MAM_e = fun_information_estimation(Rx0,MAM,'e');%Euclidean Distance
+    R_MAM_l = fun_information_estimation(Rx0,MAM,'l');%Log Euclidean Distance
+    R_MAM_p = fun_information_estimation(Rx0,MAM,'p');%Power-Euclidean distance
+    R_MAM_ro = fun_information_estimation(Rx0,MAM,'ro');%Root Euclidean Distance
     %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%% ANMF_SCM
-    Tanmf_SCM(i) = fun_ANMF(R_SCM,x0,s);
+    Tanmf_SCM(i) = fun_KGLRT(R_SCM,x0,s);
     %%%%%% ANMF_NSCM
-    Tanmf_NSCM(i) = fun_ANMF(R_NSCM,x0,s);
+    Tanmf_NSCM(i) = fun_ANMF(R_NSCMN,x0,s);
     %%%%%% ANMF_MAM_r
     Tanmf_MAM_r(i) = fun_ANMF(R_MAM_r,x0,s);
     %%%%%% ANMF_MAM_c
-%     Tanmf_MAM_c(i) = fun_ANMF(R_MAM_c,x0,s);
+    Tanmf_MAM_c(i) = fun_ANMF(R_MAM_c,x0,s);
     %%%%%% ANMF_MAM_e
     Tanmf_MAM_e(i) = fun_ANMF(R_MAM_e,x0,s);
     %%%%%% ANMF_MAM_l
@@ -101,7 +108,7 @@ toc
 TANMF_SCM=sort(Tanmf_SCM,'descend');
 TANMF_NSCM=sort(Tanmf_NSCM,'descend');
 TANMF_MAM_r=sort(Tanmf_MAM_r,'descend');
-% TANMF_MAM_c=sort(Tanmf_MAM_c,'descend');
+TANMF_MAM_c=sort(Tanmf_MAM_c,'descend');
 TANMF_MAM_e=sort(Tanmf_MAM_e,'descend');
 TANMF_MAM_l=sort(Tanmf_MAM_l,'descend');
 TANMF_MAM_p=sort(Tanmf_MAM_p,'descend');
@@ -112,7 +119,7 @@ Th_SCM=(TANMF_SCM(floor(MonteCarloPfa*PFA-1))+TANMF_SCM(floor(MonteCarloPfa*PFA)
 Th_NSCM=(TANMF_NSCM(floor(MonteCarloPfa*PFA-1))+TANMF_NSCM(floor(MonteCarloPfa*PFA)))/2;
 
 Th_MAM_r=(TANMF_MAM_r(floor(MonteCarloPfa*PFA-1))+TANMF_MAM_r(floor(MonteCarloPfa*PFA)))/2;
-% Th_MAM_c=(TANMF_MAM_c(floor(MonteCarloPfa*PFA-1))+TANMF_MAM_c(floor(MonteCarloPfa*PFA)))/2;
+Th_MAM_c=(TANMF_MAM_c(floor(MonteCarloPfa*PFA-1))+TANMF_MAM_c(floor(MonteCarloPfa*PFA)))/2;
 Th_MAM_e=(TANMF_MAM_e(floor(MonteCarloPfa*PFA-1))+TANMF_MAM_e(floor(MonteCarloPfa*PFA)))/2;
 Th_MAM_l=(TANMF_MAM_l(floor(MonteCarloPfa*PFA-1))+TANMF_MAM_l(floor(MonteCarloPfa*PFA)))/2;
 Th_MAM_p=(TANMF_MAM_p(floor(MonteCarloPfa*PFA-1))+TANMF_MAM_p(floor(MonteCarloPfa*PFA)))/2;
@@ -124,7 +131,7 @@ Th_GLRTMAM=(TGLRT_MAM(floor(MonteCarloPfa*PFA-1))+TGLRT_MAM(floor(MonteCarloPfa*
 counter_scm=0;
 counter_nscm=0;
 counter_mam_r=0;
-% counter_mam_c=0;
+counter_mam_c=0;
 counter_mam_e=0;
 counter_mam_l=0;
 counter_mam_p=0;
@@ -134,7 +141,7 @@ counter_glrtmam=0;
 Pd_SCM_mc = zeros(1,length(SNRout));
 Pd_NSCM_mc = zeros(1,length(SNRout));
 Pd_MAM_r_mc = zeros(1,length(SNRout));
-% Pd_MAM_c_mc = zeros(1,length(SNRout));
+Pd_MAM_c_mc = zeros(1,length(SNRout));
 Pd_MAM_e_mc = zeros(1,length(SNRout));
 Pd_MAM_l_mc = zeros(1,length(SNRout));
 Pd_MAM_p_mc = zeros(1,length(SNRout));
@@ -159,24 +166,31 @@ for m=1:length(SNRout)
     
         R_NSCMN = (fun_NSCMN(Train));
         %%%%%%%MAM协方差估计%%%%%%%%%%%%%
-        Rx0=fun_SCM(x0);
-        R_MAM_r = fun_information_estimation(R_NSCMN,MAM,'r');
-%         R_MAM_c = fun_information_estimation(Rx0,MAM,'c');
-        R_MAM_e = fun_information_estimation(R_NSCMN,MAM,'e');
-        R_MAM_l = fun_information_estimation(R_NSCMN,MAM,'l');
-        R_MAM_p = fun_information_estimation(R_NSCMN,MAM,'p');
-        R_MAM_ro = fun_information_estimation(R_NSCMN,MAM,'ro');
+        Rx0 = x0*x0';
+        [V,D] = svd(Rx0);
+        Evalue = abs(diag(D));
+        index_1 = find(Evalue<=1);
+        Evalue(index_1) = 1;
+        % Evalue = sort(Evalue,'descend');
+        D = diag(Evalue);
+        Rx0 = abs(V)*D*abs(V');
+        R_MAM_r = fun_information_estimation(Rx0,MAM,'r');
+        R_MAM_c = fun_information_estimation(Rx0,MAM,'c');
+        R_MAM_e = fun_information_estimation(Rx0,MAM,'e');
+        R_MAM_l = fun_information_estimation(Rx0,MAM,'l');
+        R_MAM_p = fun_information_estimation(Rx0,MAM,'p');
+        R_MAM_ro = fun_information_estimation(Rx0,MAM,'ro');
         %%%检测信号
         x0=alpha(m)*s+x0;%+pp;    %%%%%%%  重要  %%%%%%%%%%%%%
         %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%% ANMF_SCM
-        Tscm = fun_ANMF(R_SCM,x0,s);
+        Tscm = fun_KGLRT(R_SCM,x0,s);
         %%%%%% ANMF_NSCM
-        Tnscm = fun_ANMF(R_NSCM,x0,s);
+        Tnscm = fun_ANMF(R_NSCMN,x0,s);
         %%%%%% ANMF_MAM_r
         Tmam_r = fun_ANMF(R_MAM_r,x0,s);
         %%%%%% ANMF_MAM_c
-%         Tmam_c = fun_ANMF(R_MAM_c,x0,s);
+        Tmam_c = fun_ANMF(R_MAM_c,x0,s);
         %%%%%% ANMF_MAM_e
         Tmam_e = fun_ANMF(R_MAM_e,x0,s);
         %%%%%% ANMF_MAM_l
@@ -191,7 +205,7 @@ for m=1:length(SNRout)
         if Tscm>Th_SCM;          counter_scm=counter_scm+1;        end                
         if Tnscm>Th_NSCM;       counter_nscm=counter_nscm+1;    end   
         if Tmam_r>Th_MAM_r;      counter_mam_r=counter_mam_r+1;    end
-%         if Tmam_c>Th_MAM_c;      counter_mam_c=counter_mam_c+1;    end
+        if Tmam_c>Th_MAM_c;      counter_mam_c=counter_mam_c+1;    end
         if Tmam_e>Th_MAM_e;      counter_mam_e=counter_mam_e+1;    end
         if Tmam_l>Th_MAM_l;      counter_mam_l=counter_mam_l+1;    end
         if Tmam_p>Th_MAM_p;      counter_mam_p=counter_mam_p+1;    end
@@ -201,7 +215,7 @@ for m=1:length(SNRout)
     Pd_SCM_mc(m)=counter_scm/MonteCarloPd;           counter_scm=0;
     Pd_NSCM_mc(m)=counter_nscm/MonteCarloPd;        counter_nscm=0;
     Pd_MAM_r_mc(m)=counter_mam_r/MonteCarloPd;       counter_mam_r=0; 
-%     Pd_MAM_c_mc(m)=counter_mam_c/MonteCarloPd;       counter_mam_c=0;
+    Pd_MAM_c_mc(m)=counter_mam_c/MonteCarloPd;       counter_mam_c=0;
     Pd_MAM_e_mc(m)=counter_mam_e/MonteCarloPd;       counter_mam_e=0;
     Pd_MAM_l_mc(m)=counter_mam_l/MonteCarloPd;       counter_mam_l=0;
     Pd_MAM_p_mc(m)=counter_mam_p/MonteCarloPd;       counter_mam_p=0;
@@ -215,15 +229,15 @@ hold on
 plot(SNRout,Pd_SCM_mc,'b-+','linewidth',2)
 plot(SNRout,Pd_NSCM_mc,'k.-','linewidth',2)
 plot(SNRout,Pd_MAM_r_mc,'g-s','linewidth',2)
-% plot(SNRout,Pd_MAM_c_mc,'k-s','linewidth',2)
+plot(SNRout,Pd_MAM_c_mc,'k-s','linewidth',2)
 plot(SNRout,Pd_MAM_e_mc,'m-s','linewidth',2)
 plot(SNRout,Pd_MAM_l_mc,'r-s','linewidth',2)
 plot(SNRout,Pd_MAM_p_mc,'c-s','linewidth',2)
 plot(SNRout,Pd_MAM_ro_mc,'b-s','linewidth',2)
 plot(SNRout,Pd_GLRTMAM_mc,'y-o','linewidth',2)
-h_leg = legend('ANMF with SCM','ANMF with NSCM','ANMF with MAM__r',...
-    'ANMF with MAM__e','ANMF with MAM__l',...
-    'ANMF with MAM__p','ANMF with MAM__o','GLRT with MAM');
+h_leg = legend('SCM','NSCM','ReimanDistance','Cholesky',...
+    'Euclidean Distance','Log Euclidean Distance',...
+    'Power-Euclidean distance','Root Euclidean Distance','GLRTMAM');
 xlabel('SNR/dB','FontSize',20)
 ylabel('Pd','FontSize',20)
 set(gca,'FontSize',20)

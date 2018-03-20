@@ -35,8 +35,8 @@ h = waitbar(0,'Please wait...');
 for i = 1:MC
     waitbar(i/MC,h,sprintf([num2str(i/MC*100),'%%']));
     %%产生杂波和噪声
-    Train = fun_TrainData(N,L,rouR);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
-    x0 = fun_TrainData(N,1,rouR); % 接收信号仅包括杂波和噪声
+    Train = fun_TrainData('p',N,L,rouR,3,1,1);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
+    x0 = fun_TrainData('p',N,1,rouR,3,1,1); % 接收信号仅包括杂波和噪声
     Sx0 = (x0*x0');
 %%协方差估计
     %%SCM，采样协方差
