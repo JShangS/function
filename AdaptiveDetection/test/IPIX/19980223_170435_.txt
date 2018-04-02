@@ -1,0 +1,41 @@
+File: 19980223_170435_ANTSTEP.CDF
+
+%% Variables:
+            RF_frequency =       9.39 GHz
+            Pulse_length =        100 nanoseconds
+                     PRF =       1000 Hertz
+        Unambig_velocity =     7.9872 metres per second
+                   range = [3501 3516 ..range.. 3996] metres
+           azimuth_angle = [342.2845 342.2845 ..azimuth_angle.. 346.7505] degrees
+         elevation_angle = [359.7693 359.7693 ..elevation_angle.. 359.7748] degrees
+               radar_lat =      43.21 degrees
+               radar_lon =       79.6 degrees
+              radar_elev =         20 metres
+       antenna_beamwidth =        0.9 degrees
+            antenna_gain =       45.7 dB
+             like_stc_RF =      2.998 volts
+            cross_stc_RF =      2.998 volts
+             like_stc_IF =     1.2488 volts
+            cross_stc_IF =    0.94971 volts
+              decimation =          5 none
+                adc_data = [adc_data x adc_data x adc_data x adc_data] ADC output
+
+%% Dimensions:
+                  nrange =         34
+                  nsweep =      60000
+                  ntxpol =          2
+                    nadc =          4
+
+%% Global attributes:
+            Organization = McMaster University
+         Instrument_name = IPIX X-band Polarimetric Coherent Radar
+                Campaign =    Grimsby
+                    Site = Grimsby, ON
+    Data_collection_date = 1998/02/23 17:04:35
+         TX_polarization =          A
+        NetCDF_file_name = 19980223_170435_antstep.cdf
+ NetCDF_creation_routine = make_Grimsby_ncdf
+    NetCDF_creation_date = Mon Dec 18 20:55:12 2000
+           Field_CD_name =   ipixcd12
+          Field_file_dir =   Feb2398a
+         Field_file_name = antstep8882534750

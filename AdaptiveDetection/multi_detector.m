@@ -8,7 +8,7 @@ Na=2;     % 阵元数
 Np=4;     % 脉冲数
 N=Na*Np;
 L=round(2*N); 
-SNRout=0:1:20; % 输出SNR
+SNRout=0:1:25; % 输出SNR
 cos2=1;%%%失配情况
 PFA=1e-3;% PFA=1e-4;
 SNRnum=10.^(SNRout/10);
@@ -22,7 +22,7 @@ vt=exp(-1i*2*pi*nn*theta_sig)'; %%%%%% 系统导向矢量
 rhoR=0.95;
 for i=1:N
     for j=1:N
-        R(i,j)=rhoR^abs(i-j);
+        R(i,j)=rhoR^abs(i-j)*exp(1j*2*pi*(i-j)*0.1);
     end
 end
 iR=inv(R);
@@ -54,12 +54,12 @@ parfor i=1:MonteCarloPfa
 %     waitbar(i/MonteCarloPfa,h,sprintf([num2str(i/MonteCarloPfa*100),'%%']));
 %     X=(randn(N,L)+1i*randn(N,L))/sqrt(2); % 产生方差为1的复高斯白噪声 % Rwhite1=1/snapshot1*X1*X1'; eig(Rwhite1); % round(mean(abs(eig(Rwhite1)))) == 1
 %     S=(R_half*X)*(R_half*X)'; % 有L个训练样本估计的杂波与噪声的协方差矩阵(Rhalf*X表示接收的L个训练数据)
-    Train = fun_TrainData('g',N,L,R);
-    S = fun_SCMN(Train);
+    Train = fun_TrainData('p',N,L,R,2,1,1);
+    S = fun_SCM(Train);
     iS=inv(S);
 %     W=(randn(N,1)+1i*randn(N,1))/sqrt(2); % 1i == -i
 %     x=R_half*W;%+pp; % noise=(randn(N,1)+j*randn(N,1))/sqrt(2);  % 接收信号仅包括杂波和噪声
-    x = fun_TrainData('g',N,1,R);
+    x = fun_TrainData('p',N,1,R,2,1,1);
     Tamf(i)=abs(vt'*iS*x)^2/abs(vt'*iS*vt);     %%%%%% AMF或者wald
     tmp=abs(x'*iS*x);
     Tglrt(i)=Tamf(i)/(1+tmp);                   %%%%%% KGLRT
@@ -70,6 +70,8 @@ parfor i=1:MonteCarloPfa
     Tprao(i)=Tglrt(i)^2/(Tamf(i)*(1-Tglrt(i))); %%%%%% DMRao
     Tdnamf(i)=Tace_bar/tmp;                     %%%%%% DNAMF  % eq.(24) 检测统计量
     Taed(i)=tmp;                                %%%%%% 能量检测器 
+    Tmtd_t = fft(x);
+    Tmtd(i) = abs(Tmtd_t(2));
 end
 TAMF=sort(Tamf,'descend');
 TACE=sort(Tace,'descend');
@@ -79,6 +81,7 @@ TWABORT=sort(Twabort,'descend');
 TDMRao=sort(Tprao,'descend');
 TDNAMF=sort(Tdnamf,'descend');
 TAED=sort(Taed,'descend');
+TMTD = sort(Tmtd,'descend');
 
 Th_AMF=(TAMF(floor(MonteCarloPfa*PFA-1))+TAMF(floor(MonteCarloPfa*PFA)))/2;
 Th_ACE=(TACE(floor(MonteCarloPfa*PFA-1))+TACE(floor(MonteCarloPfa*PFA)))/2;
@@ -88,6 +91,7 @@ Th_WABORT=(TWABORT(floor(MonteCarloPfa*PFA-1))+TWABORT(floor(MonteCarloPfa*PFA))
 Th_DMRao=(TDMRao(floor(MonteCarloPfa*PFA-1))+TDMRao(floor(MonteCarloPfa*PFA)))/2;
 Th_DNAMF=(TDNAMF(floor(MonteCarloPfa*PFA-1))+TDNAMF(floor(MonteCarloPfa*PFA)))/2;
 Th_AED=(TAED(floor(MonteCarloPfa*PFA-1))+TAED(floor(MonteCarloPfa*PFA)))/2;
+Th_MTD=(TMTD(floor(MonteCarloPfa*PFA-1))+TMTD(floor(MonteCarloPfa*PFA)))/2;
 toc
 % alpha=sqrt(SNRnum/abs(vt'*invR*vt)); % 根据SNR=|alpha|^2*s'*R^(-1)*s求得|alpha|
 a=0;b=2*pi;
@@ -101,7 +105,8 @@ counter_wabort=0;
 counter_prao=0;
 counter_dnamf=0;
 counter_aed=0;
-alpha=sqrt(SNRnum/abs(vt_real'*iR*vt_real)); % 根据SNR=|alpha|^2*s'*R^(-1)*s求得|alpha|
+counter_mtd = 0;
+alpha=sqrt(SNRnum/abs(vt'*iR*vt)); % 根据SNR=|alpha|^2*s'*R^(-1)*s求得|alpha|
 Pd_AMF_mc = zeros(1,length(SNRout));
 Pd_KGLRT_mc = zeros(1,length(SNRout));
 Pd_ACE_mc = zeros(1,length(SNRout));
@@ -110,19 +115,20 @@ Pd_WABORT_mc = zeros(1,length(SNRout));
 Pd_DMRao_mc = zeros(1,length(SNRout));
 Pd_DNAMF_mc = zeros(1,length(SNRout));
 Pd_AED_mc = zeros(1,length(SNRout));
+Pd_MTD_mc = zeros(1,length(SNRout));
 h = waitbar(0,'Please wait...');
 for m=1:length(SNRout)
     waitbar(m/length(SNRout),h,sprintf([num2str(m/length(SNRout)*100),'%%']));
     parfor i=1:MonteCarloPd
 %         X=(randn(N,L)+1i*randn(N,L))/sqrt(2); % 产生方差为1的复高斯白噪声 % Rwhite1=1/snapshot1*X1*X1'; eig(Rwhite1); % round(mean(abs(eig(Rwhite1)))) == 1
 %         S=(R_half*X)*(R_half*X)'; % 有L个训练样本估计的杂波与噪声的协方差矩阵(Rhalf*X表示接收的L个训练数据)
-        Train = fun_TrainData('g',N,L,R);
-        S = fun_SCMN(Train);
+        Train = fun_TrainData('p',N,L,R,2,1,1);
+        S = fun_SCM(Train);
         iS=inv(S);
         W=(randn(N,1)+1i*randn(N,1))/sqrt(2); % 1i == -i
     %     THETA=a+(b-a)*rand; % 产出0--2*pi的均匀分布随机相位
     %         x=alpha(m)*exp(1i*THETA)*vt+Clutter;%+pp;
-        x = fun_TrainData('g',N,1,R);
+        x = fun_TrainData('p',N,1,R,2,1,1);
         x=alpha(m)*vt_real+x;%+pp;    %%%%%%%  重要  %%%%%%%%%%%%%
         Tamf=abs(vt'*iS*x)^2/abs(vt'*iS*vt);  %%%%%% AMF
         tmp=abs(x'*iS*x);
@@ -134,6 +140,8 @@ for m=1:length(SNRout)
         Tprao=Tglrt^2/(Tamf*(1-Tglrt));       %%%%%% DMRao
         Tdnamf=Tace_bar/tmp;                  %%%%%% DNAMF  % eq.(24) 检测统计量
         Taed=tmp;                             %%%%%% 能量检测器  
+        Tmtd_t = fft(x);
+        Tmtd = abs(Tmtd_t(2));
         if Tamf>Th_AMF;         counter_amf=counter_amf+1;          end            
         if Tglrt>Th_KGLRT;      counter_glrt=counter_glrt+1;        end                
         if Tace>Th_ACE;         counter_ace=counter_ace+1;          end          
@@ -141,7 +149,8 @@ for m=1:length(SNRout)
         if Twabort>Th_WABORT;   counter_wabort=counter_wabort+1;    end        
         if Tprao>Th_DMRao;      counter_prao=counter_prao+1;        end          
         if Tdnamf>Th_DNAMF;     counter_dnamf=counter_dnamf+1;      end          
-        if Taed>Th_AED;         counter_aed=counter_aed+1;          end         
+        if Taed>Th_AED;         counter_aed=counter_aed+1;          end
+        if Tmtd>Th_MTD;         counter_mtd=counter_mtd+1;          end
     end
     Pd_AMF_mc(m)=counter_amf/MonteCarloPd;          counter_amf=0;
     Pd_KGLRT_mc(m)=counter_glrt/MonteCarloPd;        counter_glrt=0;
@@ -151,7 +160,7 @@ for m=1:length(SNRout)
     Pd_DMRao_mc(m)=counter_prao/MonteCarloPd;        counter_prao=0;
     Pd_DNAMF_mc(m)=counter_dnamf/MonteCarloPd;      counter_dnamf=0;
     Pd_AED_mc(m)=counter_aed/MonteCarloPd;          counter_aed=0;  
-
+    Pd_MTD_mc(m)=counter_mtd/MonteCarloPd;          counter_mtd=0; 
     m
 end
 close(h)
@@ -166,8 +175,9 @@ plot(SNRout,Pd_ABORT_mc,'c-*','linewidth',2)
 plot(SNRout,Pd_WABORT_mc,'m-P','linewidth',2)
 plot(SNRout,Pd_DMRao_mc,'r-o','linewidth',2)
 plot(SNRout,Pd_AED_mc,'r-d','linewidth',2)
-plot(SNRout,Pd_DNAMF_mc,'g-s','linewidth',2);    
-legend('KGLRT','AMF/DMwald','ACE','ABORT','WABORT','DMRao','AED','DNAMF')
+plot(SNRout,Pd_DNAMF_mc,'g-s','linewidth',2); 
+plot(SNRout,Pd_MTD_mc,'b-s','linewidth',2); 
+legend('KGLRT','AMF/DMwald','ACE','ABORT','WABORT','DMRao','AED','DNAMF','MTD')
 % legend({'KGLRT','AMF/DMwald','DMRao'},'FontSize',20)
 xlabel('SNR/dB','FontSize',20)
 ylabel('Pd','FontSize',20)

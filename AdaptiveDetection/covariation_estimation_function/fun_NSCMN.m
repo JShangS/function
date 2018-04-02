@@ -10,6 +10,5 @@ for i = 1:N
     NX(:,i) = X(:,i)/sqrt(norm(X(:,i),'fro')^2/M);
 end
 R_NS = (NX * NX'/N);
-
 end
 

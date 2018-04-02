@@ -45,13 +45,29 @@ switch opt
         for i=1:L
             distance(i) = fun_RootED(R0,MAM(:,:,i));
         end
+    case 'kl' %KL divergence
+        for i=1:L
+            distance(i) = fun_KLD(R0,MAM(:,:,i));
+        end
+    case 'bh' %Bhattacharyya distance
+        for i=1:L
+            distance(i) = fun_BhD(R0,MAM(:,:,i));
+        end   
+   case 'h' %Hellinger distance
+        for i=1:L
+            distance(i) = fun_HD(R0,MAM(:,:,i));
+        end 
+   case 'skl' %sKL divergence
+        for i=1:L
+            distance(i) = fun_sKLD(R0,MAM(:,:,i));
+        end
         
     otherwise
 end
-
+h = 1;
 % distance = distance/sum(distance);
-Sum_ratio = sum(exp(-distance));
-ratio = exp(-distance)/Sum_ratio;
+Sum_ratio = sum(exp(-(distance)/h^2));
+ratio = exp(-(distance))/Sum_ratio;
 ratio = reshape(ratio,1,1,L);
 ratio = repmat(ratio,N,N,1);
 R_MAM = sum(ratio.*MAM,3);
