@@ -12,7 +12,7 @@ SNRout=0:1:25; % 输出SNR
 cos2=1;%%%失配情况
 PFA=1e-3;% PFA=1e-4;
 SNRnum=10.^(SNRout/10);
-MonteCarloPfa=1/PFA*100;
+MonteCarloPfa=round(1/PFA*100);
 MonteCarloPd=1e4;
 R=zeros(N);
 % vt=randn(N,1)+1i*randn(N,1);
@@ -54,12 +54,12 @@ parfor i=1:MonteCarloPfa
 %     waitbar(i/MonteCarloPfa,h,sprintf([num2str(i/MonteCarloPfa*100),'%%']));
 %     X=(randn(N,L)+1i*randn(N,L))/sqrt(2); % 产生方差为1的复高斯白噪声 % Rwhite1=1/snapshot1*X1*X1'; eig(Rwhite1); % round(mean(abs(eig(Rwhite1)))) == 1
 %     S=(R_half*X)*(R_half*X)'; % 有L个训练样本估计的杂波与噪声的协方差矩阵(Rhalf*X表示接收的L个训练数据)
-    Train = fun_TrainData('p',N,L,R,2,1,1);
+    Train = fun_TrainData('p',N,L,R,3,1,1);
     S = fun_SCM(Train);
     iS=inv(S);
 %     W=(randn(N,1)+1i*randn(N,1))/sqrt(2); % 1i == -i
 %     x=R_half*W;%+pp; % noise=(randn(N,1)+j*randn(N,1))/sqrt(2);  % 接收信号仅包括杂波和噪声
-    x = fun_TrainData('p',N,1,R,2,1,1);
+    x = fun_TrainData('p',N,1,R,3,1,1);
     Tamf(i)=abs(vt'*iS*x)^2/abs(vt'*iS*vt);     %%%%%% AMF或者wald
     tmp=abs(x'*iS*x);
     Tglrt(i)=Tamf(i)/(1+tmp);                   %%%%%% KGLRT

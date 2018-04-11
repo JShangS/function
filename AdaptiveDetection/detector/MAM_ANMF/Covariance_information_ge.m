@@ -4,7 +4,7 @@ clear
 close all
 rou0=0.95;
 % rou=0.5:0.05:0.99;
-rou=[0.5,0.6,0.945];
+rou=[0.1,0.6,0.90];
 N=8;
 L=round(2*N);
 LL=1000;
@@ -13,9 +13,14 @@ for i =1:length(rou)
     R=fun_rho(rou(i),N);
     MAM(:,:,i)=R;
 end
+theta_sig = 0.1;
+nn = 0:N-1;
+s = exp(-1i*2*pi*nn*theta_sig)'/sqrt(N); %%%%%% 系统导向矢量
 tic
 for i =1:LL
+    i
     x0 = fun_TrainData('p',N,1,R0,2,1,1);
+    x0 = 10*s + x0;
     X = fun_TrainData('p',N,L,R0,2,1,1);
     RNX = abs(fun_NSCMN(X));
     RX = abs(fun_SCMN(X));
@@ -29,35 +34,35 @@ for i =1:LL
     D = diag(Evalue);
     Rx0 = abs(V)*D*abs(V');
     
-    [R_MAM_r,~,ratio_r]=fun_information_estimation(Rx0,MAM,'r');
+%     [R_MAM_r,~,ratio_r]=fun_information_estimation(Rx0,MAM,'r');
     [R_MAM_c,~,ratio_c]=fun_information_estimation(Rx0,MAM,'c');
     [R_MAM_e,~,ratio_e]=fun_information_estimation(Rx0,MAM,'e');
     [R_MAM_l,~,ratio_l]=fun_information_estimation(Rx0,MAM,'l');
-    [R_MAM_p,~,ratio_p]=fun_information_estimation(Rx0,MAM,'p');
-    [R_MAM_ro,~,ratio_ro]=fun_information_estimation(Rx0,MAM,'ro');
+%     [R_MAM_p,~,ratio_p]=fun_information_estimation(Rx0,MAM,'p');
+%     [R_MAM_ro,~,ratio_ro]=fun_information_estimation(Rx0,MAM,'ro');
     
-    error_R_MAM_r(i) = norm(R_MAM_r-R0,'fro')/norm(R0,'fro');%fun_ReimanDistance(R0,R_MAM);
+%     error_R_MAM_r(i) = norm(R_MAM_r-R0,'fro')/norm(R0,'fro');%fun_ReimanDistance(R0,R_MAM);
     error_R_MAM_c(i) = norm(R_MAM_c-R0,'fro')/norm(R0,'fro');
     error_R_MAM_e(i) = norm(R_MAM_e-R0,'fro')/norm(R0,'fro');
     error_R_MAM_l(i) = norm(R_MAM_l-R0,'fro')/norm(R0,'fro');
-    error_R_MAM_p(i) = norm(R_MAM_p-R0,'fro')/norm(R0,'fro');
-    error_R_MAM_ro(i) = norm(R_MAM_ro-R0,'fro')/norm(R0,'fro');
+%     error_R_MAM_p(i) = norm(R_MAM_p-R0,'fro')/norm(R0,'fro');
+%     error_R_MAM_ro(i) = norm(R_MAM_ro-R0,'fro')/norm(R0,'fro');
     error_RNX(i) = norm(RNX-R0,'fro')/norm(R0,'fro');%fun_ReimanDistance(R0,RX);.
     error_RX(i) = norm(RX-R0,'fro')/norm(R0,'fro');%fun_ReimanDistance(R0,RX);.
 end
 toc
-m_errorR_MAM_r=mean(error_R_MAM_r)*100;
-m_errorR_MAM_c=mean(error_R_MAM_c);
+% m_errorR_MAM_r=mean(error_R_MAM_r)*100;
+m_errorR_MAM_c=mean(error_R_MAM_c)*100;
 m_errorR_MAM_e=mean(error_R_MAM_e)*100;
 m_errorR_MAM_l=mean(error_R_MAM_l)*100;
-m_errorR_MAM_p=mean(error_R_MAM_p)*100;
-m_errorR_MAM_ro=mean(error_R_MAM_ro)*100;
+% m_errorR_MAM_p=mean(error_R_MAM_p)*100;
+% m_errorR_MAM_ro=mean(error_R_MAM_ro)*100;
 m_errorRNX=mean(error_RNX)*100;
 m_errorRX=mean(error_RX)*100;
-str_bar = {'Reiman','Euclidean','LogEuclidean',...
-    'Power-Euclidean','RootEuclidean','Cholesky','NSCM','SCM'};
-data = [m_errorR_MAM_r,m_errorR_MAM_e,m_errorR_MAM_l,...
-    m_errorR_MAM_p,m_errorR_MAM_ro,m_errorR_MAM_c,m_errorRNX,m_errorRX];
+str_bar = {'Euclidean','LogEuclidean','Cholesky','NSCM','SCM'};
+% str_bar = {'Reiman','Euclidean','LogEuclidean',...
+%     'Power-Euclidean','RootEuclidean','Cholesky','NSCM','SCM'};
+data = [m_errorR_MAM_e,m_errorR_MAM_l,m_errorR_MAM_c,m_errorRNX,m_errorRX];
 b = bar(data,'stack');
 set(gca,'xticklabel',str_bar);
 
