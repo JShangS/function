@@ -28,12 +28,12 @@ for i = 1:1000
     t = normrnd(1,sigma_t,N,1);%%0~0.5%%失配向量
     R_KA = R_KA + R.*(t*t')/1000;
 end
-iter = 10;
-for i =1:1000
-    i
+tic
+parfor i =1:1000
     Train = fun_TrainData(str_train,N,L,R,lambda,mu,opt_train);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
     x0 = fun_TrainData(str_train,N,1,R,lambda,mu,opt_train); 
     R_SCM = abs(fun_SCMN(Train));
+    R_NSCM = abs(fun_NSCMN(Train));
     R_x0 = abs(fun_SCMN(x0));
     %%%%%%%%%%%%%%%%%%%%%%%%%
 %     R_iter = R_x0;
@@ -42,19 +42,29 @@ for i =1:1000
 %         R_iter = opta(i,j) * R_KA + (1 - opta(i,j)) * R_SCM;
 %     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
-    [R_result,a(i)] = fun_KLPW(R_KA,R_SCM,R_x0);
+%     [R_result,a(i)] = fun_LogCC_new(Train,R_KA);
+%     [R_result,a(i)] = fun_CLAML2(Train,R_KA);
     [R_CC,alpha(i)]=fun_CC(Train,R_SCM,R_KA);
-    R_2 = 0.5 * R_KA + 0.5 * R_SCM;
-    error_R(i) = norm(R_result-R,'fro')/norm(R,'fro');
-    error_RCC(i) = norm(R_CC-R,'fro')/norm(R,'fro');
-    error_R_2(i) = norm(R_2-R,'fro')/norm(R,'fro');
-    error_RSCM(i) = norm(R_SCM-R,'fro')/norm(R,'fro');
+    [R_CCIter,alpha_iter(i,:)]=fun_CCIter(Train,R_SCM,R_KA);
+    [R_CCML,alpha_ML(i)]=fun_MLalpha(Train,R_SCM,R_KA,x0);
+    R_2 = 0.5 * R_KA + 0.5 * R_NSCM;
+%     error_R(i) = norm(R_result-R,'fro');
+    error_RCC(i) = norm(R_CC-R,'fro');
+    error_RCCIter(i) = norm(R_CCIter-R,'fro');
+    error_RCCML(i) = norm(R_CCML-R,'fro');
+    error_R_2(i) = norm(R_2-R,'fro');
+    error_RSCM(i) = norm(R_SCM-R,'fro');
 end
-m_errorR = mean(error_R)*100;
-m_errorRCC = mean(error_RCC)*100;
-m_errorR_2 = mean(error_R_2)*100;
-m_errorRSCM = mean(error_RSCM)*100;
+toc
+% m_errorR = mean(error_R)/norm(R,'fro')*100;
+m_errorRCC = mean(error_RCC)/norm(R,'fro')*100;
+m_errorRCCIter = mean(error_RCCIter)/norm(R,'fro')*100;
+m_errorRCCML = mean(error_RCCML)/norm(R,'fro')*100;
+m_errorR_2 = mean(error_R_2)/norm(R,'fro')*100;
+m_errorRSCM = mean(error_RSCM)/norm(R,'fro')*100;
 m_errorRKA = norm(R_KA-R,'fro')/norm(R,'fro')*100;
-a = mean(a);
-alpha = mean(alpha);
+% mean_a = mean(a);
+mean_alpha = mean(alpha);
+mean_alpha_iter = mean(alpha_iter);
+mean_alpha_ML = mean(alpha_ML);
 

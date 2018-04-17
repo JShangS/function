@@ -1,4 +1,4 @@
-function [ R_MLalpha, Alpha] = fun_MLalpha( X,R,R_KA,x0)
+function [ R_MLalpha, Alpha] = fun_MLalpha( X,R_KA,x0)
 %《Knowledge-Aided Space-Time Adaptive Processing,2011》
 %UNTITLED 此处显示有关此函数的摘要
 %   此处显示详细说明
@@ -8,6 +8,7 @@ function [ R_MLalpha, Alpha] = fun_MLalpha( X,R,R_KA,x0)
 %%R_KA:先验协方差
 %%x0：目标检测单元
 [M,N] = size(X);
+R = fun_SCMN(X);
 G = X'*inv(R_KA)*X;
 [U,A] = eig(G);%%U:酉矩阵，A对角阵,G=U*A*U';
 P = inv(R_KA)*X*U;
@@ -36,7 +37,7 @@ for alpha = 0.01:0.01:1
         C_max = C_t;
     end
 end
-R_MLalpha = alpha*R_KA + (1-alpha)*R;
 Alpha = alpha_max;
+R_MLalpha = Alpha*R_KA + (1-Alpha)*R;
 end
 

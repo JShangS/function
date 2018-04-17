@@ -1,4 +1,4 @@
-function [ R,opta] = fun_KLPW( R0,R1,Rcut)
+function [ R,opta] = fun_KLPW(R0,R1,Rcut)%,
 %FUN_KLPW 此处显示有关此函数的摘要
 %   此处显示详细说明
 %%R0:先验协防差
@@ -6,17 +6,17 @@ function [ R,opta] = fun_KLPW( R0,R1,Rcut)
 %%R1:CUT单元协方差
 %%%基于KL度量的最白化\alpha因子计算，参考《思考，4月8日》
 [N,~] = size(R0);
-Rcut = fun_Positive(Rcut);
+% Rcut = fun_Positive(Rcut);
 % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-opta = min(1,abs(trace((Rcut - R1) / (R0 - R1)) / N));
-R = opta * R0 + (1 - opta) * R1;
+% opta = min(1,abs(trace((Rcut - R1) / (R0 - R1)) / N));
+% R = opta * R0 + (1 - opta) * R1;
 % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% iter = 20;
-% R = Rcut;
-% for i = 1:iter
-%     opta = min(1,abs(trace((R - R1) / (R0 - R1)) / N));
-%     R = opta * R0 + (1 - opta) * R1;
-% end
+iter = 10;
+R = Rcut;
+for i = 1:iter
+    opta = min(1,abs(trace((R - R1) / (R0 - R1)) / N));
+    R = opta * R0 + (1 - opta) * R1;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % a=0;
 % iter_num = 10;

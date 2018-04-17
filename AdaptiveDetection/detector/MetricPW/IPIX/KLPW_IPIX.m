@@ -123,7 +123,7 @@ for m=1:length(SNRout)
     
         R_NSCMN = (fun_NSCMN(Train));
             
-        R_KL = fun_KLPW(R_KA,R_SCM,R_x0);
+        R_KL = fun_KLPW(R_KA,R_SCMN,R_x0);
     
         R_CC = fun_CC(Train,R_SCMN,R_KA);
         

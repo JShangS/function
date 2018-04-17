@@ -8,7 +8,7 @@ lambda = 3;
 mu = 1;
 opt_train = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
 rou = 0.95;  %%协方差矩阵生成的迟滞因子
-sigma_t = 0.1;
+sigma_t = 0.5;
 %%%%假设参数设置
 Na = 2;     % 阵元数
 Np = 4;     % 脉冲数
@@ -53,7 +53,7 @@ parfor i = 1:MonteCarloPfa
     
     R_NSCMN = (fun_NSCMN(Train));
     
-    R_KL = fun_KLPW(R_KA,R_SCMN,R_x0);
+    R_KL = fun_KLPW(R_KA,R_SCMN);
     
     R_CC = fun_CC(Train,R_SCMN,R_KA);
     
@@ -125,7 +125,7 @@ for m=1:length(SNRout)
     
         R_NSCMN = (fun_NSCMN(Train));
             
-        R_KL = fun_KLPW(R_KA,R_SCM,R_x0);
+        R_KL = fun_KLPW(R_KA,R_SCM);
     
         R_CC = fun_CC(Train,R_SCMN,R_KA);
         

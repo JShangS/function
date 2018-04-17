@@ -13,14 +13,8 @@ n = 2; %几倍的样本
 %%参数估计来自《Maximum Likelihood Estimation for
 %%%            Compound-Gaussian Clutter with Inverse GammaTexture》
 
-lambda = 3;
-mu = 1;
-% lambda = 1.4495;
-% mu = 1.3820;
-% str_train = 'g';
 opt_train = 1;
 %%%%参数设置
-% N = 8;
 SNRout=-5:1:25; % 输出SNR
 PFA=1e-3;% PFA=1e-4;
 SNRnum=10.^(SNRout/10);
@@ -165,7 +159,6 @@ h = waitbar(0,'Please wait...');
 tic
 for m=1:length(SNRout)
     waitbar(m/length(SNRout),h,sprintf([num2str(m/length(SNRout)*100),'%%']));
-    count_Pd = MonteCarloPd;
     parfor i=1:MonteCarloPd 
  %%%%%%%%%%%训练数据产生%%%%%%%%%%%%%%
 %%%%%%%%%%%%%用杂波模型产生训练数据%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -213,27 +206,7 @@ for m=1:length(SNRout)
         %%%%%% ANMF_SCM
         Tscm = fun_AMF(R_SCMN,x0,s);
         %%%%%% ANMF_NSCM
-        Tnscm = fun_ANMF(R_SCMN,x0,s);
-        %%%%%MTD
-        Tmtd_t = fft(x0);
-        Tmtd = abs(Tmtd_t(2));
-        
-%         %%%%%% ANMF_MAM_r
-%         Tmam_r = fun_ANMF(R_MAM_r,x0,s);
-%         %%%%%% ANMF_MAM_c
-%         Tmam_c = fun_ANMF(R_MAM_c,x0,s);
-%         %%%%%% ANMF_MAM_e
-%         Tmam_e = fun_ANMF(R_MAM_e,x0,s);
-%         %%%%%% ANMF_MAM_l
-%         Tmam_l = fun_ANMF(R_MAM_l,x0,s);
-%         %%%%%% ANMF_MAM_p
-%         Tmam_p = fun_ANMF(R_MAM_p,x0,s);
-%         %%%%%% ANMF_MAM_ro
-%         Tmam_ro = fun_ANMF(R_MAM_ro,x0,s);
-
-
-%         %%%%%% GLRT_MAM
-%         Tglrtmam = fun_MAM_GLRT(MAM,x0,s);
+        Tnscm = fun_ANMF(R_SCMN,x0,s);  
         %%%判断%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
         if Tscm>Th_SCM;          counter_scm=counter_scm+1;        end                
         if Tnscm>Th_NSCM;       counter_nscm=counter_nscm+1;    end 
@@ -250,16 +223,6 @@ for m=1:length(SNRout)
     end
     Pd_SCM_mc(m)=counter_scm/count_Pd;           counter_scm=0;
     Pd_NSCM_mc(m)=counter_nscm/count_Pd;        counter_nscm=0;
-    Pd_MTD_mc(m)=counter_mtd/count_Pd;          counter_mtd=0;
-    
-%     Pd_MAM_r_mc(m)=counter_mam_r/count_Pd;       counter_mam_r=0; 
-%     Pd_MAM_c_mc(m)=counter_mam_c/count_Pd;       counter_mam_c=0;
-%     Pd_MAM_e_mc(m)=counter_mam_e/count_Pd;       counter_mam_e=0;
-%     Pd_MAM_l_mc(m)=counter_mam_l/count_Pd;       counter_mam_l=0;
-%     Pd_MAM_p_mc(m)=counter_mam_p/count_Pd;       counter_mam_p=0;
-%     Pd_MAM_ro_mc(m)=counter_mam_ro/count_Pd;       counter_mam_ro=0;
-
-%     Pd_GLRTMAM_mc(m)=counter_glrtmam/count_Pd;       counter_glrtmam=0; 
 end
 close(h)
 toc
@@ -267,7 +230,6 @@ figure(1);
 hold on
 plot(SNRout,Pd_SCM_mc,'b-+','linewidth',2)
 plot(SNRout,Pd_NSCM_mc,'k.-','linewidth',2)
-plot(SNRout,Pd_MTD_mc,'b-s','linewidth',2) 
 
 % plot(SNRout,Pd_MAM_r_mc,'g-s','linewidth',2)
 % plot(SNRout,Pd_MAM_c_mc,'k-s','linewidth',2)

@@ -14,8 +14,8 @@ if M == 1 || N ==1
    logmA = UA * diag(log(sqrt(Evalue))) * UA';
    value = abs(norm(logmA,'fro'));
 else
-%     value = fun_LogED(A,eye(max(M,N)));
-    value = abs(norm(logm(A),'fro'));
+   value = fun_LogED(A,eye(max(M,N)));
+%     value = abs(norm(logm(A),'fro'));
 end
 % value = norm(logm(A),'fro');
 end

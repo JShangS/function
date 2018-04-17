@@ -32,6 +32,8 @@ elseif opt == 2
     D = diag(Evalue);
     Rx = abs(V)*D*abs(V');
     Rx = Rx./xk^2;
+elseif opt == 3
+   Rx = (X*X'+ eye(N)); 
 end
 end
 
