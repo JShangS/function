@@ -17,7 +17,7 @@ while (abs(tao_child-tao_parent)>0.1)%
     for i = 1:N
         R_AML_t = R_AML_t+X(:,i)*X(:,i)'/N/tao_child(i);
     end
-    R_AML = abs(R_AML_t);
+    R_AML = (R_AML_t);
 %     count =count+1;
 %     if count >=3  
 %         break;

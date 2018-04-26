@@ -11,7 +11,7 @@ lambda = 2;
 mu = 1;
 opt_train = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
 rou = 0.95;  %%协方差矩阵生成的迟滞因子
-rouM=[0.8,0.85,0.90];%%%%%%%%%MAM模型
+rouM=[0.1,0.5,0.90];%%%%%%%%%MAM模型
 %%%Pd_CLGLRT_2Kmu1lambda3s0.1o1_p：2K：训练单元数目，mu，lambda，s：失配向量方差，
 %%o1:opt=1，p：IG纹理复合高斯
 %%%%假设参数设置
@@ -82,9 +82,9 @@ parfor i = 1:MonteCarloPfa
     
     %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%% ANMF_SCM
-    Tanmf_SCM(i) = fun_AMF(R_SCMN,x0,s);
+    Tanmf_SCM(i) = fun_ANMF(R_SCMN,x0,s);
     %%%%%% ANMF_NSCM
-    Tanmf_NSCM(i) = fun_ANMF(R_SCMN,x0,s);
+    Tanmf_NSCM(i) = fun_ANMF(R_NSCMN,x0,s);
     %%%%%% NMF
     Tnmf(i) = fun_ANMF(rouR,x0,s);
     
@@ -216,9 +216,9 @@ for m=1:length(SNRout)
         x0=alpha(m)*s+x0;%+pp;    %%%%%%%  重要  %%%%%%%%%%%%%
         %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%% AMF
-        Tscm = fun_AMF(R_SCMN,x0,s);
+        Tscm = fun_ANMF(R_SCMN,x0,s);
         %%%%%% ANMF_NSCM
-        Tnscm = fun_ANMF(R_SCMN,x0,s);
+        Tnscm = fun_ANMF(R_NSCMN,x0,s);
         %%%%%% NMF
         Tnmf = fun_ANMF(rouR,x0,s);
         %%%%%% ANMF_MAM_r
@@ -290,9 +290,9 @@ plot(SNRout,Pd_MAM_c_mc,'k-d','linewidth',1)
 % plot(SNRout,Pd_MAM_h_mc,'r-s','linewidth',2)
 
 plot(SNRout,Pd_GLRTMAM_mc,'k-o','linewidth',1)
-h_leg = legend('NMF with correct covariance','NMF with SCM','NMF with NSCM',...
-'NMF with Euclidean Estimator','NMF with Log-Euclidean Estimator',...
-'NMF with Cholesky Estimator','BGLRT-IG')
+h_leg = legend('ANMF with correct covariance','ANMF with SCM','ANMF with NSCM',...
+'ANMF with Euclidean Estimator','ANMF with Log-Euclidean Estimator',...
+'ANMF with Cholesky Estimator','BGLRT-IG')
 
 % h_leg = legend('NMF','AMF','ANMF','ReimanDistance',...
 %     'Euclidean Distance','Log Euclidean Distance',...
@@ -305,3 +305,30 @@ grid on
 % str=['Pd_MAM_',num2str(n),'K','_',str_train,'.mat'];
 % save(str,'SNRout','Pd_SCM_mc','Pd_NSCM_mc',...
 %          'Pd_MAM_mc');
+x = 0:0.1:25;
+y_correct = interp1(SNRout,Pd_NMF_mc,x);
+y_SCM = interp1(SNRout,Pd_SCM_mc,x);
+y_NSCM = interp1(SNRout,Pd_NSCM_mc,x);
+y_e = interp1(SNRout,Pd_MAM_e_mc,x);
+y_l = interp1(SNRout,Pd_MAM_l_mc,x);
+y_c = interp1(SNRout,Pd_MAM_c_mc,x);
+y_glrtmam = interp1(SNRout,Pd_GLRTMAM_mc,x);
+figure(2);
+hold on
+plot(x,y_correct,'k','linewidth',1)
+plot(x,y_SCM,'r','linewidth',1)
+plot(x,y_NSCM,'b','linewidth',1)
+
+plot(x,y_e,'y','linewidth',1)
+plot(x,y_l,'c','linewidth',1)
+plot(x,y_c,'m','linewidth',1)
+plot(x,y_glrtmam,'k-.','linewidth',1)
+
+h_leg = legend('ANMF with correct covariance','ANMF with SCM','ANMF with NSCM',...
+'ANMF with Euclidean Estimator','ANMF with Log-Euclidean Estimator',...
+'ANMF with Cholesky Estimator','BGLRT-IG')
+xlabel('SNR/dB','FontSize',20)
+ylabel('Pd','FontSize',20)
+set(gca,'FontSize',20)
+set(h_leg,'Location','SouthEast')
+grid on

@@ -3,12 +3,12 @@ clear
 close all
 %%%%参数设置
 n = 2; %几倍的样本
-str_train = 'p';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
+str_train = 'g';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
 lambda = 3;
 mu = 1;
 opt_train = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
 rou = 0.95;  %%协方差矩阵生成的迟滞因子
-sigma_t = 0.5;
+sigma_t = 0.1;
 %%%%假设参数设置
 Na = 2;     % 阵元数
 Np = 4;     % 脉冲数
@@ -30,9 +30,9 @@ rouR_half=rouR^0.5;
 irouR=inv(rouR);
 t = normrnd(1,sigma_t,N,1);%%0~0.5%%失配向量
 R_KA = zeros(size(rouR));
-for i = 1:100
+for i = 1:1000
     t = normrnd(1,sigma_t,N,1);%%0~0.5%%失配向量
-    R_KA = R_KA + rouR.*(t*t')/100;
+    R_KA = R_KA + rouR.*(t*t')/1000;
 end
 tic
 parfor i = 1:MonteCarloPfa
@@ -43,18 +43,18 @@ parfor i = 1:MonteCarloPfa
     Train = fun_TrainData(str_train,N,L,rouR,lambda,mu,opt_train);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
     x0 = fun_TrainData(str_train,N,1,rouR,lambda,mu,opt_train); % 接收信号仅包括杂波和噪声
     %%%%协方差估计%%%%%%%%%%%%%%%%%%%%%%
-    R_x0 = abs(fun_SCMN(x0));
+    R_x0 = (fun_SCMN(x0));
      
     R_SCM = (fun_SCMN(Train));
     
     
     R_NSCM = (fun_NSCMN(Train));
 
-    R_CC = fun_CC(Train,R_KA);
+    R_CC = fun_CC(Train,R_SCM,R_KA);
     
-    R_CCIter = fun_CCIter(Train,R_KA);
+    R_CCIter = fun_CCIter2(Train,R_SCM,R_KA);
     
-    R_ML = fun_MLalpha(Train,R_KA,x0)
+    R_ML = fun_MLalpha(Train,R_SCM,R_KA,x0)
     
     R_H = 0.5 * R_KA + 0.5 * R_SCM;
     %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -121,17 +121,17 @@ for m=1:length(SNRout)
         Train = fun_TrainData(str_train,N,L,rouR,lambda,mu,opt_train);%%产生的训练数据,协方差矩阵为rouR的高斯杂波
         x0 = fun_TrainData(str_train,N,1,rouR,lambda,mu,opt_train); % 接收信号仅包括杂波和噪声
         %%%%协方差估计%%%%%%%%%%%%%%%%%%%%%%
-        R_x0 = abs(fun_SCMN(x0));
+        R_x0 = (fun_SCMN(x0));
         
         R_SCM = (fun_SCMN(Train));
     
         R_NSCM = (fun_NSCMN(Train));
             
-        R_CCIter = fun_CCIter(Train,R_KA);
+        R_CCIter = fun_CCIter2(Train,R_SCM,R_KA);
         
-        R_ML = fun_MLalpha(Train,R_KA,x0);
+        R_ML = fun_MLalpha(Train,R_SCM,R_KA,x0);
     
-        R_CC = fun_CC(Train,R_KA);
+        R_CC = fun_CC(Train,R_SCM,R_KA);
         
         R_H = 0.5 * R_KA + 0.5 * R_SCM;
         %%%检测信号
@@ -188,6 +188,6 @@ ylabel('Pd','FontSize',20)
 set(gca,'FontSize',20)
 set(h_leg,'Location','SouthEast')
 grid on
-str = [str_train,'_CCIter','_',num2str(n),'N','_s',num2str(sigma_t),'.mat'];
+str = [str_train,'_CCIter2','_',num2str(n),'N','_s',num2str(sigma_t),'.mat'];
 save (str); 
 
