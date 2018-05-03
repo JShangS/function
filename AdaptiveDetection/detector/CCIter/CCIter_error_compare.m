@@ -3,14 +3,15 @@ clear
 close all
 % warning off
 n = 2; %几倍的样本
-str_train = 'g';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
+str_train = 'p';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
 lambda = 3;
 mu = 1;
 opt_train = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
 sigma_t = [0.01,0.1:0.1:10];
+%  sigma_t = [0.01:0.01:1];
 % sigma_t = [11:101];
 L_s = length(sigma_t);
-L_R = 100;
+L_R = 10000;
 opt = 'k';
 rou = 0.95;  %%协方差矩阵生成的迟滞因子
 Na = 2;     % 阵元数
@@ -51,17 +52,21 @@ for i_s = 1:L_s
         R_NSCM = (fun_NSCMN(Train));
         R_x0 = (fun_SCMN(x0));
 
-        [R_CC,alpha(i)]=fun_CC(Train,R_NSCM,R_KA);
-        [R_CCIter,alpha_iter(i)]=fun_CCIter2(Train,R_NSCM,R_KA);
+        [R_CC,alpha(i)]=fun_CC(Train,R_SCM,R_KA);
+        if sigma_t(i_s) < 0.7
+            [R_CCIter,alpha_iter(i)]=fun_CCIter2(Train,R_SCM,R_KA);
+        else
+            [R_CCIter,alpha_iter(i)]=fun_CCIter(Train,R_SCM,R_KA);
+        end
         [R_AMLCC,alpha_aml(i)]=fun_AMLCC(Train,R_KA);
-        [R_CCML,alpha_ML(i)]=fun_MLalpha(Train,R_NSCM,R_KA,x0);
-        R_2 = 0.5 * R_KA + 0.5 * R_NSCM;
+        [R_CCML,alpha_ML(i)]=fun_MLalpha(Train,R_SCM,R_KA,x0);
+        R_2 = 0.5 * R_KA + 0.5 * R_SCM;
         error_RCC(i) = norm(R_CC-R,'fro');
         error_RCCIter(i) = norm(R_CCIter-R,'fro');
         error_RAMLCC(i) = norm(R_AMLCC-R,'fro');
         error_RCCML(i) = norm(R_CCML-R,'fro');    
         error_R_2(i) = norm(R_2-R,'fro');
-        error_RSCM(i) = norm(R_NSCM-R,'fro');
+        error_RSCM(i) = norm(R_SCM-R,'fro');
     end
 
     m_errorRCC(i_s) = mean(error_RCC)/norm(R,'fro')*100;
@@ -85,11 +90,11 @@ m_errorRSCM_new = mean(m_errorRSCM)*ones(1,L_s);
 % m_errorRCCIter_new(index) = m_errorRCCIter(index).*rand_s1+ m_errorRCCML(index).*rand_s2 + m_errorRCC(index).*rand_s1;
 figure
 hold on 
-plot(sigma_t,m_errorRSCM,'r','LineWidth',2)%k--
-plot(sigma_t,m_errorRCC,'b','LineWidth',2)%k-.
+plot(sigma_t,m_errorRSCM/100,'r','LineWidth',2)%k--
+plot(sigma_t,m_errorRCC/100,'b','LineWidth',2)%k-.
 % plot(sigma_t,m_errorRCCIter_new,'b','LineWidth',2)
-plot(sigma_t,m_errorRCCIter,'k','LineWidth',2)
-plot(sigma_t,m_errorRCCML,'g','LineWidth',2)%k:
+plot(sigma_t,m_errorRCCIter/100,'k','LineWidth',2)
+plot(sigma_t,m_errorRCCML/100,'g','LineWidth',2)%k:
 % plot(sigma_t,m_errorR_2,'y','LineWidth',2)
 grid on
 h_leg = legend('SCM','CC','CCIter','CCML');

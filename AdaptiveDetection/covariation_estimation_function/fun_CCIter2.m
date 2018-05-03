@@ -8,8 +8,10 @@ function [ R_CC,alpha0 ] = fun_CCIter2(X,R,R_KA )
 % R = fun_SCMN(X);
 R_CC = R;
 [N,K] = size(X);
-
+alpha = 0;
+alpha0 =0;
 for k = 1:20
+    alpha = alpha0;
     t1 = 0;
     t2 = 0;
     t3 = zeros(N,N);
@@ -24,8 +26,8 @@ for k = 1:20
 %     R_CC_0 = R_CC;
 %     R_CC = t3/K;    
     R_CC_0 = R_CC;
-    R_CC = alpha0 * R_KA +(1-alpha0) * R;
-    if norm(R_CC_0 - R_CC,'fro') <1e-2
+    R_CC = alpha0 * R_KA +(1-alpha0) * R_CC_0;
+    if abs(alpha0- alpha)<1e-2
         break;
     end
 end

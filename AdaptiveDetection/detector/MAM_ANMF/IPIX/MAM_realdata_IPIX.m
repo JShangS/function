@@ -63,6 +63,8 @@ parfor i = 1:MonteCarloPfa
     R_NSCM = (fun_NSCM(Train));
     
     R_NSCMN = (fun_NSCMN(Train));
+    
+    Rx0 = fun_Positive(x0,3);
     %%%%%%%MAM协方差估计%%%%%%%%%%%%%
 %     Rx0 = x0*x0';
 %     [V,D] = svd(Rx0);
@@ -77,12 +79,12 @@ parfor i = 1:MonteCarloPfa
 %     end
 %     R_MAM = MAM;%fun_congnition(Train);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    R_MAM_r = fun_information_estimation(R_NSCMN,MAM,'r');%ReimanDistance
+    R_MAM_r = fun_information_estimation(Rx0,MAM,'r');%ReimanDistance
 %     R_MAM_c = fun_information_estimation(R_NSCMN,MAM,'c');%CholeskyDistance
-    R_MAM_e = fun_information_estimation(R_NSCMN,MAM,'e');%Euclidean Distance
-    R_MAM_l = fun_information_estimation(R_NSCMN,MAM,'l');%Log Euclidean Distance
-    R_MAM_p = fun_information_estimation(R_NSCMN,MAM,'p');%Power-Euclidean distance
-    R_MAM_ro = fun_information_estimation(R_NSCMN,MAM,'ro');%Root Euclidean Distance
+    R_MAM_e = fun_information_estimation(Rx0,MAM,'e');%Euclidean Distance
+    R_MAM_l = fun_information_estimation(Rx0,MAM,'l');%Log Euclidean Distance
+    R_MAM_p = fun_information_estimation(Rx0,MAM,'p');%Power-Euclidean distance
+    R_MAM_ro = fun_information_estimation(Rx0,MAM,'ro');%Root Euclidean Distance
     %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%% ANMF_SCM
     Tanmf_SCM(i) = fun_AMF(R_SCMN,x0,s);
@@ -176,6 +178,8 @@ for m=1:length(SNRout)
         R_NSCM = (fun_NSCM(Train));
     
         R_NSCMN = (fun_NSCMN(Train));
+        
+        Rx0 = fun_Positive(x0,3);
         %%%%%%%MAM协方差估计%%%%%%%%%%%%%
 %         Rx0 = x0*x0';
 %         [V,D] = svd(Rx0);
@@ -190,12 +194,12 @@ for m=1:length(SNRout)
 %             continue;
 %         end
 %         R_MAM = MAM;%fun_congnition(Train);
-        R_MAM_r = fun_information_estimation(R_NSCMN,MAM,'r');
-%         R_MAM_c = fun_information_estimation(R_NSCMN,MAM,'c');
-        R_MAM_e = fun_information_estimation(R_NSCMN,MAM,'e');
-        R_MAM_l = fun_information_estimation(R_NSCMN,MAM,'l');
-        R_MAM_p = fun_information_estimation(R_NSCMN,MAM,'p');
-        R_MAM_ro = fun_information_estimation(R_NSCMN,MAM,'ro');
+        R_MAM_r = fun_information_estimation(Rx0,MAM,'r');
+%         R_MAM_c = fun_information_estimation(abs(Rx0),MAM,'c');
+        R_MAM_e = fun_information_estimation(Rx0,MAM,'e');
+        R_MAM_l = fun_information_estimation(Rx0,MAM,'l');
+        R_MAM_p = fun_information_estimation(Rx0,MAM,'p');
+        R_MAM_ro = fun_information_estimation(Rx0,MAM,'ro');
         %%%检测信号
         x0=alpha(m)*s+x0;%+pp;    %%%%%%%  重要  %%%%%%%%%%%%%
         %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -260,5 +264,4 @@ set(gca,'FontSize',20)
 set(h_leg,'Location','SouthEast')
 grid on
 % str=['Pd_MAM_IPIX_',num2str(n),'K','_',cdfFile_t,'.mat'];
-% save(str,'SNRout','Pd_SCM_mc','Pd_NSCM_mc',...
-%          'Pd_MAM_mc');
+% save(str);

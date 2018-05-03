@@ -52,7 +52,7 @@ for i_s = 1:L_s
 
         [R_CC,alpha(i)]=fun_CC(Train,R_SCM,R_KA);
         [R_CCIter,alpha_iter(i)]=fun_CCIter(Train,R_SCM,R_KA);
-        [R_AMLCC,alpha_aml(i)]=fun_AMLCC(Train,R_KA);
+        [R_AMLCC,alpha_aml(i)]=fun_AMLCC2(Train,R_KA);
         [R_CCML,alpha_ML(i)]=fun_MLalpha(Train,R_SCM,R_KA,x0);
         R_AML = fun_AML(Train);
         R_2 = 0.5 * R_KA + 0.5 * R_NSCM;

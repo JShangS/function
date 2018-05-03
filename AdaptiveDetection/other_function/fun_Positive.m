@@ -1,7 +1,7 @@
 function [ Rx ] = fun_Positive( X,opt )
 %FUN_POSITIVE 此处显示有关此函数的摘要
 %   此处显示详细说明
-% 当矩阵不正定时化成正定的。<>
+% 当矩阵不正定时化成正定的。
 if nargin == 1
     opt = 1;
 end
@@ -34,6 +34,8 @@ elseif opt == 2
     Rx = Rx./xk^2;
 elseif opt == 3
    Rx = (X*X'+ eye(N)); 
+elseif opt ==4
+   Rx = fun_corrcoef(X);
 end
 end
 

@@ -7,7 +7,7 @@ str_train = 'p';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
 lambda = 3;
 mu = 1;
 opt_train = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
-sigma_t = 0.1;
+sigma_t = 100;
 rou = 0.95;  %%协方差矩阵生成的迟滞因子
 Na = 2;     % 阵元数
 Np = 4;     % 脉冲数
@@ -35,23 +35,25 @@ for i =1:1000
     R_SCM = abs(fun_SCMN(Train));
     R_x0 = abs(fun_SCMN(x0));
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
-    [R_result,a(i)] = fun_LogCC(Train,R_KA);
+%     [R_result,a(i)] = fun_LogCC(Train,R_SCM,R_KA);
+    R_LogMean = fun_RLogEMean(Train);
+    [R_result,a(i)] = fun_CCIter2(Train,R_LogMean,R_KA);
     [R_CC,alpha(i)]=fun_CC(Train,R_SCM,R_KA);
-    R_2 = 0.5 * R_KA + 0.5 * R_SCM;
+%     R_2 = 0.5 * R_KA + 0.5 * R_SCM;
     error_R(i) = norm(R_result-R,'fro')/norm(R,'fro');
     error_RCC(i) = norm(R_CC-R,'fro')/norm(R,'fro');
-    error_R_2(i) = norm(R_2-R,'fro')/norm(R,'fro');
+%     error_R_2(i) = norm(R_2-R,'fro')/norm(R,'fro');
     error_RSCM(i) = norm(R_SCM-R,'fro')/norm(R,'fro');
 end
-m_errorR = mean(error_R)*100;
-m_errorRCC = mean(error_RCC)*100;
-m_errorR_2 = mean(error_R_2)*100;
-m_errorRSCM = mean(error_RSCM)*100;
-m_errorRKA = norm(R_KA-R,'fro')/norm(R,'fro')*100;
+m_errorR = mean(error_R)/norm(R,'fro');
+m_errorRCC = mean(error_RCC)/norm(R,'fro');
+% m_errorR_2 = mean(error_R_2)/norm(R,'fro');
+m_errorRSCM = mean(error_RSCM)/norm(R,'fro');
+m_errorRKA = norm(R_KA-R,'fro')/norm(R,'fro');
 mean_a = mean(a);
 mean_alpha = mean(alpha);
-plot(a,'r')
-hold on
-plot(alpha,'k')
-axis([1,1000,0,1]);
+% plot(a,'r')
+% hold on
+% plot(alpha,'k')
+% axis([1,1000,0,1]);
 

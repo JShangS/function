@@ -68,10 +68,10 @@ parfor i = 1:MonteCarloPfa
     
     R_NSCMN = (fun_NSCMN(Train));
     %%%%%%%MAM协方差估计%%%%%%%%%%%%%
-    Rx0 = fun_Positive(x0);
+    Rx0 = (fun_Positive(x0,1));
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     R_MAM_r = fun_information_estimation(Rx0,MAM,'r');%ReimanDistance
-    R_MAM_c = fun_information_estimation(Rx0,MAM,'c');%CholeskyDistance
+    R_MAM_c = fun_information_estimation((Rx0),MAM,'c');%CholeskyDistance
     R_MAM_e = fun_information_estimation(Rx0,MAM,'e');%Euclidean Distance
     R_MAM_l = fun_information_estimation(Rx0,MAM,'l');%Log Euclidean Distance
 %     R_MAM_p = fun_information_estimation(Rx0,MAM,'p',1);%Power-Euclidean distance
@@ -197,14 +197,14 @@ for m=1:length(SNRout)
     
         R_NSCMN = (fun_NSCMN(Train));
         %%%%%%%MAM协方差估计%%%%%%%%%%%%%
-        Rx0 = fun_Positive(x0);
+        Rx0 = (fun_Positive(x0,1));
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %         R_MAM_r = fun_information_estimation(Rx0,MAM,'r');
 %         if isnan(R_MAM_r)
 %             MonteCarloPd = MonteCarloPd - 1;
 %             continue;
 %         end
-        R_MAM_c = fun_information_estimation(Rx0,MAM,'c');
+        R_MAM_c = fun_information_estimation((Rx0),MAM,'c');
         R_MAM_e = fun_information_estimation(Rx0,MAM,'e');
         R_MAM_l = fun_information_estimation(Rx0,MAM,'l');
 %         R_MAM_p = fun_information_estimation(Rx0,MAM,'p',1);

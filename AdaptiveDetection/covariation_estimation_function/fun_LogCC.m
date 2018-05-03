@@ -1,22 +1,42 @@
-function [ R_CC,alpha0] = fun_LogCC( X,R,R_KA )
+function [ R_CC,alpha0 ] = fun_LogCC(X,R,R_KA )
 %FUN_CC 此处显示有关此函数的摘要
-%《On Using a priori Knowledge in Space-Time Adaptive Processing》
-%%%用LogNorm来替代FrobeniusNorm
 %   此处显示详细说明
-%%训练样本估计的协方差和先验协方差的线性组合，利用凸优化得到组合系数。
+%%迭代求解，训练样本估计的协方差和先验协方差的线性组合，利用凸优化得到组合系数。
 %%X:训练样本
 %R,样本估计的协方差
 %R_KA:先验协方差
-[M,N]=size(X);
-rou_ba_t = 0;
-for i = 1:N
-    rou_ba_t = rou_ba_t+fun_LogNorm(X(:,i))^4/(N^2);
+% R = fun_SCMN(X);
+R_CC = R;
+[N,K] = size(X);
+Rim = zeros(N,N,K);
+
+for i = 1:K
+    Rim(:,:,i) = logm(fun_Positive( X(:,i),4));
+    
 end
-rou_ba = rou_ba_t-fun_LogNorm(R)^2/N;%R_KA
-alpha0 = rou_ba/(rou_ba+fun_LogNorm(R-R_KA)^2);
-% alpha0 = min(1,rou_ba/(fun_LogNorm(R-R_KA)^2));
-% rou_ba = sum(diag(X'*X).^2)/N^2-sum(sum(abs(R).^2))/N;%（18）式,
-% alpha0 = rou_ba/(rou_ba+sum(sum(abs(R-R_KA).^2)));
-R_CC = (1-alpha0)*R+alpha0*R_KA;
+alpha = 0;
+alpha0 =0;
+for k = 1:20
+    alpha = alpha0;
+    t1 = 0;
+    t2 = 0;
+%     t3 = zeros(N,N);
+    for i = 1:K 
+        t1 = t1 + norm( Rim(:,:,i) - logm(R_CC),'fro')^2;
+        t2 = t2 + norm(logm(R_KA) - Rim(:,:,i),'fro')^2;
+    end
+    alpha0 = max(min(1,(t1/t2)),0);
+%     for i = 1:K
+%         t3 = t3 + alpha0 * R_KA +(1-alpha0) * X(:,i) * X(:,i)';
+%     end
+%     R_CC_0 = R_CC;
+%     R_CC = t3/K;    
+    R_CC_0 = R_CC;
+    R_CC = expm(alpha0 * logm(R_KA) +(1-alpha0) * logm(R_CC_0));
+    if abs(alpha0- alpha)<1e-2
+        break;
+    end
 end
+end
+
 

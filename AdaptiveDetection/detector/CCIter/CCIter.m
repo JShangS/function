@@ -3,7 +3,7 @@ clear
 close all
 %%%%参数设置
 n = 2; %几倍的样本
-str_train = 'g';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
+str_train = 'p';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
 lambda = 3;
 mu = 1;
 opt_train = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
@@ -51,8 +51,11 @@ parfor i = 1:MonteCarloPfa
     R_NSCM = (fun_NSCMN(Train));
 
     R_CC = fun_CC(Train,R_SCM,R_KA);
-    
-    R_CCIter = fun_CCIter2(Train,R_SCM,R_KA);
+    if sigma_t <0.7
+        R_CCIter = fun_CCIter2(Train,R_SCM,R_KA);
+    else
+        R_CCIter = fun_CCIter(Train,R_SCM,R_KA);
+    end
     
     R_ML = fun_MLalpha(Train,R_SCM,R_KA,x0)
     
@@ -126,8 +129,12 @@ for m=1:length(SNRout)
         R_SCM = (fun_SCMN(Train));
     
         R_NSCM = (fun_NSCMN(Train));
-            
-        R_CCIter = fun_CCIter2(Train,R_SCM,R_KA);
+        
+       if sigma_t <0.7
+            R_CCIter = fun_CCIter2(Train,R_SCM,R_KA);
+       else
+            R_CCIter = fun_CCIter(Train,R_SCM,R_KA);
+       end
         
         R_ML = fun_MLalpha(Train,R_SCM,R_KA,x0);
     
@@ -143,7 +150,7 @@ for m=1:length(SNRout)
         Tnscm = fun_ANMF(R_NSCM,x0,s);
         %%%%%% NMF
         Tnmf = fun_ANMF(rouR,x0,s);
-        %%%%%% ANMF_KL
+        %%%%%% ANMF_CCIter
         Tcciter = fun_ANMF(R_CCIter,x0,s);
         %%%%%% ANMF_KL
         Tml = fun_ANMF(R_ML,x0,s);
@@ -172,22 +179,25 @@ toc
 close(h)
 figure(1);
 hold on
-plot(SNRout,Pd_NMF_mc,'k','linewidth',1)
+% plot(SNRout,Pd_NMF_mc,'k','linewidth',1)
 plot(SNRout,Pd_SCM_mc,'k-+','linewidth',1)
-plot(SNRout,Pd_NSCM_mc,'k.-','linewidth',1)
+% plot(SNRout,Pd_NSCM_mc,'k.-','linewidth',1)
 plot(SNRout,Pd_CCIter_mc,'k-*','linewidth',1)
 plot(SNRout,Pd_ML_mc,'k-o','linewidth',1)
 plot(SNRout,Pd_CC_mc,'k-s','linewidth',1)
-plot(SNRout,Pd_H_mc,'k-^','linewidth',1)
+% plot(SNRout,Pd_H_mc,'k-^','linewidth',1)
+h_leg = legend('NMF with SCM',...
+'NMF with CCIter','NMF with ML','NMF with CC');
 
-h_leg = legend('NMF with correct covariance','NMF with SCM','NMF with NSCM',...
-'NMF with CCIter','NMF with ML','NMF with CC','NMF with H');
+% h_leg = legend('NMF with correct covariance','NMF with SCM','NMF with NSCM',...
+% 'NMF with CCIter','NMF with ML','NMF with CC','NMF with H');
 
 xlabel('SNR/dB','FontSize',20)
 ylabel('Pd','FontSize',20)
 set(gca,'FontSize',20)
 set(h_leg,'Location','SouthEast')
+axis([min(SNRout),max(SNRout),0,1])
 grid on
-str = [str_train,'_CCIter2','_',num2str(n),'N','_s',num2str(sigma_t),'.mat'];
+str = [str_train,'_CCIter','_',num2str(n),'N','_s',num2str(sigma_t),'.mat'];
 save (str); 
 
