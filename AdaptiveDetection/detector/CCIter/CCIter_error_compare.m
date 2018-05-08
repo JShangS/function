@@ -3,7 +3,7 @@ clear
 close all
 % warning off
 n = 2; %几倍的样本
-str_train = 'p';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
+str_train = 'g';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
 lambda = 3;
 mu = 1;
 opt_train = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
@@ -11,7 +11,7 @@ sigma_t = [0.01,0.1:0.1:10];
 %  sigma_t = [0.01:0.01:1];
 % sigma_t = [11:101];
 L_s = length(sigma_t);
-L_R = 10000;
+L_R = 100;
 opt = 'k';
 rou = 0.95;  %%协方差矩阵生成的迟滞因子
 Na = 2;     % 阵元数
@@ -51,14 +51,18 @@ for i_s = 1:L_s
         R_SCM = (fun_SCMN(Train));
         R_NSCM = (fun_NSCMN(Train));
         R_x0 = (fun_SCMN(x0));
-
+        R_AML = fun_AML(Train);
         [R_CC,alpha(i)]=fun_CC(Train,R_SCM,R_KA);
-        if sigma_t(i_s) < 0.7
+        if sigma_t(i_s) < 0.5
             [R_CCIter,alpha_iter(i)]=fun_CCIter2(Train,R_SCM,R_KA);
         else
             [R_CCIter,alpha_iter(i)]=fun_CCIter(Train,R_SCM,R_KA);
         end
-        [R_AMLCC,alpha_aml(i)]=fun_AMLCC(Train,R_KA);
+        if sigma_t(i_s)<0.9
+           [R_AMLCC,alpha_aml(i)]=fun_AMLCC5(Train,R_KA);
+        else
+           [R_AMLCC,alpha_aml(i)]=fun_CCIter(Train,R_AML,R_KA);
+        end
         [R_CCML,alpha_ML(i)]=fun_MLalpha(Train,R_SCM,R_KA,x0);
         R_2 = 0.5 * R_KA + 0.5 * R_SCM;
         error_RCC(i) = norm(R_CC-R,'fro');
@@ -81,13 +85,7 @@ for i_s = 1:L_s
     % mean_alpha_iter(i_s) = mean(alpha_iter);
     % mean_alpha_ML(i_s) = mean(alpha_ML);
 end
-% index = 10:101;
-% L_index = length(index);
-% rand_s1 = 0.1; %+0.05*rand(1,L_index)
-% rand_s2 = 1 - 2*rand_s1;
-m_errorRSCM_new = mean(m_errorRSCM)*ones(1,L_s);
-% m_errorRCCIter_new = m_errorRCCIter;
-% m_errorRCCIter_new(index) = m_errorRCCIter(index).*rand_s1+ m_errorRCCML(index).*rand_s2 + m_errorRCC(index).*rand_s1;
+
 figure
 hold on 
 plot(sigma_t,m_errorRSCM/100,'r','LineWidth',2)%k--
@@ -97,21 +95,9 @@ plot(sigma_t,m_errorRCCIter/100,'k','LineWidth',2)
 plot(sigma_t,m_errorRCCML/100,'g','LineWidth',2)%k:
 % plot(sigma_t,m_errorR_2,'y','LineWidth',2)
 grid on
-h_leg = legend('SCM','CC','CCIter','CCML');
+h_leg = legend('SCM','CC','KA-CE','ML');
 xlabel('\sigma^2','FontSize',10)
 ylabel('Error','FontSize',10)
 set(gca,'FontSize',10)
 set(h_leg,'Location','SouthEast')
 % axis([0,10,0,100])
-
-
-% figure
-% indexs = [1:9,20:101];%
-% hold on 
-% plot(sigma_t(indexs),m_errorRSCM(indexs),'k--','LineWidth',2)
-% plot(sigma_t(indexs),m_errorRCC(indexs),'k-.','LineWidth',2)
-% % plot(sigma_t,m_errorRCCIter_new,'b','LineWidth',2)
-% plot(sigma_t(indexs),m_errorRCCIter(indexs),'k','LineWidth',2)
-% plot(sigma_t(indexs),m_errorRCCML(indexs),'k:','LineWidth',2)
-% % plot(sigma_t,m_errorR_2,'y','LineWidth',2)
-% grid on

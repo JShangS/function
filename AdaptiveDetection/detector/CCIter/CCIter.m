@@ -3,12 +3,12 @@ clear
 close all
 %%%%参数设置
 n = 2; %几倍的样本
-str_train = 'p';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
+str_train = 'g';%%训练数据分布，p:IG纹理复合高斯，k：k分布，g：gauss
 lambda = 3;
 mu = 1;
 opt_train = 1; %%%IG的选项，1为每个距离单元IG纹理都不同
 rou = 0.95;  %%协方差矩阵生成的迟滞因子
-sigma_t = 0.1;
+sigma_t = 0.5;
 %%%%假设参数设置
 Na = 2;     % 阵元数
 Np = 4;     % 脉冲数
@@ -51,7 +51,7 @@ parfor i = 1:MonteCarloPfa
     R_NSCM = (fun_NSCMN(Train));
 
     R_CC = fun_CC(Train,R_SCM,R_KA);
-    if sigma_t <0.7
+    if sigma_t <0.5
         R_CCIter = fun_CCIter2(Train,R_SCM,R_KA);
     else
         R_CCIter = fun_CCIter(Train,R_SCM,R_KA);
@@ -62,19 +62,26 @@ parfor i = 1:MonteCarloPfa
     R_H = 0.5 * R_KA + 0.5 * R_SCM;
     %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%% ANMF_SCM
-    Tanmf_SCM(i) = fun_ANMF(R_SCM,x0,s);
+    Tanmf_SCM(i) = fun_KGLRT(R_SCM,x0,s);
+%     Tanmf_SCM(i) = fun_AMF(R_SCM,x0,s);
     %%%%%% ANMF_NSCM
-    Tanmf_NSCM(i) = fun_ANMF(R_NSCM,x0,s);
+    Tanmf_NSCM(i) = fun_KGLRT(R_NSCM,x0,s);
+%     Tanmf_NSCM(i) = fun_AMF(R_NSCM,x0,s);
     %%%%%% NMF
-    Tnmf(i) = fun_ANMF(rouR,x0,s);
+    Tnmf(i) = fun_KGLRT(rouR,x0,s);
+%      Tnmf(i) = fun_AMF(rouR,x0,s);
     %%%%%% ANMF_CCIter
-    Tanmf_CCIter(i) = fun_ANMF(R_CCIter,x0,s);
+    Tanmf_CCIter(i) = fun_KGLRT(R_CCIter,x0,s);
+%     Tanmf_CCIter(i) = fun_AMF(R_CCIter,x0,s);
     %%%%%% ANMF_ML
-    Tanmf_ML(i) = fun_ANMF(R_ML,x0,s);
+    Tanmf_ML(i) = fun_KGLRT(R_ML,x0,s);
+%     Tanmf_ML(i) = fun_AMF(R_ML,x0,s);
     %%%%%% ANMF_CC
-    Tanmf_CC(i) = fun_ANMF(R_CC,x0,s);
+    Tanmf_CC(i) = fun_KGLRT(R_CC,x0,s);
+%     Tanmf_CC(i) = fun_AMF(R_CC,x0,s);
     %%%%%% ANMF_half
-    Tanmf_H(i) = fun_ANMF(R_H,x0,s);
+    Tanmf_H(i) = fun_KGLRT(R_H,x0,s);
+%     Tanmf_H(i) = fun_AMF(R_H,x0,s);
 end
 toc
 TANMF_SCM=sort(Tanmf_SCM,'descend');
@@ -130,7 +137,7 @@ for m=1:length(SNRout)
     
         R_NSCM = (fun_NSCMN(Train));
         
-       if sigma_t <0.7
+       if sigma_t <0.5
             R_CCIter = fun_CCIter2(Train,R_SCM,R_KA);
        else
             R_CCIter = fun_CCIter(Train,R_SCM,R_KA);
@@ -145,19 +152,26 @@ for m=1:length(SNRout)
         x0=alpha(m)*s+x0;%+pp;    %%%%%%%  重要  %%%%%%%%%%%%%
         %%%检测器%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%% AMF
-        Tscm = fun_ANMF(R_SCM,x0,s);
+        Tscm = fun_KGLRT(R_SCM,x0,s);
+%         Tscm = fun_AMF(R_SCM,x0,s);
         %%%%%% ANMF_NSCM
-        Tnscm = fun_ANMF(R_NSCM,x0,s);
+        Tnscm = fun_KGLRT(R_NSCM,x0,s);
+%         Tnscm = fun_AMF(R_NSCM,x0,s);
         %%%%%% NMF
-        Tnmf = fun_ANMF(rouR,x0,s);
+        Tnmf = fun_KGLRT(rouR,x0,s);
+%         Tnmf = fun_AMF(rouR,x0,s);
         %%%%%% ANMF_CCIter
-        Tcciter = fun_ANMF(R_CCIter,x0,s);
+        Tcciter = fun_KGLRT(R_CCIter,x0,s);
+%         Tcciter = fun_AMF(R_CCIter,x0,s);
         %%%%%% ANMF_KL
-        Tml = fun_ANMF(R_ML,x0,s);
+        Tml = fun_KGLRT(R_ML,x0,s);
+%         Tml = fun_AMF(R_ML,x0,s);
         %%%%%% ANMF_CC
-        Tcc = fun_ANMF(R_CC,x0,s);
+        Tcc = fun_KGLRT(R_CC,x0,s);
+%         Tcc = fun_AMF(R_CC,x0,s);
         %%%%%% ANMF_CC
-        Thh = fun_ANMF(R_H,x0,s);
+        Thh = fun_KGLRT(R_H,x0,s);
+%         Thh = fun_AMF(R_H,x0,s);
         %%%判断%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
         if Tscm>Th_SCM;          counter_scm=counter_scm+1;        end                
         if Tnscm>Th_NSCM;       counter_nscm=counter_nscm+1;    end   
@@ -179,15 +193,16 @@ toc
 close(h)
 figure(1);
 hold on
-% plot(SNRout,Pd_NMF_mc,'k','linewidth',1)
-plot(SNRout,Pd_SCM_mc,'k-+','linewidth',1)
+% plot(SNRout,Pd_NMF_mc,'c','linewidth',2)
+plot(SNRout,Pd_SCM_mc,'r','linewidth',2)
 % plot(SNRout,Pd_NSCM_mc,'k.-','linewidth',1)
-plot(SNRout,Pd_CCIter_mc,'k-*','linewidth',1)
-plot(SNRout,Pd_ML_mc,'k-o','linewidth',1)
-plot(SNRout,Pd_CC_mc,'k-s','linewidth',1)
+plot(SNRout,Pd_CC_mc,'b','linewidth',2)
+plot(SNRout,Pd_CCIter_mc,'g','linewidth',2)
+plot(SNRout,Pd_ML_mc,'k','linewidth',2)
+
 % plot(SNRout,Pd_H_mc,'k-^','linewidth',1)
-h_leg = legend('NMF with SCM',...
-'NMF with CCIter','NMF with ML','NMF with CC');
+h_leg = legend('KGLRT with SCM',...
+'KGLRT with CC','KGLRT with KA-CE','KGLRT with ML');
 
 % h_leg = legend('NMF with correct covariance','NMF with SCM','NMF with NSCM',...
 % 'NMF with CCIter','NMF with ML','NMF with CC','NMF with H');
@@ -198,6 +213,6 @@ set(gca,'FontSize',20)
 set(h_leg,'Location','SouthEast')
 axis([min(SNRout),max(SNRout),0,1])
 grid on
-str = [str_train,'_CCIter','_',num2str(n),'N','_s',num2str(sigma_t),'.mat'];
+str = [str_train,'_CCIter_KGLRT','_',num2str(n),'N','_s',num2str(sigma_t),'.mat'];
 save (str); 
 
